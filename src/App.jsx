@@ -7,8 +7,8 @@ export default function App() {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      {/* Header fijo (h-16): compensamos con pt-16 */}
-      <main className="flex-1 pt-16 md:pt-20">
+      {/* Header fijo (h-20): compensamos con pt-20 */}
+      <main className="flex-1 pt-20 md:pt-24">
         {/* ⛔️ sin wrapper global para permitir secciones full-bleed */}
         <Outlet />
       </main>
