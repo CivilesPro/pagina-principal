@@ -32,7 +32,7 @@ export default function Home() {
       <section className="pt-10 md:pt-14 pb-16 text-center">
         <div className="wrap-wide px-4">
           <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-primary">
-            Somos una comunidad de la construcción
+            Todo lo que un proyecto necesita, en un solo lugar
           </h1>
           <p className="mt-5 mx-auto max-w-2xl text-lg text-gray-700">
             Ingenieros, arquitectos y maestros de obra compartiendo recursos, plantillas y herramientas para que tu obra sea más <b>rápida</b> y <b>confiable</b>.
