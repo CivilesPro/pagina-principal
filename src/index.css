@@ -16,3 +16,17 @@ body { margin: 0; background: #fff; color: #111; }
 .wrap       { @apply mx-auto w-full max-w-7xl; }            /* ~1280px */
 .wrap-wide  { @apply mx-auto w-full max-w-screen-2xl; }     /* ~1536px */
 .wrap-fluid { @apply w-full; }                               /* 100% */
+
+/* Announcement bar marquee */
+@keyframes announcement-marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.announcement-track {
+  animation: announcement-marquee 25s linear infinite;
+}
