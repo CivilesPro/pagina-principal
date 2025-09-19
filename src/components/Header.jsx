@@ -50,11 +50,11 @@ export default function Header() {
           </nav>
 
           <div className="flex items-center gap-3">
-            <NavLink to="/planes" className="btn-outline whitespace-nowrap">
-              Ver planes
+            <NavLink to="https://app.civilespro.com/register" className="btn-outline whitespace-nowrap">
+              Registrarse
             </NavLink>
             <NavLink
-              to="/entrar"
+              to="https://app.civilespro.com/login"
               className="btn"
               style={{ backgroundColor: SECONDARY, color: "white", borderColor: SECONDARY }}
             >
