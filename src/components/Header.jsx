@@ -16,7 +16,7 @@ const baseLinkClasses =
 
 export default function Header() {
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-gray-200 bg-white/95 backdrop-blur">
+    <header className="fixed inset-x-0 top-[36px] md:top-[40px] z-50 border-b border-gray-200 bg-white/95 backdrop-blur">
       <div className="wrap-wide px-4">
         <div className="flex h-20 items-center gap-6">
           <a href="/" aria-label="Inicio" className="shrink-0">
