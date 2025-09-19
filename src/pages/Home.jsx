@@ -2,6 +2,9 @@
 import React from "react"
 import SEO from "../components/SEO.jsx"
 import BimServiceCard from "../components/BimServiceCard.jsx"
+import ServiceCard from "../components/ServiceCard.jsx"
+import ExpandableCard from "../components/ExpandableCard.jsx"
+import FormatsGrid from "../components/FormatsGrid.jsx"
 
 export default function Home() {
   const jsonLd = {
@@ -18,6 +21,31 @@ export default function Home() {
     "description":
       "Comunidad de ingenieros, arquitectos y maestros de obra. Calcula materiales, genera presupuestos con APU y exporta a Excel.",
   }
+
+  const pebItems = [
+    "Definición de roles y responsabilidades.",
+    "Procesos de trabajo colaborativos.",
+    "Estándares y normas internacionales.",
+    "Entregables BIM claros y estructurados.",
+  ]
+
+  const lodItems = [
+    "LOD 100: Idea / Anteproyecto conceptual.",
+    "LOD 200: Diseño preliminar.",
+    "LOD 300: Geometría precisa y coordinación.",
+    "LOD 400: Construcción y documentación.",
+    "LOD 500: Proyecto final para operación y mantenimiento.",
+  ]
+
+  const projectItems = [
+    "Nave Industrial (Arquitectura + Estructuras).",
+    "Vivienda Unifamiliar (Arquitectura).",
+    "Edificio Residencial (Arquitectura + MEP).",
+    "Hospital de Primer Nivel (Arquitectura + Estructuras + MEP).",
+    "Bloque Escolar (Arquitectura + Estructuras).",
+    "Centros de Atención IPS (Arquitectura).",
+    "Edificio Multifuncional (Estructuras).",
+  ]
 
   return (
     <>
@@ -56,13 +84,26 @@ export default function Home() {
 
           {/* Tarjeta hero de Modelado BIM */}
           <div className="mt-8">
-            <BimServiceCard />
+            <BimServiceCard
+              title={"Modelado BIM\nbajo protocolos ISO 19650"}
+              subtitle="Integramos todas las disciplinas en un solo proyecto, asegurando eficiencia y coordinación desde la etapa conceptual hasta la construcción."
+            />
           </div>
 
-          <div className="mt-10 text-center">
-            <a href="/servicios" className="btn-outline">
-              Ver todos los servicios
-            </a>
+          <div className="mt-10 grid gap-6 lg:grid-cols-2">
+            <ServiceCard title="Planes de Ejecución BIM (PEB)" items={pebItems} />
+
+            <ExpandableCard
+              title="LOD – Niveles de Desarrollo"
+              intro="Adaptamos el nivel de detalle según la etapa del proyecto."
+              items={lodItems}
+            />
+
+            <ServiceCard title="Proyectos Ejecutados" items={projectItems} />
+
+            <div className="lg:col-span-2">
+              <FormatsGrid />
+            </div>
           </div>
         </div>
       </section>
