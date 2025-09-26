@@ -42,10 +42,6 @@ export default function ProductosPage() {
     setSelectedProduct(product)
   }, [])
 
-  const handleCloseModal = React.useCallback(() => {
-    setSelectedProduct(null)
-  }, [])
-
   React.useEffect(() => {
     const paramCurrency = normalizeCurrency(searchParams.get("currency"))
     if (paramCurrency && paramCurrency !== currency) {
@@ -203,11 +199,14 @@ export default function ProductosPage() {
         </div>
       </section>
 
-      <ProductModal
-        product={selectedProduct}
-        currency={currency}
-        onClose={handleCloseModal}
-      />
+      {selectedProduct && (
+        <ProductModal
+          isOpen={true}
+          product={selectedProduct}
+          currency={currency}
+          onClose={() => setSelectedProduct(null)}
+        />
+      )}
     </>
   )
 }
