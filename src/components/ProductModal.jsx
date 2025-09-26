@@ -3,6 +3,29 @@ import React from "react";
 /* Utils */
 const cx = (...c) => c.filter(Boolean).join(" ");
 
+async function parseSafe(res) {
+  const contentType = res.headers?.get?.("content-type") || "";
+  const text = await res.text();
+
+  if (!text) {
+    return { message: `HTTP ${res.status}` };
+  }
+
+  if (contentType.includes("application/json")) {
+    try {
+      return JSON.parse(text);
+    } catch (error) {
+      console.error("Error parsing JSON response", error);
+    }
+  }
+
+  try {
+    return JSON.parse(text);
+  } catch (error) {
+    return { message: text };
+  }
+}
+
 /* Cargar PayPal SDK (una vez) */
 function usePayPalSDK(clientId) {
   const [ready, setReady] = React.useState(!!window.paypal);
@@ -33,6 +56,7 @@ function useRenderPayPalButtons({ enabled, createOrder, onApprove, onError }) {
       createOrder,
       onApprove,
       onError,
+      funding: { disallowed: [window.paypal.FUNDING.CARD] },
     });
     btns.render(ref.current);
     return () => {
@@ -82,10 +106,17 @@ export default function ProductModal({ isOpen = true, product, currency = "COP",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ slug: product.slug, currency }),
       });
-      const data = await res.json();
-      if (!res.ok || !data?.orderID) throw new Error(data?.message || "No se pudo crear la orden.");
+      const data = await parseSafe(res);
+      if (!res.ok || !data?.orderID) {
+        throw new Error(data?.message || data?.detail || "No se pudo crear la orden.");
+      }
       setOrderId(data.orderID);
       return data.orderID;
+    } catch (error) {
+      const message = error?.message || "No se pudo crear la orden.";
+      setOrderId(null);
+      setErrorMsg(message);
+      throw error;
     } finally { setCreating(false); }
   }, [product?.slug, currency]);
 
@@ -97,10 +128,13 @@ export default function ProductModal({ isOpen = true, product, currency = "COP",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ orderID: data.orderID }),
       });
-      const out = await res.json();
-      if (!res.ok || !out?.downloadUrl) throw new Error(out?.message || "Error capturando pago.");
+      const out = await parseSafe(res);
+      if (!res.ok || !out?.downloadUrl) {
+        throw new Error(out?.message || out?.detail || "Error capturando el pago.");
+      }
       setPaid(true); setDownloadUrl(out.downloadUrl);
     } catch (e) {
+      setPaid(false); setDownloadUrl(null);
       setErrorMsg(e.message || "Error al procesar el pago.");
     } finally { setCapturing(false); }
   }, []);

@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import os
-from typing import List
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -15,17 +14,23 @@ init_db()
 
 app = FastAPI(title="Civiles Pro API", version="1.0.0")
 
-raw_origins = os.environ.get("CORS_ORIGINS", "*")
-if raw_origins == "*":
-    allowed_origins: List[str] = ["*"]
+DEFAULT_FRONTEND_ORIGIN = "http://localhost:5173"
+raw_origins = os.environ.get("CORS_ORIGINS")
+
+allowed_origins = {DEFAULT_FRONTEND_ORIGIN}
+if raw_origins:
+    allowed_origins.update({origin.strip() for origin in raw_origins.split(",") if origin.strip()})
+
+if "*" in allowed_origins:
+    allow_origins = ["*"]
     allow_credentials = False
 else:
-    allowed_origins = [origin.strip() for origin in raw_origins.split(",") if origin.strip()]
+    allow_origins = sorted(allowed_origins)
     allow_credentials = True
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allowed_origins,
+    allow_origins=allow_origins,
     allow_methods=["*"],
     allow_headers=["*"],
     allow_credentials=allow_credentials,
