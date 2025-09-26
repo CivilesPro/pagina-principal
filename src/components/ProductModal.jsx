@@ -1,534 +1,352 @@
-import React from "react"
-import fakeReviews from "../data/fakeReviews.json"
-import { formatPrice } from "../utils/formatPrice.js"
+// src/components/ProductModal.jsx
+import React from "react";
 
-const PAYPAL_CLIENT_ID = import.meta.env.VITE_PAYPAL_CLIENT_ID
+/* ================== Utils ================== */
+const cx = (...c) => c.filter(Boolean).join(" ");
 
-function useLockBodyScroll(active) {
+/* Carga el SDK de PayPal una sola vez por app */
+function usePayPalSDK(clientId) {
+  const [ready, setReady] = React.useState(!!window.paypal);
+
   React.useEffect(() => {
-    if (!active) return undefined
-    const original = document.body.style.overflow
-    document.body.style.overflow = "hidden"
-    return () => {
-      document.body.style.overflow = original
+    if (window.paypal) {
+      setReady(true);
+      return;
     }
-  }, [active])
+    if (!clientId) return;
+
+    const id = "paypal-sdk-script";
+    if (document.getElementById(id)) return; // ya agregado
+
+    const s = document.createElement("script");
+    s.id = id;
+    s.src = `https://www.paypal.com/sdk/js?client-id=${clientId}`;
+    s.async = true;
+    s.onload = () => setReady(true);
+    s.onerror = () => setReady(false);
+    document.body.appendChild(s);
+  }, [clientId]);
+
+  return ready;
 }
 
-function usePayPalButtons({ clientId, currency, dependencyKey, createOrder, onApprove, onError }) {
-  const containerRef = React.useRef(null)
+/* Renderizador de PayPal Buttons en un contenedor DOM */
+function useRenderPayPalButtons({ enabled, createOrder, onApprove, onError }) {
+  const containerRef = React.useRef(null);
 
   React.useEffect(() => {
-    if (!clientId || !dependencyKey) return undefined
-    const container = containerRef.current
-    if (!container) return undefined
+    if (!enabled) return;
+    if (!window.paypal || !containerRef.current) return;
 
-    container.innerHTML = ""
+    // limpiar render anterior (si lo hubiera)
+    containerRef.current.innerHTML = "";
 
-    const removeExistingScripts = () => {
-      const scripts = document.querySelectorAll("script[data-paypal-sdk]")
-      scripts.forEach((script) => {
-        if (
-          script instanceof HTMLScriptElement &&
-          (script.dataset.currency !== currency || script.dataset.clientId !== clientId)
-        ) {
-          script.remove()
-        }
-      })
-    }
+    const btns = window.paypal.Buttons({
+      style: { layout: "vertical", shape: "rect", label: "paypal" },
+      createOrder,
+      onApprove,
+      onError,
+    });
 
-    removeExistingScripts()
+    btns.render(containerRef.current);
 
-    let isMounted = true
-
-    const renderButtons = () => {
-      if (!isMounted || typeof window === "undefined" || !window.paypal) return
+    return () => {
       try {
-        const buttons = window.paypal.Buttons({
-          style: {
-            shape: "rect",
-            layout: "vertical",
-            label: "paypal",
-            height: 48,
-            color: "gold",
-          },
-          fundingSource: window.paypal.FUNDING.PAYPAL,
-          createOrder,
-          onApprove,
-          onError,
-        })
+        btns.close();
+      } catch (_) {}
+      if (containerRef.current) containerRef.current.innerHTML = "";
+    };
+  }, [enabled, createOrder, onApprove, onError]);
 
-        buttons.render(container).catch((err) => {
-          console.error("paypal.render", err)
-          onError?.(err)
-        })
-      } catch (error) {
-        console.error("paypal.buttons", error)
-        onError?.(error)
-      }
-    }
-
-    const existingScript = document.querySelector(
-      `script[data-paypal-sdk][data-currency="${currency}"][data-client-id="${clientId}"]`,
-    )
-
-    if (existingScript) {
-      if (existingScript.hasAttribute("data-loaded") && window.paypal) {
-        renderButtons()
-      } else {
-        existingScript.addEventListener("load", renderButtons, { once: true })
-        existingScript.addEventListener(
-          "error",
-          () => onError?.(new Error("No se pudo cargar el SDK de PayPal.")),
-          { once: true },
-        )
-      }
-    } else {
-      const script = document.createElement("script")
-      script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&currency=${currency}`
-      script.async = true
-      script.dataset.paypalSdk = "true"
-      script.dataset.currency = currency
-      script.dataset.clientId = clientId
-      script.addEventListener("load", () => {
-        script.setAttribute("data-loaded", "true")
-        renderButtons()
-      })
-      script.addEventListener("error", () => {
-        onError?.(new Error("No se pudo cargar el SDK de PayPal."))
-      })
-      document.body.appendChild(script)
-    }
-
-    return () => {
-      isMounted = false
-    }
-  }, [clientId, currency, dependencyKey, createOrder, onApprove, onError])
-
-  return containerRef
+  return containerRef;
 }
 
-function StarRating({ value, size = "md" }) {
-  const rounded = Math.round(value)
-  return (
-    <div className={`flex items-center gap-1 ${size === "sm" ? "text-sm" : "text-lg"}`} aria-hidden="true">
-      {Array.from({ length: 5 }).map((_, index) => (
-        <span key={index} className={index < rounded ? "text-amber-500" : "text-gray-300"}>
-          ★
-        </span>
-      ))}
-    </div>
-  )
-}
+/* ================== Modal ================== */
+export default function ProductModal({
+  isOpen = true,
+  product,
+  currency = "COP",
+  onClose,
+}) {
+  const PAYPAL_CLIENT_ID = import.meta.env.VITE_PAYPAL_CLIENT_ID;
 
-function ReviewCard({ review }) {
-  const formattedDate = React.useMemo(() => {
+  /* --------- HOOKS: siempre al tope y en mismo orden --------- */
+  const [activeIndex, setActiveIndex] = React.useState(0);
+  const [orderId, setOrderId] = React.useState(null);
+  const [creating, setCreating] = React.useState(false);
+  const [capturing, setCapturing] = React.useState(false);
+  const [paid, setPaid] = React.useState(false);
+  const [downloadUrl, setDownloadUrl] = React.useState(null);
+  const [errorMsg, setErrorMsg] = React.useState(null);
+
+  // imágenes del producto
+  const images = React.useMemo(() => {
+    const arr =
+      (product?.images && product.images.length > 0
+        ? product.images
+        : [product?.image].filter(Boolean)) || [];
+    // forzar 1:1 consistencia; no tocar si ya están bien
+    return arr;
+  }, [product?.images, product?.image, product?.slug]);
+
+  // reset por cambio de producto
+  React.useEffect(() => {
+    setActiveIndex(0);
+    setOrderId(null);
+    setCreating(false);
+    setCapturing(false);
+    setPaid(false);
+    setDownloadUrl(null);
+    setErrorMsg(null);
+  }, [product?.slug]);
+
+  // SDK listo
+  const paypalReady = usePayPalSDK(PAYPAL_CLIENT_ID);
+
+  // crear orden en backend (no depende del SDK)
+  const createOrder = React.useCallback(async () => {
+    if (!product?.slug) throw new Error("Producto inválido.");
     try {
-      return new Intl.DateTimeFormat("es-CO", { dateStyle: "medium" }).format(new Date(review.date))
-    } catch (error) {
-      console.warn("Fecha de reseña inválida", review.date, error)
-      return review.date
-    }
-  }, [review.date])
-
-  return (
-    <article className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
-      <div className="flex items-center justify-between gap-3">
-        <div>
-          <p className="font-semibold text-gray-900">{review.name}</p>
-          <p className="text-xs text-gray-500">{formattedDate}</p>
-        </div>
-        <StarRating value={review.rating} size="sm" />
-      </div>
-      <p className="mt-3 text-sm leading-relaxed text-gray-700">{review.text}</p>
-    </article>
-  )
-}
-
-export default function ProductModal({ product, currency, onClose }) {
-  const [activeIndex, setActiveIndex] = React.useState(0)
-  const [orderId, setOrderId] = React.useState(null)
-  const [loadingOrder, setLoadingOrder] = React.useState(false)
-  const [capturing, setCapturing] = React.useState(false)
-  const [paid, setPaid] = React.useState(false)
-  const [downloadUrl, setDownloadUrl] = React.useState(null)
-  const [errorMsg, setErrorMsg] = React.useState(null)
-
-  const dialogRef = React.useRef(null)
-  const closeButtonRef = React.useRef(null)
-
-  const isOpen = Boolean(product)
-  const isPurchasable = React.useMemo(() => {
-    if (!product) return false
-    return product.priceCop != null && Boolean(product.fileKey)
-  }, [product])
-
-  const productImages = React.useMemo(() => {
-    if (!product) return []
-    if (product.images && product.images.length > 0) {
-      return product.images
-    }
-    return product.image ? [product.image] : []
-  }, [product])
-
-  const reviews = React.useMemo(() => {
-    if (!product) return []
-    return fakeReviews[product.slug] ?? []
-  }, [product])
-
-  const averageRating = React.useMemo(() => {
-    if (!reviews.length) return 5
-    const total = reviews.reduce((sum, review) => sum + review.rating, 0)
-    return total / reviews.length
-  }, [reviews])
-
-  const formattedPrice = React.useMemo(() => {
-    if (!product) return null
-    return formatPrice(product.priceCop, currency)
-  }, [currency, product])
-
-  const formattedYearPrice = React.useMemo(() => {
-    if (!product || product.priceCopYear == null) return null
-    return formatPrice(product.priceCopYear, currency)
-  }, [currency, product])
-
-  const descriptionParagraphs = React.useMemo(() => {
-    if (!product?.description) return []
-    return product.description
-      .split("\n")
-      .map((paragraph) => paragraph.trim())
-      .filter(Boolean)
-  }, [product])
-
-  useLockBodyScroll(isOpen)
-
-  React.useEffect(() => {
-    if (!isOpen) return undefined
-
-    const handler = (event) => {
-      if (event.key === "Escape") {
-        event.preventDefault()
-        onClose?.()
-      }
-    }
-
-    window.addEventListener("keydown", handler)
-    return () => window.removeEventListener("keydown", handler)
-  }, [isOpen, onClose])
-
-  React.useEffect(() => {
-    if (!isOpen) return
-    const element = dialogRef.current
-    if (element) {
-      element.focus()
-    }
-    const timeout = window.setTimeout(() => {
-      closeButtonRef.current?.focus()
-    }, 150)
-
-    return () => window.clearTimeout(timeout)
-  }, [isOpen])
-
-  React.useEffect(() => {
-    if (!isOpen) return
-    setActiveIndex(0)
-    setOrderId(null)
-    setPaid(false)
-    setDownloadUrl(null)
-    setErrorMsg(null)
-  }, [isOpen, product])
-
-  const fetchOrder = React.useCallback(async () => {
-    if (!product || !isPurchasable) {
-      return
-    }
-
-    if (!PAYPAL_CLIENT_ID) {
-      setErrorMsg("Configuración de PayPal incompleta. Contacta al administrador.")
-      return
-    }
-
-    setLoadingOrder(true)
-    setErrorMsg(null)
-    setOrderId(null)
-
-    try {
-      const response = await fetch("/api/paypal/create-order", {
+      setCreating(true);
+      setErrorMsg(null);
+      const res = await fetch("/api/paypal/create-order", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          slug: product.slug,
-          currency,
-        }),
-      })
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-        const message = errorData?.detail || "No se pudo iniciar el pago."
-        throw new Error(message)
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug: product.slug, currency }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data?.orderID) {
+        throw new Error(data?.message || "No se pudo crear la orden.");
       }
-
-      const data = await response.json()
-      if (!data?.orderID) {
-        throw new Error("Respuesta inválida del servidor.")
-      }
-      setOrderId(data.orderID)
-    } catch (error) {
-      console.error("create-order", error)
-      setErrorMsg(error.message || "No se pudo iniciar el pago.")
+      setOrderId(data.orderID);
+      return data.orderID;
+    } catch (e) {
+      setErrorMsg(e.message || "Error creando la orden.");
+      throw e;
     } finally {
-      setLoadingOrder(false)
+      setCreating(false);
     }
-  }, [currency, isPurchasable, product])
+  }, [product?.slug, currency]);
 
-  React.useEffect(() => {
-    if (!isOpen) return
-    if (!isPurchasable) {
-      return
-    }
-    fetchOrder()
-  }, [fetchOrder, isOpen, isPurchasable])
-
-  const handlePayPalError = React.useCallback((error) => {
-    console.error("paypal-error", error)
-    setErrorMsg(error?.message || "Ocurrió un error con PayPal. Intenta nuevamente.")
-  }, [])
-
-  const handleApprove = React.useCallback(async () => {
-    if (!orderId) {
-      handlePayPalError(new Error("Orden no disponible."))
-      return
-    }
-
-    setCapturing(true)
-    setErrorMsg(null)
-
-    try {
-      const response = await fetch("/api/paypal/capture-order", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ orderID: orderId }),
-      })
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-        const message = errorData?.detail || "No se pudo completar el pago."
-        throw new Error(message)
+  // capturar pago en backend
+  const onApprove = React.useCallback(
+    async (data) => {
+      try {
+        setCapturing(true);
+        setErrorMsg(null);
+        const res = await fetch("/api/paypal/capture-order", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ orderID: data.orderID }),
+        });
+        const out = await res.json();
+        if (!res.ok || !out?.downloadUrl) {
+          throw new Error(out?.message || "Error capturando el pago.");
+        }
+        setPaid(true);
+        setDownloadUrl(out.downloadUrl);
+      } catch (e) {
+        setErrorMsg(e.message || "Error al procesar el pago.");
+      } finally {
+        setCapturing(false);
       }
+    },
+    []
+  );
 
-      const data = await response.json()
-      if (!data?.downloadUrl) {
-        throw new Error("No se recibió el enlace de descarga.")
-      }
+  const onError = React.useCallback((err) => {
+    setErrorMsg(err?.message || "Error en PayPal.");
+  }, []);
 
-      setPaid(true)
-      setDownloadUrl(data.downloadUrl)
-      setErrorMsg(null)
-    } catch (error) {
-      console.error("capture-order", error)
-      setErrorMsg(error.message || "No se pudo completar el pago.")
-    } finally {
-      setCapturing(false)
-    }
-  }, [handlePayPalError, orderId])
+  // Renderizar botones cuando SDK listo
+  const paypalContainerRef = useRenderPayPalButtons({
+    enabled: paypalReady && !paid,
+    createOrder,
+    onApprove,
+    onError,
+  });
 
-  const createOrderCallback = React.useCallback(() => {
-    if (!orderId) {
-      return Promise.reject(new Error("Orden no disponible."))
-    }
-    return orderId
-  }, [orderId])
-
-  const paypalDependencyKey = !paid && orderId ? `${orderId}-${currency}` : null
-  const paypalContainerRef = usePayPalButtons({
-    clientId: PAYPAL_CLIENT_ID,
-    currency,
-    dependencyKey: paypalDependencyKey,
-    createOrder: createOrderCallback,
-    onApprove: handleApprove,
-    onError: handlePayPalError,
-  })
-
-  if (!isOpen) {
-    return null
-  }
-
+  // Botón reintentar crear orden (no es un hook condicional)
   const handleRetry = React.useCallback(() => {
-    if (!loadingOrder) {
-      fetchOrder()
-    }
-  }, [fetchOrder, loadingOrder])
+    if (!creating) createOrder().catch(() => {});
+  }, [creating, createOrder]);
 
-  const modalTitleId = `product-modal-${product.slug}`
+  // (Opción segura) no hacemos early return condicional de hooks.
+  // Si quieres ocultar visualmente cuando isOpen = false:
+  if (!isOpen) return null;
+
+  const canClose = !capturing; // bloquear cierre durante captura
+  const titleId = `modal-title-${product?.slug || "producto"}`;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4 py-6" onClick={onClose}>
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby={titleId}
+      className="fixed inset-0 z-50 flex items-center justify-center"
+    >
+      {/* Overlay */}
       <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={modalTitleId}
-        ref={dialogRef}
-        tabIndex={-1}
-        className="relative max-h-[calc(100vh-48px)] w-full max-w-5xl overflow-hidden rounded-3xl bg-white shadow-2xl focus:outline-none"
-        onClick={(event) => event.stopPropagation()}
-      >
-        <button
-          ref={closeButtonRef}
-          type="button"
-          onClick={onClose}
-          className="absolute right-4 top-4 rounded-full bg-white/90 p-2 text-gray-700 shadow focus:outline-none focus:ring-2 focus:ring-emerald-500"
-          aria-label="Cerrar"
-        >
-          <span aria-hidden="true">✕</span>
-        </button>
+        className="absolute inset-0 bg-black/60"
+        onClick={() => canClose && onClose?.()}
+      />
 
-        <div className="grid h-full gap-6 overflow-hidden lg:grid-cols-[1fr_520px]">
-          <div className="order-2 flex flex-col overflow-hidden lg:order-1">
-            <div className="flex-1 overflow-y-auto px-6 pb-10 pt-10 lg:max-h-[calc(100vh-96px)] lg:pr-8">
-              <div className="flex flex-col gap-6">
-                <header className="space-y-3">
-                  <span className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-600">
-                    <StarRating value={averageRating} />
-                    <span className="text-xs text-gray-500">
-                      {reviews.length > 0 ? `${averageRating.toFixed(1)} · ${reviews.length} reseñas` : "Nuevo"}
-                    </span>
-                  </span>
-                  <h2 id={modalTitleId} className="text-2xl font-bold text-gray-900 md:text-3xl">
-                    {product.title}
-                  </h2>
-                  <div className="space-y-1 text-gray-900">
-                    {formattedYearPrice ? (
-                      <>
-                        <p className="text-xl font-semibold">Plan mensual: {formattedPrice}</p>
-                        <p className="text-sm text-gray-600">
-                          Plan anual: <span className="font-semibold text-gray-900">{formattedYearPrice}</span>
-                        </p>
-                      </>
-                    ) : (
-                      <p className="text-xl font-semibold">{formattedPrice}</p>
-                    )}
+      {/* Modal */}
+      <div className="relative z-10 w-full max-w-6xl rounded-2xl bg-white p-6 shadow-xl">
+        {/* Header */}
+        <div className="mb-4 flex items-start justify-between gap-4">
+          <h3 id={titleId} className="text-2xl font-bold text-gray-900">
+            {product?.title || "Producto"}
+          </h3>
+
+          <button
+            type="button"
+            onClick={() => canClose && onClose?.()}
+            disabled={!canClose}
+            className={cx(
+              "inline-flex h-9 w-9 items-center justify-center rounded-full border text-gray-600 hover:bg-gray-50",
+              !canClose && "opacity-60 cursor-not-allowed"
+            )}
+            aria-label="Cerrar"
+          >
+            ✕
+          </button>
+        </div>
+
+        {/* Body: 2 columnas */}
+        <div className="grid gap-6 lg:grid-cols-[1fr_520px]">
+          {/* IZQUIERDA: panel con scroll independiente */}
+          <div className="max-h-[calc(100vh-220px)] overflow-y-auto pr-2">
+            {/* Estrellas fake */}
+            <div className="mb-2 flex items-center gap-1 text-amber-500">
+              {"★★★★★".split("").map((s, i) => (
+                <span key={`star-${i}`} aria-hidden>
+                  ★
+                </span>
+              ))}
+              <span className="ml-2 text-sm text-gray-500">(128 reseñas)</span>
+            </div>
+
+            {/* Precio */}
+            <div className="mb-3 text-xl font-semibold text-gray-900">
+              {/* El precio final lo muestras en la tarjeta;
+                  aquí puedes repetirlo si quieres */}
+              {/* Ejemplo: */}
+              {/* {formattedPrice} */}
+            </div>
+
+            {/* Descripción */}
+            <p className="mb-4 text-gray-700">{product?.description}</p>
+
+            {/* PayPal */}
+            <div
+              className="rounded-xl border border-gray-200 p-4"
+              aria-busy={capturing ? "true" : "false"}
+              aria-live="polite"
+            >
+              {!paypalReady && (
+                <p className="text-sm text-gray-500">Cargando PayPal…</p>
+              )}
+
+              <div ref={paypalContainerRef} className="min-h-[48px]" />
+
+              {creating && (
+                <p className="mt-2 text-sm text-gray-500">
+                  Preparando orden…
+                </p>
+              )}
+              {capturing && (
+                <p className="mt-2 text-sm text-gray-500">
+                  Procesando pago…
+                </p>
+              )}
+              {errorMsg && !paid && (
+                <div className="mt-3 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+                  {errorMsg}
+                  <div className="mt-2">
+                    <button
+                      type="button"
+                      onClick={handleRetry}
+                      className="rounded-md border px-3 py-1.5 text-gray-700 hover:bg-gray-50"
+                    >
+                      Reintentar
+                    </button>
                   </div>
-                </header>
-
-                <div className="space-y-4 text-gray-700">
-                  {descriptionParagraphs.map((paragraph, index) => (
-                    <p key={index} className="leading-relaxed">
-                      {paragraph}
-                    </p>
-                  ))}
                 </div>
+              )}
 
-                <div className="mt-4 space-y-4">
-                  {paid ? (
-                    <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 text-emerald-900">
-                      <p className="text-lg font-semibold">Pago exitoso ✅</p>
-                      <p className="mt-1 text-sm">
-                        Tu descarga está lista. El enlace permanecerá activo durante 24 horas.
-                      </p>
-                      <a
-                        href={downloadUrl}
-                        className="mt-4 inline-flex items-center justify-center rounded-xl bg-emerald-600 px-5 py-3 font-semibold text-white shadow hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                      >
-                        Descargar
-                      </a>
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      {loadingOrder ? (
-                        <div className="flex items-center gap-2 rounded-xl border border-dashed border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
-                          <span className="inline-flex h-3 w-3 animate-ping rounded-full bg-emerald-500" aria-hidden="true" />
-                          Preparando pago seguro…
-                        </div>
-                      ) : null}
-
-                      {errorMsg && !loadingOrder ? (
-                        <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-                          <p className="font-semibold">{errorMsg}</p>
-                          {isPurchasable ? (
-                            <button
-                              type="button"
-                              className="mt-3 inline-flex items-center gap-2 rounded-lg border border-red-300 px-3 py-2 text-xs font-semibold text-red-700 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-400"
-                              onClick={handleRetry}
-                            >
-                              Reintentar
-                            </button>
-                          ) : null}
-                        </div>
-                      ) : null}
-
-                      {!loadingOrder && !errorMsg && isPurchasable ? (
-                        <div className="relative">
-                          <div ref={paypalContainerRef} className="min-h-[48px]" />
-                          {capturing ? (
-                            <div className="absolute inset-0 grid place-items-center rounded-lg bg-white/70">
-                              <div className="flex items-center gap-2 text-sm font-semibold text-emerald-700">
-                                <span className="inline-flex h-3 w-3 animate-ping rounded-full bg-emerald-500" aria-hidden="true" />
-                                Procesando pago…
-                              </div>
-                            </div>
-                          ) : null}
-                        </div>
-                      ) : null}
-
-                      {!isPurchasable ? (
-                        <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
-                          Este producto requiere asesoría personalizada para la compra. Escríbenos para coordinar.
-                        </div>
-                      ) : null}
-                    </div>
-                  )}
+              {paid && downloadUrl && (
+                <div className="mt-3 rounded-lg border border-emerald-200 bg-emerald-50 p-3">
+                  <p className="font-medium text-emerald-800">
+                    Pago exitoso ✅
+                  </p>
+                  <a
+                    href={downloadUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-2 inline-flex items-center justify-center rounded-md bg-emerald-700 px-4 py-2 font-semibold text-white hover:bg-emerald-800"
+                  >
+                    Descargar
+                  </a>
                 </div>
+              )}
+            </div>
 
-                <hr className="my-6 border-dashed border-gray-200" />
-
-                <section className="space-y-4">
-                  <h3 className="text-lg font-semibold text-gray-900">Lo que dicen nuestros clientes</h3>
-                  <div className="grid gap-4">
-                    {reviews.map((review) => (
-                      <ReviewCard key={`${review.name}-${review.date}`} review={review} />
-                    ))}
+            {/* Reseñas (fake) */}
+            <div className="mt-6 space-y-4">
+              {[1, 2, 3].map((i) => (
+                <div
+                  key={`${product?.slug || "p"}-rev-${i}`}
+                  className="rounded-xl border border-gray-200 p-4"
+                >
+                  <div className="mb-1 flex items-center justify-between">
+                    <div className="font-semibold text-gray-800">
+                      Usuario {i}
+                    </div>
+                    <div className="text-amber-500" aria-hidden>
+                      ★★★★☆
+                    </div>
                   </div>
-                </section>
-              </div>
+                  <p className="text-sm text-gray-600">
+                    Excelente plantilla, ahorra tiempo y evita errores.
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
 
-          <div className="order-1 border-b border-gray-100 bg-gray-50 px-6 pb-8 pt-14 lg:order-2 lg:border-l lg:border-b-0 lg:bg-white">
-            <div className="lg:sticky lg:top-6">
-              <div className="aspect-square w-full overflow-hidden rounded-2xl bg-gray-100">
-                <img
-                  src={productImages[activeIndex]}
-                  alt={`${product.title} vista ${activeIndex + 1}`}
-                  className="h-full w-full object-contain"
-                />
-              </div>
-              {productImages.length > 1 ? (
-                <div className="mt-4 flex gap-3 overflow-x-auto pb-2">
-                  {productImages.map((imgSrc, index) => {
-                    const isActive = index === activeIndex
-                    return (
-                      <button
-                        type="button"
-                        key={imgSrc + index}
-                        onClick={() => setActiveIndex(index)}
-                        className={`aspect-square h-20 min-w-[5rem] overflow-hidden rounded-xl border transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
-                          isActive ? "border-emerald-500 ring-2 ring-emerald-200" : "border-transparent"
-                        }`}
-                      >
-                        <img src={imgSrc} alt="Miniatura" className="h-full w-full object-contain" />
-                      </button>
-                    )
-                  })}
-                </div>
-              ) : null}
+          {/* DERECHA: carrusel sticky (no se mueve) */}
+          <div className="hidden lg:block lg:sticky lg:top-6">
+            <div className="aspect-square overflow-hidden rounded-2xl bg-gray-100">
+              <img
+                src={images[activeIndex]}
+                alt={`${product?.title || "Producto"} - vista ${activeIndex + 1}`}
+                className="h-full w-full object-contain"
+              />
+            </div>
+
+            <div className="mt-3 flex gap-2 overflow-x-auto">
+              {images.map((src, i) => (
+                <button
+                  key={`${product?.slug || "p"}-thumb-${i}`}
+                  onClick={() => setActiveIndex(i)}
+                  className={cx(
+                    "h-16 w-16 shrink-0 overflow-hidden rounded-lg border bg-white",
+                    i === activeIndex ? "border-emerald-600" : "border-gray-300"
+                  )}
+                  aria-label={`Vista ${i + 1}`}
+                >
+                  <img
+                    src={src}
+                    alt={`Vista ${i + 1}`}
+                    className="h-full w-full object-contain"
+                  />
+                </button>
+              ))}
             </div>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
