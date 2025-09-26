@@ -1,6 +1,7 @@
 import React from "react"
 import { useSearchParams } from "react-router-dom"
 import SEO from "../components/SEO.jsx"
+import ProductModal from "../components/ProductModal.jsx"
 import products from "../data/products.js"
 import { SUPPORTED_CURRENCIES } from "../data/exchangeRates.js"
 import { formatPrice } from "../utils/formatPrice.js"
@@ -34,6 +35,16 @@ export default function ProductosPage() {
 
     return DEFAULT_CURRENCY
   })
+
+  const [selectedProduct, setSelectedProduct] = React.useState(null)
+
+  const handleOpenProduct = React.useCallback((product) => {
+    setSelectedProduct(product)
+  }, [])
+
+  const handleCloseModal = React.useCallback(() => {
+    setSelectedProduct(null)
+  }, [])
 
   React.useEffect(() => {
     const paramCurrency = normalizeCurrency(searchParams.get("currency"))
@@ -166,14 +177,18 @@ export default function ProductosPage() {
                     </div>
                     <button
                       type="button"
-                      className={`h-11 w-full rounded-xl font-semibold shadow transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+                      className={`h-11 w-full rounded-xl font-semibold shadow transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:cursor-not-allowed disabled:opacity-60 ${
                         isConsultation
                           ? "border border-emerald-700 bg-white text-emerald-700 hover:bg-emerald-50"
                           : "bg-emerald-700 text-white hover:bg-emerald-800"
                       }`}
-                      onClick={() => console.log(product.slug)}
+                      onClick={() => {
+                        if (isConsultation) return
+                        handleOpenProduct(product)
+                      }}
+                      disabled={isConsultation}
                     >
-                      Comprar
+                      {isConsultation ? "Solicitar información" : "Comprar"}
                     </button>
                   </div>
                 </article>
@@ -186,6 +201,12 @@ export default function ProductosPage() {
           </div>
         </div>
       </section>
+
+      <ProductModal
+        product={selectedProduct}
+        currency={currency}
+        onClose={handleCloseModal}
+      />
     </>
   )
 }
