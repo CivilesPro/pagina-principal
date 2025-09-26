@@ -138,13 +138,14 @@ export default function ProductosPage() {
                       {badgeLabel}
                     </span>
                   ) : null}
-                  <div className="mb-4 grid aspect-[4/3] place-items-center overflow-hidden rounded-xl bg-gray-100">
-                    <img
-                      src={product.image}
-                      alt={product.title}
-                      className="h-40 w-full object-contain transition-transform duration-300 group-hover:scale-[1.03]"
-                    />
-                  </div>
+                <div className="mb-4 aspect-square overflow-hidden rounded-xl bg-gray-100">
+                      <img
+                        src={product.image}
+                        alt={product.title}
+                        className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-[1.03]"
+                      />
+                    </div>
+
                   <div className="flex flex-col gap-2">
                     <h3 className="text-lg font-semibold leading-tight text-gray-900 line-clamp-2">
                       {product.title}
@@ -152,16 +153,16 @@ export default function ProductosPage() {
                     <p className="text-sm text-gray-600 line-clamp-3">{product.description}</p>
                   </div>
                   <div className="mt-auto space-y-4">
-                    <div className="space-y-1">
+                    <div className="space-y-1 mt-5">
                       {formattedYearPrice ? (
                         <>
-                          <p className="text-base font-bold text-gray-900">Plan mensual: {formattedPrice}</p>
+                          <p className="text-base font-bold text-gray-900">Desde: {formattedPrice}</p>
                           <p className="text-xs text-gray-500">
-                            Plan anual: <span className="font-semibold text-gray-900">{formattedYearPrice}</span>
+                            Premium: <span className="font-semibold text-gray-900">{formattedYearPrice}</span>
                           </p>
                         </>
                       ) : (
-                        <p className="text-base font-bold text-gray-900">{formattedPrice}</p>
+                        <p className="text-base font-bold text-gray-900">Precio: {formattedPrice}</p>
                       )}
                     </div>
                     <button
