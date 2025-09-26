@@ -85,22 +85,7 @@ const products = [
     description:
       "¡¡Esta plantilla de Concreto lo hace TODO!! ✅ Calcula cemento, arena, grava y aditivos por resistencia. ✅ Tiempos por tanda en trompos/mezcladoras/Carmix. ✅ Dosificación por ciclo. ✅ Entrega en m³, kg, baldes o viajes. ✅ Exporta PDF. ✅ Permite cargar nuevos diseños de mezcla.",
   },
-   {
-    slug: "almacen-obra",
-    title: "Excel para el Control de Almacén de Obra",
-    priceCop: 30000,
-    image: "/productos/Excel de Almacen.png",
-    description:
-      "Entradas, salidas y kardex de materiales con consolidado por capítulo.",
-  },
-  {
-    slug: "formaletas-encofrados",
-    title: "Excel para el Control de Formaletas & Encofrados",
-    priceCop: 30000,
-    image: "/productos/Excel de Encofrados.png",
-    description:
-      "Planificación y control de encofrados por frente de trabajo.",
-  },
+
   {
     slug: "plataforma-civilespro",
     title: "Plataforma CivilesPro (APU + Informes de Obra Diarios)",
