@@ -1,12 +1,85 @@
-export default [
-  { slug:'pedido-acero-long', title:'Excel para el Pedido de Acero en Longitudes Comercial', price:'$100.000 🇨🇴', desc:'' },
-  { slug:'control-acero', title:'Excel para Control de Acero', price:'$50.000 🇨🇴', desc:'' },
-  { slug:'control-almacen', title:'Excel para el Control de Almacén de Obra', price:'$30.000 🇨🇴', desc:'' },
-  { slug:'formaletas-encofrados', title:'Excel para el Control de Formaletas & Encofrados', price:'$30.000 🇨🇴', desc:'' },
-  { slug:'materiales-instant-20', title:'Excel para Materiales de Obra al Instante 2.0', price:'$165.000 🇨🇴', desc:'' },
-  { slug:'concretos-autohorm', title:'Excel para Concretos en Autohormigoneras & Mezcladoras', price:'$20.000 🇨🇴', desc:'' },
-  { slug:'plataforma', title:'Plataforma CivilesPro (APU + Informes de Obra Diarios)', price:'Mensual $20.000 — Anual $150.000 (ahorro de $90.000) 🇨🇴', desc:'' },
-  { slug:'revit-plantillas', title:'Plantillas de Revit Estructural & Arquitectónicas', price:'$60.000 🇨🇴', desc:'Incluye Vistas, Familias, Detalles, Parámetros compartidos.' },
-  { slug:'bloques-dinamicos', title:'Plantillas de Bloques Dinámicos [Arq + Estruct + Sanit + Eléc]', price:'$60.000 🇨🇴', desc:'' },
-  { slug:'megapack', title:'MegaPack de Ingeniería & Arquitectura (Drive 90GB)', price:'$30.000 🇨🇴', desc:'Programas, recursos, cursos y libros.' },
+const products = [
+  {
+    slug: "pedido-acero",
+    title: "Excel para el Pedido de Acero en Longitudes Comercial",
+    priceCop: 100000,
+    image: "/productos/Excel Pedido de Acero.png",
+    description:
+      "Plantilla para calcular pedidos de acero en longitudes comerciales y optimizar desperdicios.",
+  },
+  {
+    slug: "control-acero",
+    title: "Excel para Control de Acero",
+    priceCop: 50000,
+    image: "/productos/Excel de Control de Acero.png",
+    description:
+      "Control de existencias, cortes y consumos de acero con reportes rápidos.",
+  },
+  {
+    slug: "almacen-obra",
+    title: "Excel para el Control de Almacén de Obra",
+    priceCop: 30000,
+    image: "/productos/Excel de Almacen.png",
+    description:
+      "Entradas, salidas y kardex de materiales con consolidado por capítulo.",
+  },
+  {
+    slug: "formaletas-encofrados",
+    title: "Excel para el Control de Formaletas & Encofrados",
+    priceCop: 30000,
+    image: "/productos/Excel de Encofrados.png",
+    description:
+      "Planificación y control de encofrados por frente de trabajo.",
+  },
+  {
+    slug: "cantidades-instant",
+    title: "Excel para Materiales de Obra al Instante 2.0",
+    priceCop: 165000,
+    image: "/productos/Excel de Cantidades de Materiales.png",
+    description:
+      "Calcula materiales de múltiples partidas (concreto, muros, losas, acabados, cubiertas, etc.) al instante.",
+  },
+  {
+    slug: "concretos-autohormigoneras",
+    title: "Excel para Concretos en Autohormigoneras & Mezcladoras",
+    priceCop: 20000,
+    image: "/productos/Excel de Concreto de Hormigueras.png",
+    description:
+      "¡¡Esta plantilla de Concreto lo hace TODO!! ✅ Calcula cemento, arena, grava y aditivos por resistencia. ✅ Tiempos por tanda en trompos/mezcladoras/Carmix. ✅ Dosificación por ciclo. ✅ Entrega en m³, kg, baldes o viajes. ✅ Exporta PDF. ✅ Permite cargar nuevos diseños de mezcla.",
+  },
+  {
+    slug: "plataforma-civilespro",
+    title: "Plataforma CivilesPro (APU + Informes de Obra Diarios)",
+    priceCop: 20000,
+    priceCopYear: 150000,
+    image: "/productos/Excel de Cantidades de Materiales.png",
+    description:
+      "Genera presupuestos con APU conectados + Informes de Obra Diarios en Excel. Plan mensual y anual.",
+  },
+  {
+    slug: "plantillas-revit",
+    title: "Plantillas de Revit Estructural & Arquitectónicas",
+    priceCop: 60000,
+    image: "/productos/Familia de Revit.png",
+    description:
+      "Incluye vistas, familias, detalles y parámetros compartidos listos para producción.",
+  },
+  {
+    slug: "bloques-dinamicos",
+    title: "Plantillas de Bloques Dinámicos (Arq + Estruct + Sanit + Eléctr.)",
+    priceCop: 60000,
+    image: "/productos/Bloques Dinamicos.png",
+    description:
+      "Bloques dinámicos listos para acelerar dibujo y cuantificación en AutoCAD.",
+  },
+  {
+    slug: "megapack",
+    title: "MEGAPACK INGENIERÍA & ARQUITECTURA",
+    priceCop: null,
+    image: "/productos/Megapack.png",
+    description:
+      "Acceso de por vida. Incluye programas FULL (Revit 2024, ArchiCAD 25, Tekla 2024, SketchUp 2024, AutoCAD 2024/2021, Office 2021/2024), 16 cursos PRO (Revit BIM, Estructural, MEP, ArchiCAD, Tekla, AutoCAD, 3ds Max, Project, CYPE, Navisworks y más), materiales extra (bloques dinámicos, LISP, familias Revit, componentes SketchUp, hatches, plugins), y galería de libros técnicos.",
+  },
 ]
+
+export default products
