@@ -1,10 +1,63 @@
 import React from "react"
+import { useSearchParams } from "react-router-dom"
 import SEO from "../components/SEO.jsx"
 import products from "../data/products.js"
+import { SUPPORTED_CURRENCIES } from "../data/exchangeRates.js"
+import { formatPrice } from "../utils/formatPrice.js"
 
 const SITE_URL = "https://civilespro.com"
+const DEFAULT_CURRENCY = "COP"
+
+function normalizeCurrency(value) {
+  if (!value) return null
+  const upper = value.toUpperCase()
+  return SUPPORTED_CURRENCIES.includes(upper) ? upper : null
+}
 
 export default function ProductosPage() {
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  const [currency, setCurrency] = React.useState(() => {
+    const fromParam = normalizeCurrency(searchParams.get("currency"))
+    if (fromParam) return fromParam
+
+    if (typeof window !== "undefined") {
+      const stored = normalizeCurrency(window.localStorage.getItem("currency"))
+      if (stored) return stored
+    }
+
+    return DEFAULT_CURRENCY
+  })
+
+  React.useEffect(() => {
+    const paramCurrency = normalizeCurrency(searchParams.get("currency"))
+    if (paramCurrency && paramCurrency !== currency) {
+      setCurrency(paramCurrency)
+    }
+  }, [searchParams, currency])
+
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("currency", currency)
+    }
+
+    const currentParam = normalizeCurrency(searchParams.get("currency"))
+    if (currency === DEFAULT_CURRENCY) {
+      if (currentParam) {
+        const next = new URLSearchParams(searchParams)
+        next.delete("currency")
+        setSearchParams(next, { replace: true })
+      }
+      return
+    }
+
+    if (currency !== currentParam) {
+      const next = new URLSearchParams(searchParams)
+      next.set("currency", currency)
+      setSearchParams(next, { replace: true })
+    }
+  }, [currency, searchParams, setSearchParams])
+
   return (
     <>
       <SEO
@@ -33,31 +86,76 @@ export default function ProductosPage() {
                   Recursos listos para usar que aceleran tu flujo de trabajo diario.
                 </p>
               </div>
-              <a href="/contacto" className="btn-outline whitespace-nowrap">
-                Solicitar asesoría
-              </a>
+              <div className="ml-auto flex items-center gap-4 flex-wrap">
+                <label className="text-sm font-medium text-gray-700" htmlFor="currency-select">
+                  Moneda
+                </label>
+                <select
+                  id="currency-select"
+                  className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  value={currency}
+                  onChange={(event) => setCurrency(event.target.value)}
+                >
+                  {SUPPORTED_CURRENCIES.map((code) => (
+                    <option key={code} value={code}>
+                      {code}
+                    </option>
+                  ))}
+                </select>
+                <a href="/contacto" className="btn-outline whitespace-nowrap">
+                  Solicitar asesoría
+                </a>
+              </div>
             </div>
 
             <div className="mt-8 grid gap-6 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-              {products.map((product) => (
-                <article key={product.slug} className="flex flex-col gap-4 p-6 border rounded-2xl bg-white shadow-sm">
-                  <header>
-                    <h3 className="text-lg font-semibold text-gray-900">{product.title}</h3>
-                    {product.desc && <p className="mt-2 text-gray-700">{product.desc}</p>}
-                  </header>
-                  <div className="mt-auto">
-                    <p className="font-bold text-primary">{product.price}</p>
-                    <div className="mt-4 flex gap-3">
-                      <a href={`/producto/${product.slug}`} className="btn-primary">
-                        Ver detalles
-                      </a>
-                      <a href="/contacto" className="btn-outline">
-                        Consultar
-                      </a>
+              {products.map((product) => {
+                const formattedPrice = formatPrice(product.priceCop, currency)
+                const formattedYearPrice =
+                  product.priceCopYear != null
+                    ? formatPrice(product.priceCopYear, currency)
+                    : null
+
+                return (
+                  <article
+                    key={product.slug}
+                    className="flex h-full flex-col gap-5 rounded-2xl border bg-white p-6 shadow-sm"
+                  >
+                    <div className="flex h-48 items-center justify-center overflow-hidden rounded-xl bg-gray-50">
+                      <img
+                        src={product.image}
+                        alt={product.title}
+                        className="h-full w-full object-contain"
+                      />
                     </div>
-                  </div>
-                </article>
-              ))}
+                    <header>
+                      <h3 className="text-lg font-semibold text-gray-900">{product.title}</h3>
+                      <p className="mt-2 text-sm text-gray-700">{product.description}</p>
+                    </header>
+                    <div className="mt-auto space-y-1">
+                      {formattedYearPrice ? (
+                        <>
+                          <p className="font-semibold text-primary">
+                            Plan mensual: {formattedPrice}
+                          </p>
+                          <p className="text-sm text-gray-700">
+                            Plan anual: <span className="font-semibold text-primary">{formattedYearPrice}</span>
+                          </p>
+                        </>
+                      ) : (
+                        <p className="font-semibold text-primary">{formattedPrice}</p>
+                      )}
+                    </div>
+                    <button
+                      type="button"
+                      className="btn-primary mt-4"
+                      onClick={() => console.log(product.slug)}
+                    >
+                      Comprar
+                    </button>
+                  </article>
+                )
+              })}
             </div>
           </section>
 
