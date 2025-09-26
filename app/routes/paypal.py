@@ -8,7 +8,8 @@ from decimal import Decimal
 from typing import Optional
 from uuid import uuid4
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
@@ -50,23 +51,24 @@ def _build_download_url(token_id: str) -> str:
     return f"/api/download/{token_id}"
 
 
+def _json_error(status_code: int, message: str) -> JSONResponse:
+    return JSONResponse(status_code=status_code, content={"message": message})
+
+
 @router.post("/create-order", response_model=CreateOrderResponse)
-async def create_order_endpoint(payload: CreateOrderRequest, db: Session = Depends(get_session)) -> CreateOrderResponse:
+async def create_order_endpoint(payload: CreateOrderRequest, db: Session = Depends(get_session)) -> CreateOrderResponse | JSONResponse:
     currency = payload.currency.upper()
     try:
         currency = catalog.normalize_currency(currency)
     except ValueError as exc:  # pragma: no cover - validation
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+        return _json_error(400, str(exc))
 
     product = catalog.get_product(payload.slug)
     if not product:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Producto no encontrado")
+        return _json_error(404, "Producto no encontrado")
 
     if product.price_cop is None or not product.file_key:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Este producto no está disponible para compra en línea.",
-        )
+        return _json_error(400, "Este producto no está disponible para compra en línea.")
 
     amount_decimal = catalog.convert_from_cop(product.price_cop, currency)
     try:
@@ -77,11 +79,13 @@ async def create_order_endpoint(payload: CreateOrderRequest, db: Session = Depen
             reference_id=product.slug,
         )
     except PayPalError as exc:
-        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=str(exc)) from exc
+        return _json_error(502, f"PayPal error: {exc}")
+    except Exception as exc:  # pragma: no cover - defensive
+        return _json_error(500, f"Server error: {exc}")
 
     order_id = paypal_response.get("id")
     if not order_id:
-        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail="Respuesta inválida de PayPal")
+        return _json_error(502, "Respuesta inválida de PayPal")
 
     purchase = Purchase(
         slug=product.slug,
@@ -92,19 +96,23 @@ async def create_order_endpoint(payload: CreateOrderRequest, db: Session = Depen
         status="CREATED",
     )
 
-    db.add(purchase)
-    db.commit()
+    try:
+        db.add(purchase)
+        db.commit()
+    except Exception:  # pragma: no cover - commit protection
+        db.rollback()
+        return _json_error(500, "No se pudo registrar la orden.")
 
     return CreateOrderResponse(orderID=order_id)
 
 
 @router.post("/capture-order", response_model=CaptureOrderResponse)
-async def capture_order_endpoint(payload: CaptureOrderRequest, db: Session = Depends(get_session)) -> CaptureOrderResponse:
+async def capture_order_endpoint(payload: CaptureOrderRequest, db: Session = Depends(get_session)) -> CaptureOrderResponse | JSONResponse:
     order_id = payload.orderID
     purchase: Optional[Purchase] = db.query(Purchase).filter(Purchase.order_id == order_id).one_or_none()
 
     if not purchase:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Orden no registrada")
+        return _json_error(404, "Orden no registrada")
 
     now = datetime.now(timezone.utc)
 
@@ -121,43 +129,45 @@ async def capture_order_endpoint(payload: CaptureOrderRequest, db: Session = Dep
     try:
         capture_data = await paypal_capture_order(order_id)
     except PayPalError as exc:
-        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=str(exc)) from exc
+        return _json_error(502, f"PayPal error: {exc}")
+    except Exception as exc:  # pragma: no cover - defensive
+        return _json_error(500, f"Server error: {exc}")
 
     if capture_data.get("status") != "COMPLETED":
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="La orden no fue completada.")
+        return _json_error(400, "La orden no fue completada.")
 
     purchase_units = capture_data.get("purchase_units") or []
     if not purchase_units:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Orden de PayPal inválida")
+        return _json_error(400, "Orden de PayPal inválida")
 
     first_unit = purchase_units[0]
     payments = first_unit.get("payments", {})
     captures = payments.get("captures") or []
     if not captures:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="La orden no tiene capturas registradas")
+        return _json_error(400, "La orden no tiene capturas registradas")
 
     capture_entry = captures[0]
     if capture_entry.get("status") != "COMPLETED":
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="La captura no fue completada")
+        return _json_error(400, "La captura no fue completada")
 
     capture_amount = capture_entry.get("amount", {})
     captured_value = capture_amount.get("value")
     captured_currency = capture_amount.get("currency_code")
 
     if not captured_value or not captured_currency:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Monto de captura inválido")
+        return _json_error(400, "Monto de captura inválido")
 
     try:
         captured_decimal = Decimal(captured_value)
-    except Exception as exc:  # pragma: no cover - defensive
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Monto de captura inválido") from exc
+    except Exception:  # pragma: no cover - defensive
+        return _json_error(400, "Monto de captura inválido")
 
     if captured_currency.upper() != purchase.currency.upper():
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Moneda de captura inválida")
+        return _json_error(400, "Moneda de captura inválida")
 
     stored_amount = Decimal(purchase.amount)
     if captured_decimal != stored_amount:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="El monto capturado no coincide")
+        return _json_error(400, "El monto capturado no coincide")
 
     payer_email = (capture_data.get("payer") or {}).get("email_address")
 
@@ -167,7 +177,8 @@ async def capture_order_endpoint(payload: CaptureOrderRequest, db: Session = Dep
 
     product = catalog.get_product(purchase.slug)
     if not product or not product.file_key:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Producto sin archivo configurado")
+        db.rollback()
+        return _json_error(500, "Producto sin archivo configurado")
 
     expires_at = now + timedelta(hours=DOWNLOAD_TOKEN_TTL_HOURS)
     token = DownloadToken(
@@ -179,6 +190,11 @@ async def capture_order_endpoint(payload: CaptureOrderRequest, db: Session = Dep
         expires_at=expires_at,
     )
     db.add(token)
-    db.commit()
+
+    try:
+        db.commit()
+    except Exception:  # pragma: no cover - commit protection
+        db.rollback()
+        return _json_error(500, "No se pudo finalizar la orden.")
 
     return CaptureOrderResponse(downloadUrl=_build_download_url(token.id))
