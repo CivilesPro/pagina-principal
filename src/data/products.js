@@ -16,6 +16,22 @@ const products = [
       "Control de existencias, cortes y consumos de acero con reportes rápidos.",
   },
   {
+    slug: "cantidades-instant",
+    title: "Excel para Materiales de Obra al Instante 2.0",
+    priceCop: 165000,
+    image: "/productos/Excel de Cantidades de Materiales.png",
+    description:
+      "Calcula materiales de múltiples partidas (concreto, muros, losas, acabados, cubiertas, etc.) al instante.",
+  },
+  {
+    slug: "concretos-autohormigoneras",
+    title: "Excel para Concretos en Autohormigoneras & Mezcladoras",
+    priceCop: 20000,
+    image: "/productos/Excel de Concreto de Hormigueras.png",
+    description:
+      "¡¡Esta plantilla de Concreto lo hace TODO!! ✅ Calcula cemento, arena, grava y aditivos por resistencia. ✅ Tiempos por tanda en trompos/mezcladoras/Carmix. ✅ Dosificación por ciclo. ✅ Entrega en m³, kg, baldes o viajes. ✅ Exporta PDF. ✅ Permite cargar nuevos diseños de mezcla.",
+  },
+   {
     slug: "almacen-obra",
     title: "Excel para el Control de Almacén de Obra",
     priceCop: 30000,
@@ -32,25 +48,9 @@ const products = [
       "Planificación y control de encofrados por frente de trabajo.",
   },
   {
-    slug: "cantidades-instant",
-    title: "Excel para Materiales de Obra al Instante 2.0",
-    priceCop: 165000,
-    image: "/productos/Excel de Cantidades de Materiales.png",
-    description:
-      "Calcula materiales de múltiples partidas (concreto, muros, losas, acabados, cubiertas, etc.) al instante.",
-  },
-  {
-    slug: "concretos-autohormigoneras",
-    title: "Excel para Concretos en Autohormigoneras & Mezcladoras",
-    priceCop: 20000,
-    image: "/productos/Excel de Concreto de Hormigueras.png",
-    description:
-      "¡¡Esta plantilla de Concreto lo hace TODO!! ✅ Calcula cemento, arena, grava y aditivos por resistencia. ✅ Tiempos por tanda en trompos/mezcladoras/Carmix. ✅ Dosificación por ciclo. ✅ Entrega en m³, kg, baldes o viajes. ✅ Exporta PDF. ✅ Permite cargar nuevos diseños de mezcla.",
-  },
-  {
     slug: "plataforma-civilespro",
     title: "Plataforma CivilesPro (APU + Informes de Obra Diarios)",
-    priceCop: 20000,
+    priceCop: 60000,
     priceCopYear: 150000,
     image: "/productos/Excel de Cantidades de Materiales.png",
     description:
@@ -75,7 +75,7 @@ const products = [
   {
     slug: "megapack",
     title: "MEGAPACK INGENIERÍA & ARQUITECTURA",
-    priceCop: null,
+    priceCop: 30000,
     image: "/productos/Megapack.png",
     description:
       "Acceso de por vida. Incluye programas FULL (Revit 2024, ArchiCAD 25, Tekla 2024, SketchUp 2024, AutoCAD 2024/2021, Office 2021/2024), 16 cursos PRO (Revit BIM, Estructural, MEP, ArchiCAD, Tekla, AutoCAD, 3ds Max, Project, CYPE, Navisworks y más), materiales extra (bloques dinámicos, LISP, familias Revit, componentes SketchUp, hatches, plugins), y galería de libros técnicos.",
