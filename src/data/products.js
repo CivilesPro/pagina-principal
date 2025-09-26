@@ -28,6 +28,7 @@ const products = [
       "Control de existencias, cortes y consumos de acero con reportes rápidos.",
   },
   {
+
     slug: "almacen-obra",
     title: "Excel para el Control de Almacén de Obra",
     priceCop: 30000,
@@ -56,6 +57,7 @@ const products = [
       "Planificación y control de encofrados por frente de trabajo.",
   },
   {
+
     slug: "cantidades-instant",
     title: "Excel para Materiales de Obra al Instante 2.0",
     priceCop: 165000,
@@ -83,10 +85,26 @@ const products = [
     description:
       "¡¡Esta plantilla de Concreto lo hace TODO!! ✅ Calcula cemento, arena, grava y aditivos por resistencia. ✅ Tiempos por tanda en trompos/mezcladoras/Carmix. ✅ Dosificación por ciclo. ✅ Entrega en m³, kg, baldes o viajes. ✅ Exporta PDF. ✅ Permite cargar nuevos diseños de mezcla.",
   },
+   {
+    slug: "almacen-obra",
+    title: "Excel para el Control de Almacén de Obra",
+    priceCop: 30000,
+    image: "/productos/Excel de Almacen.png",
+    description:
+      "Entradas, salidas y kardex de materiales con consolidado por capítulo.",
+  },
+  {
+    slug: "formaletas-encofrados",
+    title: "Excel para el Control de Formaletas & Encofrados",
+    priceCop: 30000,
+    image: "/productos/Excel de Encofrados.png",
+    description:
+      "Planificación y control de encofrados por frente de trabajo.",
+  },
   {
     slug: "plataforma-civilespro",
     title: "Plataforma CivilesPro (APU + Informes de Obra Diarios)",
-    priceCop: 20000,
+    priceCop: 60000,
     priceCopYear: 150000,
     image: "/productos/Excel de Cantidades de Materiales.png",
     images: [
@@ -129,7 +147,7 @@ const products = [
   {
     slug: "megapack",
     title: "MEGAPACK INGENIERÍA & ARQUITECTURA",
-    priceCop: null,
+    priceCop: 30000,
     image: "/productos/Megapack.png",
     images: [
       "/productos/Megapack.png",
