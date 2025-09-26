@@ -8,6 +8,12 @@ import { formatPrice } from "../utils/formatPrice.js"
 const SITE_URL = "https://civilespro.com"
 const DEFAULT_CURRENCY = "COP"
 
+const BADGES_BY_SLUG = {
+  "cantidades-instant": "Más vendido",
+  "control-acero": "Mejor precio",
+  "concretos-autohormigoneras": "Nuevo",
+}
+
 function normalizeCurrency(value) {
   if (!value) return null
   const upper = value.toUpperCase()
@@ -68,98 +74,114 @@ export default function ProductosPage() {
       />
 
       <section className="py-16">
-        <div className="wrap-wide px-4">
-          <div className="mx-auto max-w-3xl text-center">
-            <h1 className="text-4xl md:text-5xl font-extrabold text-primary">
-              Productos Civiles Pro
-            </h1>
-            <p className="mt-5 text-lg text-gray-700">
-              Plantillas, Excel y acceso a la plataforma para que calcules materiales, generes presupuestos y documentes tu obra sin complicaciones.
-            </p>
-          </div>
+        <div className="mx-auto max-w-4xl px-4 text-center">
+          <h1 className="text-4xl font-extrabold text-primary md:text-5xl">
+            Productos Civiles Pro
+          </h1>
+          <p className="mt-5 text-lg text-gray-700">
+            Plantillas, Excel y acceso a la plataforma para que calcules materiales, generes presupuestos y documentes tu obra sin complicaciones.
+          </p>
+        </div>
+      </section>
 
-          <section id="productos" className="mt-14">
-            <div className="flex items-baseline justify-between gap-6 flex-wrap">
-              <div>
-                <h2 className="text-2xl md:text-3xl font-bold">Nuestros productos</h2>
-                <p className="mt-2 text-gray-700">
-                  Recursos listos para usar que aceleran tu flujo de trabajo diario.
-                </p>
-              </div>
-              <div className="ml-auto flex items-center gap-4 flex-wrap">
-                <label className="text-sm font-medium text-gray-700" htmlFor="currency-select">
-                  Moneda
-                </label>
-                <select
-                  id="currency-select"
-                  className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
-                  value={currency}
-                  onChange={(event) => setCurrency(event.target.value)}
-                >
-                  {SUPPORTED_CURRENCIES.map((code) => (
-                    <option key={code} value={code}>
+      <section id="productos" className="bg-gray-50 py-10">
+        <div className="mx-auto max-w-7xl px-4">
+          <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+            <div className="max-w-2xl">
+              <h2 className="text-3xl font-bold text-gray-900">Nuestros productos</h2>
+              <p className="mt-2 text-gray-600">
+                Recursos listos para usar que aceleran tu flujo de trabajo diario.
+              </p>
+            </div>
+            <div className="flex flex-col gap-2 md:items-end">
+              <span className="text-sm font-medium text-gray-600">Moneda</span>
+              <div className="inline-flex max-w-full gap-1 overflow-x-auto rounded-full border border-gray-200 bg-white p-1 shadow-sm snap-x">
+                {SUPPORTED_CURRENCIES.map((code) => {
+                  const isActive = code === currency
+                  return (
+                    <button
+                      key={code}
+                      type="button"
+                      className={`snap-center rounded-full px-4 py-2 text-sm font-semibold transition-colors duration-200 whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 ${
+                        isActive
+                          ? "bg-emerald-600 text-white shadow"
+                          : "text-gray-700 hover:bg-emerald-50"
+                      }`}
+                      onClick={() => setCurrency(code)}
+                    >
                       {code}
-                    </option>
-                  ))}
-                </select>
-                <a href="/contacto" className="btn-outline whitespace-nowrap">
-                  Solicitar asesoría
-                </a>
+                    </button>
+                  )
+                })}
               </div>
             </div>
+          </div>
 
-            <div className="mt-8 grid gap-6 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-              {products.map((product) => {
-                const formattedPrice = formatPrice(product.priceCop, currency)
-                const formattedYearPrice =
-                  product.priceCopYear != null
-                    ? formatPrice(product.priceCopYear, currency)
-                    : null
+          <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {products.map((product) => {
+              const formattedPrice = formatPrice(product.priceCop, currency)
+              const formattedYearPrice =
+                product.priceCopYear != null
+                  ? formatPrice(product.priceCopYear, currency)
+                  : null
 
-                return (
-                  <article
-                    key={product.slug}
-                    className="flex h-full flex-col gap-5 rounded-2xl border bg-white p-6 shadow-sm"
-                  >
-                    <div className="flex h-48 items-center justify-center overflow-hidden rounded-xl bg-gray-50">
-                      <img
-                        src={product.image}
-                        alt={product.title}
-                        className="h-full w-full object-contain"
-                      />
-                    </div>
-                    <header>
-                      <h3 className="text-lg font-semibold text-gray-900">{product.title}</h3>
-                      <p className="mt-2 text-sm text-gray-700">{product.description}</p>
-                    </header>
-                    <div className="mt-auto space-y-1">
+              const badgeLabel = BADGES_BY_SLUG[product.slug]
+              const isConsultation = product.priceCop == null
+
+              return (
+                <article
+                  key={product.slug}
+                  className="group relative flex h-full flex-col rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg"
+                >
+                  {badgeLabel ? (
+                    <span className="absolute left-3 top-3 rounded-full bg-emerald-600 px-2 py-1 text-xs font-semibold text-white shadow">
+                      {badgeLabel}
+                    </span>
+                  ) : null}
+                  <div className="mb-4 grid aspect-[4/3] place-items-center overflow-hidden rounded-xl bg-gray-100">
+                    <img
+                      src={product.image}
+                      alt={product.title}
+                      className="h-40 w-full object-contain transition-transform duration-300 group-hover:scale-[1.03]"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <h3 className="text-lg font-semibold leading-tight text-gray-900 line-clamp-2">
+                      {product.title}
+                    </h3>
+                    <p className="text-sm text-gray-600 line-clamp-3">{product.description}</p>
+                  </div>
+                  <div className="mt-auto space-y-4">
+                    <div className="space-y-1">
                       {formattedYearPrice ? (
                         <>
-                          <p className="font-semibold text-primary">
-                            Plan mensual: {formattedPrice}
-                          </p>
-                          <p className="text-sm text-gray-700">
-                            Plan anual: <span className="font-semibold text-primary">{formattedYearPrice}</span>
+                          <p className="text-base font-bold text-gray-900">Plan mensual: {formattedPrice}</p>
+                          <p className="text-xs text-gray-500">
+                            Plan anual: <span className="font-semibold text-gray-900">{formattedYearPrice}</span>
                           </p>
                         </>
                       ) : (
-                        <p className="font-semibold text-primary">{formattedPrice}</p>
+                        <p className="text-base font-bold text-gray-900">{formattedPrice}</p>
                       )}
                     </div>
                     <button
                       type="button"
-                      className="btn-primary mt-4"
+                      className={`h-11 w-full rounded-xl font-semibold shadow transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+                        isConsultation
+                          ? "border border-emerald-700 bg-white text-emerald-700 hover:bg-emerald-50"
+                          : "bg-emerald-700 text-white hover:bg-emerald-800"
+                      }`}
                       onClick={() => console.log(product.slug)}
                     >
                       Comprar
                     </button>
-                  </article>
-                )
-              })}
-            </div>
-          </section>
+                  </div>
+                </article>
+              )
+            })}
+          </div>
 
-          <div className="mt-16 rounded-3xl border border-dashed border-gray-300 bg-gray-50 p-10 text-center text-gray-600">
+          <div className="mt-16 rounded-3xl border border-dashed border-gray-300 bg-white p-10 text-center text-gray-600">
             ¿Buscas un producto a medida? Escríbenos y diseñamos la solución ideal para tu proyecto.
           </div>
         </div>
