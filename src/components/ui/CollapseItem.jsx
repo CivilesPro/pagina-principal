@@ -4,21 +4,21 @@ const levelStyles = {
   main: {
     container: "rounded-xl border border-slate-200/70 bg-slate-50",
     header: "py-3 px-3 md:py-4 md:px-4",
-    title: "text-slate-800 text-base md:text-lg font-semibold",
-    subtitle: "text-slate-500 text-sm",
-    body: "px-3 pb-3 md:px-4",
+    title: "text-base font-semibold text-slate-800 md:text-lg",
+    subtitle: "text-sm text-slate-500",
+    body: "px-3 pb-3 pt-3 md:px-4",
   },
   sub: {
     container: "rounded-lg border border-slate-200 bg-white",
     header: "py-2.5 px-3",
-    title: "text-slate-700 text-sm font-medium",
-    subtitle: "text-slate-500 text-xs",
-    body: "px-3 pb-3",
+    title: "text-sm font-medium text-slate-700",
+    subtitle: "text-xs text-slate-500",
+    body: "px-3 pb-3 pt-2",
   },
 }
 
 const baseChevronClasses =
-  "flex h-8 w-8 items-center justify-center rounded-full bg-white text-slate-500 transition-transform duration-300 border border-slate-200"
+  "flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 transition-transform duration-300"
 
 export default function CollapseItem({
   title,
@@ -59,11 +59,11 @@ export default function CollapseItem({
     <div className={`${styles.container} ${className}`.trim()}>
       <button
         type="button"
-        className={`flex w-full items-center justify-between gap-4 text-left ${styles.header}`}
+        className={`flex w-full items-center justify-between gap-4 cursor-pointer text-left ${styles.header}`}
         onClick={() => setIsOpen((prev) => !prev)}
         aria-expanded={isOpen}
       >
-        <div className="flex flex-1 items-start gap-3">
+        <div className="flex flex-1 items-center gap-3">
           {leadingIcon ? leadingIcon : null}
           <div className="flex-1">
             <p className={`${styles.title}`}>{title}</p>
@@ -92,7 +92,7 @@ export default function CollapseItem({
           opacity: isOpen || maxHeight !== "0px" ? 1 : 0,
         }}
       >
-        <div ref={contentRef} className={`${styles.body} pt-0`.trim()}>
+        <div ref={contentRef} className={`${styles.body}`.trim()}>
           {children}
         </div>
       </div>
