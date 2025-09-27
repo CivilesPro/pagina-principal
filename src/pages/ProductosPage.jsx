@@ -148,10 +148,10 @@ export default function ProductosPage() {
 
           <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {products.map((product) => {
-              const formattedPrice = formatPrice(product.priceCop, currency);
+              const formattedPrice = formatPrice(product.priceCop, currency, { withCode: true });
               const formattedYearPrice =
                 product.priceCopYear != null
-                  ? formatPrice(product.priceCopYear, currency)
+                  ? formatPrice(product.priceCopYear, currency, { withCode: true })
                   : null;
 
               const badgeLabel = BADGES_BY_SLUG[product.slug];
@@ -200,7 +200,9 @@ export default function ProductosPage() {
                   </div>
                   <div className="mt-auto space-y-4">
                     <div className="space-y-1 mt-5">
-                      {formattedYearPrice ? (
+                      {isConsultation ? (
+                        <p className="text-base font-semibold text-amber-700">Precio a consultar</p>
+                      ) : formattedYearPrice ? (
                         <>
                           <p className="text-base font-bold text-gray-900">Desde: {formattedPrice}</p>
                           <p className="text-xs text-gray-500">
@@ -233,8 +235,16 @@ export default function ProductosPage() {
             })}
           </div>
 
-          <div className="mt-16 rounded-3xl border border-dashed border-gray-300 bg-white p-10 text-center text-gray-600">
-            ¿Buscas un producto a medida? Escríbenos y diseñamos la solución ideal para tu proyecto.
+          <div className="mt-16 rounded-3xl border border-dashed border-gray-300 bg-white p-10 text-center text-gray-700">
+            ¿Buscas un producto a medida?
+            <a
+              href="https://wa.me/573127437848?text=Hola%20CivilesPro%2C%20necesito%20un%20producto%20a%20medida."
+              target="_blank"
+              rel="noreferrer"
+              className="ml-2 inline-flex items-center justify-center rounded-full bg-emerald-700 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-800"
+            >
+              Escríbenos por WhatsApp
+            </a>
           </div>
         </div>
       </section>
