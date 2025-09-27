@@ -4,6 +4,7 @@ import BimServiceCard from "../components/BimServiceCard.jsx"
 import ServiceCard from "../components/ServiceCard.jsx"
 import ExpandableCard from "../components/ExpandableCard.jsx"
 import FormatsGrid from "../components/FormatsGrid.jsx"
+import BimDeepSections from "../components/BimDeepSections.jsx"
 
 const SITE_URL = "https://civilespro.com"
 
@@ -123,6 +124,8 @@ export default function ModeladoBIMPage() {
           </div>
         </div>
       </section>
+
+      <BimDeepSections />
     </>
   )
 }
