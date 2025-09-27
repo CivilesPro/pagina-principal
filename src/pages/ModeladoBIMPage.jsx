@@ -1,10 +1,8 @@
 import React from "react"
 import SEO from "../components/SEO.jsx"
 import BimServiceCard from "../components/BimServiceCard.jsx"
-import ServiceCard from "../components/ServiceCard.jsx"
-import ExpandableCard from "../components/ExpandableCard.jsx"
-import FormatsGrid from "../components/FormatsGrid.jsx"
-import BimDeepSections from "../components/BimDeepSections.jsx"
+import LODList from "../components/bim/LODList.jsx"
+import ProjectsList from "../components/bim/ProjectsList.jsx"
 
 const SITE_URL = "https://civilespro.com"
 
@@ -23,31 +21,6 @@ export default function ModeladoBIMPage() {
     description:
       "Integramos todas las disciplinas de un proyecto bajo estándares BIM, asegurando coordinación y eficiencia de principio a fin.",
   }
-
-  const pebItems = [
-    "Definición de roles y responsabilidades.",
-    "Procesos de trabajo colaborativos.",
-    "Estándares y normas internacionales.",
-    "Entregables BIM claros y estructurados.",
-  ]
-
-  const lodItems = [
-    "LOD 100: Idea / Anteproyecto conceptual.",
-    "LOD 200: Diseño preliminar.",
-    "LOD 300: Geometría precisa y coordinación.",
-    "LOD 400: Construcción y documentación.",
-    "LOD 500: Proyecto final para operación y mantenimiento.",
-  ]
-
-  const projectItems = [
-    "Nave Industrial (Arquitectura + Estructuras).",
-    "Vivienda Unifamiliar (Arquitectura).",
-    "Edificio Residencial (Arquitectura + MEP).",
-    "Hospital de Primer Nivel (Arquitectura + Estructuras + MEP).",
-    "Bloque Escolar (Arquitectura + Estructuras).",
-    "Centros de Atención IPS (Arquitectura).",
-    "Edificio Multifuncional (Estructuras).",
-  ]
 
   return (
     <>
@@ -87,23 +60,41 @@ export default function ModeladoBIMPage() {
             <BimServiceCard
               title={"Modelado BIM\nbajo protocolos ISO 19650"}
               subtitle="Integramos todas las disciplinas en un solo proyecto, asegurando eficiencia y coordinación desde la etapa conceptual hasta la construcción."
-            />
-          </div>
+            >
+              {/* Tarjeta PEB */}
+              <div className="rounded-2xl bg-white shadow-sm ring-1 ring-black/5 p-6 md:p-8">
+                <h3 className="text-lg font-semibold">Planes de Ejecución BIM (PEB)</h3>
+                <ul className="mt-4 space-y-2 text-slate-700">
+                  <li>✓ Definición de roles y responsabilidades.</li>
+                  <li>✓ Procesos de trabajo colaborativos.</li>
+                  <li>✓ Estándares y normas internacionales.</li>
+                  <li>✓ Entregables BIM claros y estructurados.</li>
+                </ul>
+              </div>
 
-          <div className="mt-10 grid gap-6 lg:grid-cols-2">
-            <ServiceCard title="Planes de Ejecución BIM (PEB)" items={pebItems} />
+              {/* Tarjeta LOD con colapsables por nivel */}
+              <div className="rounded-2xl bg-white shadow-sm ring-1 ring-black/5 p-6 md:p-8">
+                <h3 className="text-lg font-semibold">LOD – Niveles de Desarrollo</h3>
+                <p className="text-slate-600 text-sm">Adaptamos el nivel de detalle según la etapa del proyecto.</p>
+                <div className="mt-4">
+                  {/* contenido puro, sin tarjeta adicional */}
+                  <LODList />
+                </div>
+              </div>
 
-            <ExpandableCard
-              title="LOD – Niveles de Desarrollo"
-              intro="Adaptamos el nivel de detalle según la etapa del proyecto."
-              items={lodItems}
-            />
+              {/* Tarjeta Proyectos Ejecutados */}
+              <div className="rounded-2xl bg-white shadow-sm ring-1 ring-black/5 p-6 md:p-8 lg:col-span-2">
+                <h3 className="text-lg font-semibold">Proyectos Ejecutados</h3>
+                <p className="text-slate-600 text-sm">Experiencia comprobada en distintas escalas.</p>
+                <div className="mt-4">
+                  {/* contenido puro, sin tarjeta adicional */}
+                  <ProjectsList />
+                </div>
+              </div>
 
-            <ServiceCard title="Proyectos Ejecutados" items={projectItems} />
-
-            <div className="lg:col-span-2">
-              <FormatsGrid />
-            </div>
+              {/* Tarjeta Entregables (si la usas) */}
+              {/* <div className="rounded-2xl bg-white shadow-sm ring-1 ring-black/5 p-6 md:p-8 lg:col-span-2">...</div> */}
+            </BimServiceCard>
           </div>
         </div>
       </section>
@@ -125,7 +116,6 @@ export default function ModeladoBIMPage() {
         </div>
       </section>
 
-      <BimDeepSections />
     </>
   )
 }
