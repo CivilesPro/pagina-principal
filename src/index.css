@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Reset mínimo para layout correcto */
+html, body, #root { height: 100%; }
+body { margin: 0; background: #fff; color: #111; }
+#root { width: 100%; }
+
+/* Helpers UI */
+.btn { @apply inline-flex items-center px-5 py-3 rounded-2xl font-semibold border transition; }
+.btn-primary { @apply btn bg-primary text-white border-transparent hover:opacity-90; }
+.btn-outline { @apply btn border-primary text-primary hover:bg-primary/10; }
+
+/* Wrappers de ancho (no usar .container de Tailwind para evitar choques) */
+.wrap       { @apply mx-auto w-full max-w-7xl; }            /* ~1280px */
+.wrap-wide  { @apply mx-auto w-full max-w-screen-2xl; }     /* ~1536px */
+.wrap-fluid { @apply w-full; }                               /* 100% */
+
+/* Announcement bar marquee */
+@keyframes announcement-marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.announcement-track {
+  animation: announcement-marquee 25s linear infinite;
+}
+
+@layer utilities {
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
