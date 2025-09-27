@@ -1,124 +1,117 @@
-import React from "react"
-import { useSearchParams } from "react-router-dom"
-import SEO from "../components/SEO.jsx"
-import ProductModal from "../components/ProductModal.jsx"
-import products from "../data/products.js"
-import { SUPPORTED_CURRENCIES } from "../data/exchangeRates.js"
-import { formatPrice } from "../utils/formatPrice.js"
+import * as React from "react";
+import { useSearchParams } from "react-router-dom";
+import SEO from "../components/SEO.jsx";
+import ProductModal from "../components/ProductModal.jsx";
+import products from "../data/products.js";
+import CurrencySelector from "../components/CurrencySelector.jsx";
+import { SUPPORTED_CURRENCIES } from "../data/exchangeRates.js";
+import { formatPrice } from "../utils/formatPrice.js";
 
-const SITE_URL = "https://civilespro.com"
-const DEFAULT_CURRENCY = "COP"
+const SITE_URL = "https://civilespro.com";
+const DEFAULT_CURRENCY = "COP";
 
 const BADGES_BY_SLUG = {
   "cantidades-instant": "Más vendido",
   "control-acero": "Mejor precio",
   "concretos-autohormigoneras": "Nuevo",
-}
+};
 
-function normalizeCurrency(value) {
-  if (!value) return null
-  const upper = value.toUpperCase()
-  return SUPPORTED_CURRENCIES.includes(upper) ? upper : null
+function normalizeCurrency(code) {
+  if (!code) return null;
+  const up = String(code).toUpperCase();
+  return SUPPORTED_CURRENCIES.includes(up) ? up : null;
 }
 
 export default function ProductosPage() {
-  const [searchParams, setSearchParams] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams();
 
+  // INIT: una sola vez, resolviendo prioridad URL -> localStorage -> default
   const [currency, setCurrency] = React.useState(() => {
-    const fromParam = normalizeCurrency(searchParams.get("currency"))
-    if (fromParam) return fromParam
+    const fromURL = normalizeCurrency(searchParams.get("currency"));
+    if (fromURL) return fromURL;
+    const fromStorage = normalizeCurrency(
+      typeof window !== "undefined" ? window.localStorage.getItem("currency") : null
+    );
+    return fromStorage || DEFAULT_CURRENCY;
+  });
 
+  // Escribir en localStorage cuando cambie currency
+  React.useEffect(() => {
     if (typeof window !== "undefined") {
-      const stored = normalizeCurrency(window.localStorage.getItem("currency"))
-      if (stored) return stored
+      window.localStorage.setItem("currency", currency);
     }
+  }, [currency]);
 
-    return DEFAULT_CURRENCY
-  })
+  // Mantener URL sincronizada con currency (sin hacer eco de vuelta)
+  React.useEffect(() => {
+    const current = normalizeCurrency(searchParams.get("currency"));
+    if (currency === DEFAULT_CURRENCY) {
+      if (current) {
+        const next = new URLSearchParams(searchParams);
+        next.delete("currency");
+        setSearchParams(next, { replace: true });
+      }
+      return;
+    }
+    if (currency !== current) {
+      const next = new URLSearchParams(searchParams);
+      next.set("currency", currency);
+      setSearchParams(next, { replace: true });
+    }
+  }, [currency, searchParams, setSearchParams]);
 
-  const handleCurrencyChange = React.useCallback(
-    (nextCurrency) => {
-      setCurrency((current) => (current === nextCurrency ? current : nextCurrency))
-    },
-    []
-  )
+  // Si el usuario pega un link con ?currency=XXX, reflejarlo UNA VEZ si cambia el query
+  React.useEffect(() => {
+    const fromParam = normalizeCurrency(searchParams.get("currency"));
+    if (fromParam && fromParam !== currency) {
+      setCurrency(fromParam);
+    }
+    // No pongas `currency` en deps para no ciclar: este efecto
+    // solo escucha cambios de los searchParams.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
-  const [selectedProduct, setSelectedProduct] = React.useState(null)
+  // handler directo y sin memo para evitar closures obsoletos
+  const handleCurrencyChange = (code) => {
+    const norm = normalizeCurrency(code) || DEFAULT_CURRENCY;
+    setCurrency(norm);
+  };
+
+  const [selectedProduct, setSelectedProduct] = React.useState(null);
 
   const handleOpenProduct = React.useCallback((product) => {
-    setSelectedProduct(product)
-  }, [])
+    setSelectedProduct(product);
+  }, []);
 
   React.useEffect(() => {
-    if (!selectedProduct) return
-    if (typeof window === "undefined" || typeof document === "undefined") return
+    if (!selectedProduct) return;
+    if (typeof window === "undefined" || typeof document === "undefined") return;
 
-    const scrollY = window.scrollY
-    const body = document.body
-    if (!body) return
+    const scrollY = window.scrollY;
+    const body = document.body;
+    if (!body) return;
 
-    const { style } = body
+    const { style } = body;
     const previousStyles = {
       overflow: style.overflow,
       position: style.position,
       top: style.top,
       width: style.width,
-    }
+    };
 
-    style.overflow = "hidden"
-    style.position = "fixed"
-    style.top = `-${scrollY}px`
-    style.width = "100%"
+    style.overflow = "hidden";
+    style.position = "fixed";
+    style.top = `-${scrollY}px`;
+    style.width = "100%";
 
     return () => {
-      style.overflow = previousStyles.overflow || ""
-      style.position = previousStyles.position || ""
-      style.top = previousStyles.top || ""
-      style.width = previousStyles.width || ""
-      window.scrollTo(0, scrollY)
-    }
-  }, [selectedProduct])
-
-  React.useEffect(() => {
-    const paramCurrency = normalizeCurrency(searchParams.get("currency"))
-    if (paramCurrency && paramCurrency !== currency) {
-      setCurrency(paramCurrency)
-      if (typeof window !== "undefined") {
-        window.localStorage.setItem("currency", paramCurrency)
-      }
-    }
-  }, [searchParams, currency])
-
-  React.useEffect(() => {
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem("currency", currency)
-    }
-
-    setSearchParams(
-      (previousParams) => {
-        const currentParam = normalizeCurrency(previousParams.get("currency"))
-
-        if (currency === DEFAULT_CURRENCY) {
-          if (!currentParam) {
-            return previousParams
-          }
-
-          const nextParams = new URLSearchParams(previousParams)
-          nextParams.delete("currency")
-          return nextParams
-        }
-
-        if (currency === currentParam) {
-          return previousParams
-        }
-
-        const nextParams = new URLSearchParams(previousParams)
-        nextParams.set("currency", currency)
-        return nextParams
-      },
-      { replace: true }
-    )
-  }, [currency, setSearchParams])
+      style.overflow = previousStyles.overflow || "";
+      style.position = previousStyles.position || "";
+      style.top = previousStyles.top || "";
+      style.width = previousStyles.width || "";
+      window.scrollTo(0, scrollY);
+    };
+  }, [selectedProduct]);
 
   return (
     <>
@@ -149,57 +142,39 @@ export default function ProductosPage() {
                 Recursos listos para usar que aceleran tu flujo de trabajo diario.
               </p>
             </div>
-            <div className="flex flex-col gap-2 md:items-end">
-              <span className="text-sm font-medium text-gray-600">Moneda</span>
-              <div className="inline-flex max-w-full gap-1 overflow-x-auto rounded-full border border-gray-200 bg-white p-1 shadow-sm snap-x">
-                {SUPPORTED_CURRENCIES.map((code) => {
-                  const isActive = code === currency
-                  return (
-                    <button
-                      key={code}
-                      type="button"
-                      className={`snap-center rounded-full px-4 py-2 text-sm font-semibold transition-colors duration-200 whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 ${
-                        isActive
-                          ? "bg-emerald-600 text-white shadow"
-                          : "text-gray-700 hover:bg-emerald-50"
-                      }`}
-                      onClick={() => handleCurrencyChange(code)}
-                    >
-                      {code}
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
+
+            <CurrencySelector value={currency} onChange={handleCurrencyChange} />
           </div>
 
           <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {products.map((product) => {
-              const formattedPrice = formatPrice(product.priceCop, currency)
+              const formattedPrice = formatPrice(product.priceCop, currency);
               const formattedYearPrice =
                 product.priceCopYear != null
                   ? formatPrice(product.priceCopYear, currency)
-                  : null
+                  : null;
 
-              const badgeLabel = BADGES_BY_SLUG[product.slug]
-              const isConsultation = product.priceCop == null
+              const badgeLabel = BADGES_BY_SLUG[product.slug];
+              const isConsultation = product.priceCop == null;
 
               return (
                 <article
                   key={product.slug}
-                  className={`group relative flex h-full flex-col rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg ${isConsultation ? "" : "cursor-pointer"}`}
+                  className={`group relative flex h-full flex-col rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg ${
+                    isConsultation ? "" : "cursor-pointer"
+                  }`}
                   role="button"
                   tabIndex={isConsultation ? -1 : 0}
                   aria-disabled={isConsultation}
                   onClick={() => {
-                    if (isConsultation) return
-                    handleOpenProduct(product)
+                    if (isConsultation) return;
+                    handleOpenProduct(product);
                   }}
                   onKeyDown={(event) => {
-                    if (isConsultation) return
+                    if (isConsultation) return;
                     if (event.key === "Enter" || event.key === " ") {
-                      event.preventDefault()
-                      handleOpenProduct(product)
+                      event.preventDefault();
+                      handleOpenProduct(product);
                     }
                   }}
                 >
@@ -208,13 +183,14 @@ export default function ProductosPage() {
                       {badgeLabel}
                     </span>
                   ) : null}
-                <div className="mb-4 aspect-square overflow-hidden rounded-xl bg-gray-100">
-                      <img
-                        src={product.image}
-                        alt={product.title}
-                        className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-[1.03]"
-                      />
-                    </div>
+
+                  <div className="mb-4 aspect-square overflow-hidden rounded-xl bg-gray-100">
+                    <img
+                      src={product.image}
+                      alt={product.title}
+                      className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-[1.03]"
+                    />
+                  </div>
 
                   <div className="flex flex-col gap-2">
                     <h3 className="text-lg font-semibold leading-tight text-gray-900 line-clamp-2">
@@ -243,9 +219,9 @@ export default function ProductosPage() {
                           : "bg-emerald-700 text-white hover:bg-emerald-800"
                       }`}
                       onClick={(event) => {
-                        event.stopPropagation()
-                        if (isConsultation) return
-                        handleOpenProduct(product)
+                        event.stopPropagation();
+                        if (isConsultation) return;
+                        handleOpenProduct(product);
                       }}
                       disabled={isConsultation}
                     >
@@ -253,7 +229,7 @@ export default function ProductosPage() {
                     </button>
                   </div>
                 </article>
-              )
+              );
             })}
           </div>
 
@@ -272,5 +248,5 @@ export default function ProductosPage() {
         />
       )}
     </>
-  )
+  );
 }
