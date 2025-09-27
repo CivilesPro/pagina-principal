@@ -51,6 +51,90 @@ class CaptureOrderResponse(BaseModel):
     downloadUrl: str
 
 
+def _finalize_purchase(
+    purchase: Purchase,
+    db: Session,
+    now: datetime,
+    order_id: str,
+    payer_email: Optional[str],
+) -> CaptureOrderResponse | JSONResponse:
+    existing_token = (
+        db.query(DownloadToken)
+        .filter(DownloadToken.order_id == order_id)
+        .order_by(DownloadToken.created_at.desc())
+        .first()
+    )
+
+    if existing_token and existing_token.expires_at > now:
+        needs_commit = False
+        if purchase.status != "COMPLETED":
+            purchase.status = "COMPLETED"
+            needs_commit = True
+        if payer_email and purchase.payer_email != payer_email:
+            purchase.payer_email = payer_email
+            needs_commit = True
+
+        if needs_commit:
+            db.add(purchase)
+            try:
+                db.commit()
+            except Exception:
+                db.rollback()
+                logger.exception("Database error while finalizing order '%s'", order_id)
+                return _json_error(500, "No se pudo finalizar la orden.")
+
+        logger.info(
+            "Existing download token reused for order '%s' (token id '%s')",
+            order_id,
+            existing_token.id,
+        )
+        return CaptureOrderResponse(downloadUrl=_build_download_url(existing_token.id))
+
+    product = catalog.get_product(purchase.slug)
+    if not product or not product.file_key:
+        db.rollback()
+        logger.error(
+            "Product '%s' is missing file key during capture for order '%s'",
+            purchase.slug,
+            order_id,
+        )
+        return _json_error(500, "Producto sin archivo configurado")
+
+    expires_at = now + timedelta(hours=DOWNLOAD_TOKEN_TTL_HOURS)
+    token_id = str(uuid4())
+
+    purchase.status = "COMPLETED"
+    if payer_email:
+        purchase.payer_email = payer_email
+
+    token = DownloadToken(
+        id=token_id,
+        slug=purchase.slug,
+        file_key=product.file_key,
+        order_id=order_id,
+        payer_email=purchase.payer_email,
+        expires_at=expires_at,
+    )
+
+    db.add(purchase)
+    db.add(token)
+
+    try:
+        db.commit()
+    except Exception:
+        db.rollback()
+        logger.exception("Database error while finalizing order '%s'", order_id)
+        return _json_error(500, "No se pudo finalizar la orden.")
+
+    logger.info(
+        "Order '%s' captured successfully. Download token '%s' generated with expiration %s",
+        order_id,
+        token_id,
+        expires_at.isoformat(),
+    )
+    return CaptureOrderResponse(downloadUrl=_build_download_url(token.id))
+
+
 def _amount_to_string(value: Decimal) -> str:
     return f"{value:.2f}"
 
@@ -164,22 +248,10 @@ async def capture_order_endpoint(payload: CaptureOrderRequest, db: Session = Dep
     now = datetime.now(timezone.utc)
 
     if purchase.status == "COMPLETED":
-        existing_token = (
-            db.query(DownloadToken)
-            .filter(DownloadToken.order_id == order_id)
-            .order_by(DownloadToken.created_at.desc())
-            .first()
-        )
-        if existing_token and existing_token.expires_at > now:
-            logger.info(
-                "Existing download token reused for order '%s' (token id '%s')",
-                order_id,
-                existing_token.id,
-            )
-            return CaptureOrderResponse(downloadUrl=_build_download_url(existing_token.id))
+        return _finalize_purchase(purchase, db, now, order_id, purchase.payer_email)
 
     try:
-        capture_data = await paypal_capture_order(order_id)
+        response = await paypal_capture_order(order_id)
     except PayPalError as exc:
         logger.error("PayPal error while capturing order '%s': %s", order_id, exc)
         return _json_error(502, f"PayPal error: {exc}")
@@ -187,8 +259,61 @@ async def capture_order_endpoint(payload: CaptureOrderRequest, db: Session = Dep
         logger.exception("Unexpected error while capturing order '%s'", order_id)
         return _json_error(500, f"Server error: {exc}")
 
-    if capture_data.get("status") != "COMPLETED":
-        logger.warning("Capture response for order '%s' not completed: %s", order_id, capture_data.get("status"))
+    try:
+        capture_data = response.json()
+    except ValueError:
+        capture_data = None
+
+    if response.status_code >= 400:
+        error_payload = capture_data if isinstance(capture_data, dict) else {}
+        details = error_payload.get("details") if isinstance(error_payload, dict) else None
+
+        def _has_issue(issue: str) -> bool:
+            if not isinstance(details, list):
+                return False
+            return any(isinstance(item, dict) and item.get("issue") == issue for item in details)
+
+        name = error_payload.get("name") if isinstance(error_payload, dict) else None
+        issue_value = error_payload.get("issue") if isinstance(error_payload, dict) else None
+
+        if (
+            issue_value == "ORDER_ALREADY_CAPTURED"
+            or (name == "UNPROCESSABLE_ENTITY" and _has_issue("ORDER_ALREADY_CAPTURED"))
+            or _has_issue("ORDER_ALREADY_CAPTURED")
+        ):
+            logger.info("PayPal reported order '%s' already captured; reusing download link", order_id)
+            return _finalize_purchase(purchase, db, now, order_id, purchase.payer_email)
+
+        if (
+            issue_value == "INSTRUMENT_DECLINED"
+            or name == "INSTRUMENT_DECLINED"
+            or _has_issue("INSTRUMENT_DECLINED")
+        ):
+            return _json_error(400, "Método de pago declinado. Intenta nuevamente.")
+
+        message: Optional[str] = None
+        if isinstance(error_payload, dict):
+            message = error_payload.get("message")
+            if not message and isinstance(details, list) and details:
+                first_detail = details[0]
+                if isinstance(first_detail, dict):
+                    message = first_detail.get("description") or first_detail.get("issue")
+
+        if not message:
+            message = response.text or "Respuesta inválida de PayPal"
+
+        message = str(message)
+
+        logger.warning("PayPal capture error for order '%s': %s", order_id, message)
+        return _json_error(400, f"PayPal error: {message}")
+
+    if not isinstance(capture_data, dict):
+        logger.error("PayPal capture response invalid for order '%s': %s", order_id, response.text)
+        return _json_error(502, "Respuesta inválida de PayPal")
+
+    status = capture_data.get("status")
+    if status != "COMPLETED":
+        logger.warning("Capture response for order '%s' not completed: %s", order_id, status)
         return _json_error(400, "La orden no fue completada.")
 
     purchase_units = capture_data.get("purchase_units") or []
@@ -216,7 +341,7 @@ async def capture_order_endpoint(payload: CaptureOrderRequest, db: Session = Dep
     captured_value = capture_amount.get("value")
     captured_currency = capture_amount.get("currency_code")
 
-    if not captured_value or not captured_currency:
+    if not captured_value:
         logger.error("Capture amount invalid for order '%s': %s", order_id, capture_entry)
         return _json_error(400, "Monto de captura inválido")
 
@@ -226,60 +351,26 @@ async def capture_order_endpoint(payload: CaptureOrderRequest, db: Session = Dep
         logger.exception("Invalid capture amount format for order '%s': %s", order_id, capture_entry)
         return _json_error(400, "Monto de captura inválido")
 
-    if captured_currency.upper() != purchase.currency.upper():
-        logger.error(
-            "Capture currency mismatch for order '%s': expected %s got %s",
+    stored_currency = (purchase.currency or "").upper()
+    capture_currency_code = (captured_currency or "").upper() if captured_currency else ""
+    if capture_currency_code == stored_currency and stored_currency:
+        stored_amount = Decimal(purchase.amount)
+        if captured_decimal != stored_amount:
+            logger.error(
+                "Capture amount mismatch for order '%s': expected %s got %s",
+                order_id,
+                stored_amount,
+                captured_decimal,
+            )
+            return _json_error(400, "El monto capturado no coincide")
+    else:
+        logger.info(
+            "Capture currency '%s' differs from stored currency '%s' for order '%s'; skipping direct amount validation",
+            capture_currency_code or "(desconocida)",
+            stored_currency or "(desconocida)",
             order_id,
-            purchase.currency,
-            captured_currency,
         )
-        return _json_error(400, "Moneda de captura inválida")
-
-    stored_amount = Decimal(purchase.amount)
-    if captured_decimal != stored_amount:
-        logger.error(
-            "Capture amount mismatch for order '%s': expected %s got %s",
-            order_id,
-            stored_amount,
-            captured_decimal,
-        )
-        return _json_error(400, "El monto capturado no coincide")
 
     payer_email = (capture_data.get("payer") or {}).get("email_address")
 
-    purchase.status = "COMPLETED"
-    purchase.payer_email = payer_email
-    db.add(purchase)
-
-    product = catalog.get_product(purchase.slug)
-    if not product or not product.file_key:
-        db.rollback()
-        logger.error("Product '%s' is missing file key during capture for order '%s'", purchase.slug, order_id)
-        return _json_error(500, "Producto sin archivo configurado")
-
-    expires_at = now + timedelta(hours=DOWNLOAD_TOKEN_TTL_HOURS)
-    token_id = str(uuid4())
-    token = DownloadToken(
-        id=token_id,
-        slug=purchase.slug,
-        file_key=product.file_key,
-        order_id=order_id,
-        payer_email=payer_email,
-        expires_at=expires_at,
-    )
-    db.add(token)
-
-    try:
-        db.commit()
-    except Exception:  # pragma: no cover - commit protection
-        db.rollback()
-        logger.exception("Database error while finalizing order '%s'", order_id)
-        return _json_error(500, "No se pudo finalizar la orden.")
-
-    logger.info(
-        "Order '%s' captured successfully. Download token '%s' generated with expiration %s",
-        order_id,
-        token_id,
-        expires_at.isoformat(),
-    )
-    return CaptureOrderResponse(downloadUrl=_build_download_url(token.id))
+    return _finalize_purchase(purchase, db, now, order_id, payer_email)

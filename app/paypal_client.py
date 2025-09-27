@@ -159,8 +159,12 @@ async def create_order(amount_value: str, currency_code: str, description: str, 
     return response.json()
 
 
-async def capture_order(order_id: str) -> Dict[str, Any]:
-    """Capture a previously approved PayPal order."""
+async def capture_order(order_id: str) -> httpx.Response:
+    """Capture a previously approved PayPal order.
+
+    Returns the raw HTTP response so that callers can inspect
+    idempotency-related errors (e.g. ORDER_ALREADY_CAPTURED).
+    """
 
     access_token = await _get_access_token()
 
@@ -179,12 +183,11 @@ async def capture_order(order_id: str) -> Dict[str, Any]:
 
     if response.status_code >= 400:
         detail = _paypal_error_message(response, f"HTTP {response.status_code}")
-        logger.error(
+        logger.warning(
             "PayPal capture order request returned %s for %s: %s",
             response.status_code,
             order_id,
             detail,
         )
-        raise PayPalError(f"Error al capturar la orden {order_id}: {detail}")
 
-    return response.json()
+    return response
