@@ -31,18 +31,15 @@ export const projectsSection = {
     "Experiencia comprobada implementando flujos BIM en proyectos reales de distintas escalas.",
 }
 
+// LODs
 export const lodItems = [
   {
     id: "lod100",
     icon: "brain",
     title: "LOD 100: Idea / Anteproyecto conceptual",
-    short: "Modelo conceptual para evaluar volumen, áreas y alternativas; útil para estimaciones de alto nivel.",
-    desc: "Modelo a nivel conceptual que apoya decisiones tempranas: volumetrías, relaciones espaciales y supuestos de costos/plazos. Útil para evaluar alternativas y riesgos sin comprometer diseño detallado.",
-    images: [
-      "/img/bim/lod100/01.webp",
-      "/img/bim/lod100/02.webp",
-      "/img/bim/lod100/03.webp",
-    ],
+    short: "Modelo conceptual para evaluar volumen, áreas y alternativas.",
+    desc: "Modelo a nivel conceptual que apoya decisiones tempranas (volumetrías, relaciones espaciales y supuestos de costo/plazo). Útil para estimaciones de alto nivel y evaluación de alternativas.",
+    images: ["/img/bim/lod100/01.webp", "/img/bim/lod100/02.webp", "/img/bim/lod100/03.webp"],
     whatsMsg:
       "Hola, me interesa el servicio LOD 100 (Idea/Anteproyecto). ¿Podemos hablar de mi proyecto?",
   },
@@ -50,72 +47,51 @@ export const lodItems = [
     id: "lod200",
     icon: "brain",
     title: "LOD 200: Desarrollo esquemático",
-    short: "Diseño preliminar con geometrías aproximadas y ubicación de sistemas; base para coordinación inicial.",
-    desc: "Modelo que incorpora geometrías aproximadas y ubicación general de sistemas. Permite validar criterios de diseño, estimar cantidades preliminares y preparar la coordinación interdisciplinar inicial.",
-    images: [
-      "/img/bim/lod200/01.webp",
-      "/img/bim/lod200/02.webp",
-      "/img/bim/lod200/03.webp",
-    ],
-    whatsMsg:
-      "Hola, me interesa el servicio LOD 200 (Desarrollo esquemático). ¿Podemos hablar de mi proyecto?",
+    short: "Geometrías aproximadas, ubicación de sistemas y coordinación inicial.",
+    desc: "Diseño preliminar con definiciones aproximadas, ubicación de elementos y base para coordinación temprana entre disciplinas.",
+    images: ["/img/bim/lod200/01.webp"],
+    whatsMsg: "Hola, me interesa el servicio LOD 200.",
   },
   {
     id: "lod300",
     icon: "brain",
     title: "LOD 300: Diseño coordinado",
-    short: "Geometría definida y relaciones precisas; lista para coordinación técnica y extracción confiable de cantidades.",
-    desc: "Modelo con geometría definida, relaciones precisas y especificaciones asociadas. Facilita la coordinación técnica entre disciplinas y permite extraer cantidades confiables para planeación y compras.",
-    images: [
-      "/img/bim/lod300/01.webp",
-      "/img/bim/lod300/02.webp",
-      "/img/bim/lod300/03.webp",
-    ],
-    whatsMsg:
-      "Hola, me interesa el servicio LOD 300 (Diseño coordinado). ¿Podemos hablar de mi proyecto?",
+    short: "Geometría definida y relaciones precisas para extracción confiable de cantidades.",
+    desc: "Geometría y relaciones precisas, listas para coordinación técnica, detección de interferencias y cantidades confiables.",
+    images: ["/img/bim/lod300/01.webp"],
+    whatsMsg: "Hola, me interesa el servicio LOD 300.",
   },
   {
     id: "lod400",
     icon: "brain",
     title: "LOD 400: Construcción y prefabricación",
-    short: "Modelo para construcción y fabricación; incluye detalles y ensamblajes para producción en obra/taller.",
-    desc: "Modelo listo para construcción y prefabricación, con detalles constructivos, secuencias y ensamblajes. Soporta la fabricación en taller y la logística de montaje en obra.",
-    images: [
-      "/img/bim/lod400/01.webp",
-      "/img/bim/lod400/02.webp",
-      "/img/bim/lod400/03.webp",
-    ],
-    whatsMsg:
-      "Hola, me interesa el servicio LOD 400 (Construcción/prefabricación). ¿Podemos hablar de mi proyecto?",
+    short: "Detalles para producción en obra/taller.",
+    desc: "Modelo para fabricación/armado, incluye detalles, uniones y secuencias necesarias para producción.",
+    images: ["/img/bim/lod400/01.webp"],
+    whatsMsg: "Hola, me interesa el servicio LOD 400.",
   },
   {
     id: "lod500",
     icon: "brain",
     title: "LOD 500: Operación y mantenimiento",
-    short: "Modelo conforme a obra (as-built) para operación y mantenimiento.",
-    desc: "Modelo conforme a obra que documenta el estado final del activo. Integra información para operación, mantenimiento preventivo y gestión del ciclo de vida de la infraestructura.",
-    images: [
-      "/img/bim/lod500/01.webp",
-      "/img/bim/lod500/02.webp",
-      "/img/bim/lod500/03.webp",
-    ],
-    whatsMsg:
-      "Hola, me interesa el servicio LOD 500 (Operación/Mantenimiento). ¿Podemos hablar de mi proyecto?",
+    short: "Modelo conforme a obra (as-built) para O&M.",
+    desc: "Modelo verificado en campo, base para operación, mantenimiento, activos y gemelo digital.",
+    images: ["/img/bim/lod500/01.webp"],
+    whatsMsg: "Hola, me interesa el servicio LOD 500.",
   },
 ]
 
+// Proyectos ejecutados
 export const executedProjects = [
   {
     id: "nave-industrial",
     name: "Nave Industrial",
-    summary:
-      "Modelado integral para nave logística con coordinación de estructuras y arquitectura en etapas tempranas.",
+    intro: "Modelado integral con coordinación de estructuras y arquitectura en etapas tempranas.",
     disciplines: ["Arquitectura", "Estructuras"],
     lodLevels: ["LOD 200", "LOD 300"],
     complexity: {
       title: "Tipo de Edificio y Complejidad",
       text: "Nave industrial de uso múltiple para almacenamiento y operaciones logísticas ligeras. Pórticos en acero y elementos en concreto reforzado.",
-      options: ["Complejidad Media"],
     },
     deliverables: ["IFC", "PDF", "DWG"],
     images: {
@@ -133,14 +109,12 @@ export const executedProjects = [
   {
     id: "vivienda-unifamiliar",
     name: "Vivienda Unifamiliar",
-    summary:
-      "Residencia unifamiliar optimizada para un cronograma acelerado y control de costos desde la fase esquemática.",
+    intro: "Modelado arquitectónico con énfasis en tiempos de entrega y optimización de costos.",
     disciplines: ["Arquitectura"],
     lodLevels: ["LOD 200"],
     complexity: {
       title: "Tipo de Edificio y Complejidad",
-      text: "Vivienda unifamiliar de baja complejidad, optimizada para tiempos de obra y costos.",
-      options: ["Baja Complejidad"],
+      text: "Vivienda unifamiliar compacta, diseñada para ejecución ágil y control presupuestal.",
     },
     deliverables: ["IFC", "PDF", "DWG"],
     images: {
@@ -152,14 +126,12 @@ export const executedProjects = [
   {
     id: "edificio-residencial",
     name: "Edificio Residencial",
-    summary:
-      "Torre de vivienda multifamiliar con coordinación entre arquitectura y sistemas MEP para mitigación de interferencias.",
+    intro: "Torre de vivienda multifamiliar coordinada entre arquitectura y sistemas MEP.",
     disciplines: ["Arquitectura", "MEP"],
     lodLevels: ["LOD 200", "LOD 300"],
     complexity: {
       title: "Tipo de Edificio y Complejidad",
-      text: "Edificio residencial de media altura con énfasis en eficiencia energética y confort interior.",
-      options: ["Complejidad Alta"],
+      text: "Edificio residencial de media altura con foco en eficiencia energética y confort interior.",
     },
     deliverables: ["IFC", "PDF", "DWG"],
     images: {
@@ -187,14 +159,12 @@ export const executedProjects = [
   {
     id: "hospital-primer-nivel",
     name: "Hospital de Primer Nivel",
-    summary:
-      "Coordinación multidisciplinar de hospital básico con rutas críticas de instalaciones y soporte a licenciamiento.",
+    intro: "Coordinación multidisciplinar con rutas críticas de instalaciones y soporte a licenciamiento.",
     disciplines: ["Arquitectura", "Estructuras", "MEP"],
     lodLevels: ["LOD 300", "LOD 400"],
     complexity: {
       title: "Tipo de Edificio y Complejidad",
-      text: "Centro hospitalario de primer nivel con estrictos estándares sanitarios y alta densidad de redes técnicas.",
-      options: ["Alta Complejidad"],
+      text: "Centro hospitalario básico con altos estándares sanitarios y densidad de redes técnicas.",
     },
     deliverables: ["IFC", "PDF", "DWG"],
     images: {
@@ -222,22 +192,17 @@ export const executedProjects = [
           "LOD 400": "/img/proyectos/hospital/mep-lod400.webp",
         },
       },
-      imagesByComplexity: {
-        "Alta Complejidad": "/img/proyectos/hospital/alta-complejidad.webp",
-      },
     },
   },
   {
     id: "bloque-escolar",
     name: "Bloque Escolar",
-    summary:
-      "Bloque académico modular con integración de estructura prefabricada y envolvente eficiente.",
+    intro: "Bloque académico modular con integración de estructura prefabricada y envolvente eficiente.",
     disciplines: ["Arquitectura", "Estructuras"],
     lodLevels: ["LOD 200", "LOD 300"],
     complexity: {
       title: "Tipo de Edificio y Complejidad",
       text: "Edificación educativa modular con requerimientos de flexibilidad y rápida ejecución.",
-      options: ["Complejidad Media"],
     },
     deliverables: ["IFC", "PDF", "DWG"],
     images: {
@@ -250,22 +215,17 @@ export const executedProjects = [
         "LOD 200": "/img/proyectos/escolar/lod200.webp",
         "LOD 300": "/img/proyectos/escolar/lod300.webp",
       },
-      imagesByComplexity: {
-        "Complejidad Media": "/img/proyectos/escolar/media.webp",
-      },
     },
   },
   {
     id: "centros-ips",
     name: "Centros de Atención IPS",
-    summary:
-      "Red de centros de salud para atención primaria con enfoque en replicabilidad y control de calidad.",
+    intro: "Red de centros de salud con enfoque en replicabilidad y control de calidad.",
     disciplines: ["Arquitectura"],
     lodLevels: ["LOD 200", "LOD 300"],
     complexity: {
       title: "Tipo de Edificio y Complejidad",
-      text: "Centros de atención IPS distribuidos, con prototipos adaptables a diferentes ubicaciones.",
-      options: ["Complejidad Media"],
+      text: "Centros de atención primaria con prototipos adaptables a diferentes ubicaciones.",
     },
     deliverables: ["IFC", "PDF", "DWG"],
     images: {
@@ -282,14 +242,12 @@ export const executedProjects = [
   {
     id: "edificio-multifuncional",
     name: "Edificio Multifuncional",
-    summary:
-      "Estructura de gran luz para usos mixtos con énfasis en coordinación estructural y logística constructiva.",
+    intro: "Estructura de gran luz enfocada en coordinación estructural y logística constructiva.",
     disciplines: ["Estructuras"],
     lodLevels: ["LOD 300", "LOD 400"],
     complexity: {
       title: "Tipo de Edificio y Complejidad",
-      text: "Edificio multifuncional con grandes luces y cargas variables que demandan ingeniería estructural avanzada.",
-      options: ["Alta Complejidad"],
+      text: "Edificio de usos mixtos con grandes luces y cargas variables que requieren ingeniería avanzada.",
     },
     deliverables: ["IFC", "PDF", "DWG"],
     images: {
@@ -300,9 +258,6 @@ export const executedProjects = [
       imagesByLOD: {
         "LOD 300": "/img/proyectos/multifuncional/lod300.webp",
         "LOD 400": "/img/proyectos/multifuncional/lod400.webp",
-      },
-      imagesByComplexity: {
-        "Alta Complejidad": "/img/proyectos/multifuncional/alta.webp",
       },
     },
   },
