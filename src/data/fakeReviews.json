@@ -1,0 +1,202 @@
+{
+  "pedido-acero": [
+    {
+      "name": "Ing. Rojas",
+      "rating": 5,
+      "date": "2025-09-10",
+      "text": "Me ahorró horas en cada vaciado y puedo justificar desperdicios con datos." 
+    },
+    {
+      "name": "Arq. Pérez",
+      "rating": 4,
+      "date": "2025-08-22",
+      "text": "Muy útil para pedidos sin desperdicio, solo agregaría más tablas dinámicas." 
+    },
+    {
+      "name": "Ing. Moreno",
+      "rating": 5,
+      "date": "2025-07-18",
+      "text": "Perfecto para delegar el cálculo al residente nuevo sin perder control." 
+    }
+  ],
+  "control-acero": [
+    {
+      "name": "Ing. Villamizar",
+      "rating": 5,
+      "date": "2025-06-04",
+      "text": "El tablero de consumos nos salvó en una auditoría interna." 
+    },
+    {
+      "name": "Tec. Camacho",
+      "rating": 4,
+      "date": "2025-05-11",
+      "text": "Todo queda trazable, incluso los traslados entre frentes." 
+    },
+    {
+      "name": "Ing. Gómez",
+      "rating": 5,
+      "date": "2025-03-28",
+      "text": "Se integra perfecto con la plantilla de pedidos, van en combo." 
+    }
+  ],
+  "almacen-obra": [
+    {
+      "name": "Arq. Hernández",
+      "rating": 5,
+      "date": "2025-09-02",
+      "text": "Kardex automático por capítulo listo para reportar cada viernes." 
+    },
+    {
+      "name": "Ing. Calderón",
+      "rating": 4,
+      "date": "2025-04-15",
+      "text": "El resumen mensual nos ayudó a renegociar con proveedores." 
+    },
+    {
+      "name": "Aux. Prieto",
+      "rating": 5,
+      "date": "2025-02-01",
+      "text": "Almacén organizado y sin filas interminables en la bodega." 
+    }
+  ],
+  "formaletas-encofrados": [
+    {
+      "name": "Ing. Bernal",
+      "rating": 5,
+      "date": "2025-08-09",
+      "text": "Sabemos exactamente cuántos páneles quedan disponibles en cada frente." 
+    },
+    {
+      "name": "Ing. Nieto",
+      "rating": 4,
+      "date": "2025-06-22",
+      "text": "El cronograma semanal con rotación automática es un hit." 
+    },
+    {
+      "name": "Ing. Ruiz",
+      "rating": 5,
+      "date": "2025-05-03",
+      "text": "Reducimos retrasos por montaje gracias a los avisos tempranos." 
+    }
+  ],
+  "cantidades-instant": [
+    {
+      "name": "Ing. Rincón",
+      "rating": 5,
+      "date": "2025-09-17",
+      "text": "Sacamos metrados completos para una licitación en una tarde." 
+    },
+    {
+      "name": "Arq. Suárez",
+      "rating": 5,
+      "date": "2025-07-21",
+      "text": "Las partidas especiales de acabados quedaron listas sin fórmulas nuevas." 
+    },
+    {
+      "name": "Ing. Quintero",
+      "rating": 4,
+      "date": "2025-05-08",
+      "text": "Gran base, solo agregamos nuestros ítems personalizados." 
+    }
+  ],
+  "concretos-autohormigoneras": [
+    {
+      "name": "Mtro. García",
+      "rating": 5,
+      "date": "2025-09-01",
+      "text": "Las tandas en trompo salir listas es oro." 
+    },
+    {
+      "name": "Ing. Cabrera",
+      "rating": 5,
+      "date": "2025-08-05",
+      "text": "Por fin tenemos control del tiempo de mezclado y las dosis por viaje." 
+    },
+    {
+      "name": "Ing. Duarte",
+      "rating": 4,
+      "date": "2025-03-12",
+      "text": "El reporte en PDF facilita enviar instrucciones a planta." 
+    }
+  ],
+  "plataforma-civilespro": [
+    {
+      "name": "Ing. Valencia",
+      "rating": 5,
+      "date": "2025-09-03",
+      "text": "Conectamos APU y reportes diarios en un solo flujo." 
+    },
+    {
+      "name": "Arq. Roldán",
+      "rating": 4,
+      "date": "2025-08-14",
+      "text": "El plan anual trae soporte prioritario, vale la pena." 
+    },
+    {
+      "name": "Ing. Mejía",
+      "rating": 5,
+      "date": "2025-04-02",
+      "text": "Los informes diarios con fotos adjuntas quedan impecables." 
+    }
+  ],
+  "plantillas-revit": [
+    {
+      "name": "Arq. Bonilla",
+      "rating": 5,
+      "date": "2025-07-30",
+      "text": "Empezamos proyectos BIM con la plantilla lista para IFC." 
+    },
+    {
+      "name": "Ing. Uribe",
+      "rating": 5,
+      "date": "2025-06-16",
+      "text": "Las familias paramétricas ahorran horas al modelar estructuras." 
+    },
+    {
+      "name": "Arq. Cifuentes",
+      "rating": 4,
+      "date": "2025-04-27",
+      "text": "Incluye detalles constructivos listos para planos ejecutivos." 
+    }
+  ],
+  "bloques-dinamicos": [
+    {
+      "name": "Dib. Ramírez",
+      "rating": 5,
+      "date": "2025-09-05",
+      "text": "Los bloques inteligentes redujeron 40% el tiempo de dibujo." 
+    },
+    {
+      "name": "Arq. Cárdenas",
+      "rating": 4,
+      "date": "2025-07-02",
+      "text": "Trae variantes para instalaciones que casi no se consiguen." 
+    },
+    {
+      "name": "Ing. Pardo",
+      "rating": 5,
+      "date": "2025-05-19",
+      "text": "Integramos los bloques con tablas de cuantía en minutos." 
+    }
+  ],
+  "megapack": [
+    {
+      "name": "Ing. Zamora",
+      "rating": 5,
+      "date": "2025-08-12",
+      "text": "Todo el equipo accedió a licencias y bibliotecas sin complicaciones." 
+    },
+    {
+      "name": "Arq. Díaz",
+      "rating": 4,
+      "date": "2025-06-10",
+      "text": "Es un combo enorme, requiere buen ancho de banda pero vale cada peso." 
+    },
+    {
+      "name": "Ing. Lara",
+      "rating": 5,
+      "date": "2025-03-04",
+      "text": "Ideal para montar oficina técnica desde cero." 
+    }
+  ]
+}
