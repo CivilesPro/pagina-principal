@@ -167,17 +167,39 @@ export default function ProductModal({ isOpen = true, product, currency = "COP",
       <div className="relative z-10 w-full max-w-6xl rounded-2xl bg-white p-6 shadow-xl"
            onClick={(e) => e.stopPropagation()}>
         <div className="mb-4 flex items-start justify-between gap-4">
-          <h3 id={titleId} className="text-2xl font-bold text-gray-900">
-            {product?.title || "Producto"}
-          </h3>
+          
           <button type="button" onClick={() => canClose && onClose?.()}
                   className="inline-flex h-9 w-9 items-center justify-center rounded-full border text-gray-600 hover:bg-gray-50"
                   aria-label="Cerrar">✕</button>
         </div>
 
         <div className="grid gap-6 lg:grid-cols-[1fr_520px]">
+
+          {/* Der: carrusel sticky */}
+          <div className="hidden lg:block lg:sticky lg:top-6">
+            
+            <div className="aspect-square overflow-hidden rounded-2xl bg-gray-100">
+              <img src={images[activeIndex]} alt={`${product?.title || "Producto"} - vista ${activeIndex+1}`}
+                   className="h-full w-full object-contain" />
+            </div>
+            <div className="mt-3 flex gap-2 overflow-x-auto">
+              {images.map((src, i) => (
+                <button key={`${product?.slug || "p"}-thumb-${i}`} onClick={() => setActiveIndex(i)}
+                        className={cx("h-16 w-16 shrink-0 overflow-hidden rounded-lg border bg-white",
+                                      i===activeIndex ? "border-emerald-600" : "border-gray-300")}
+                        aria-label={`Vista ${i+1}`}>
+                  <img src={src} alt={`Vista ${i+1}`} className="h-full w-full object-contain" />
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* Izq: scroll propio */}
+          
           <div className="max-h-[calc(100vh-220px)] overflow-y-auto pr-2">
+            <h3 id={titleId} className="text-2xl font-bold text-gray-900">
+            {product?.title || "Producto"}
+          </h3>
             <div className="mb-2 flex items-center gap-1 text-amber-500" aria-hidden>
               {"★★★★★".split("").map((s, i) => <span key={`star-${i}`}>★</span>)}
               <span className="ml-2 text-sm text-gray-500">(128 reseñas)</span>
@@ -234,23 +256,7 @@ export default function ProductModal({ isOpen = true, product, currency = "COP",
             </div>
           </div>
 
-          {/* Der: carrusel sticky */}
-          <div className="hidden lg:block lg:sticky lg:top-6">
-            <div className="aspect-square overflow-hidden rounded-2xl bg-gray-100">
-              <img src={images[activeIndex]} alt={`${product?.title || "Producto"} - vista ${activeIndex+1}`}
-                   className="h-full w-full object-contain" />
-            </div>
-            <div className="mt-3 flex gap-2 overflow-x-auto">
-              {images.map((src, i) => (
-                <button key={`${product?.slug || "p"}-thumb-${i}`} onClick={() => setActiveIndex(i)}
-                        className={cx("h-16 w-16 shrink-0 overflow-hidden rounded-lg border bg-white",
-                                      i===activeIndex ? "border-emerald-600" : "border-gray-300")}
-                        aria-label={`Vista ${i+1}`}>
-                  <img src={src} alt={`Vista ${i+1}`} className="h-full w-full object-contain" />
-                </button>
-              ))}
-            </div>
-          </div>
+          
         </div>
       </div>
 
