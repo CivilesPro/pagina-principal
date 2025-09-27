@@ -80,6 +80,22 @@ def convert_from_cop(amount_cop: int, currency: str) -> Decimal:
     return amount.quantize(quant, rounding=ROUND_HALF_UP)
 
 
+def convert_to_usd(amount: Decimal, from_currency: str) -> Decimal:
+    """Convert an amount from the selected currency to USD using local rates."""
+
+    currency_code = normalize_currency(from_currency)
+    if currency_code == "USD":
+        return amount.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
+    rate_from = EXCHANGE_RATES[currency_code]
+    if rate_from == 0:  # pragma: no cover - defensive safeguard
+        raise ValueError(f"Tasa de conversión inválida para {currency_code}")
+
+    amount_cop = amount / rate_from
+    amount_usd = amount_cop * EXCHANGE_RATES["USD"]
+    return amount_usd.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
+
 def normalize_currency(currency: str) -> str:
     """Normalize and validate the currency code."""
     upper = currency.upper()
