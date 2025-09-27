@@ -8,19 +8,25 @@ const LOCALES = {
   PEN: "es-PE",
 }
 
-export function formatPrice(copValue, currency) {
-  if (copValue == null) {
-    return "Consultar"
+export function formatPrice(amountCop, currency = "COP", opts = {}) {
+  const { withCode = true, locale: forcedLocale } = opts
+
+  if (amountCop == null) {
+    return withCode ? `— ${currency}` : "—"
   }
 
-  const rate = EXCHANGE.rates[currency] ?? 1
-  const value = copValue * rate
-  const locale = LOCALES[currency] ?? "es-CO"
-  const formatter = new Intl.NumberFormat(locale, {
+  const rate = EXCHANGE.rates?.[currency] ?? 1
+  const converted = amountCop * rate
+  const locale = forcedLocale || LOCALES[currency] || "es-CO"
+  const fractionDigits = currency === "USD" ? 2 : 0
+
+  const formatted = new Intl.NumberFormat(locale, {
     style: "currency",
     currency,
-    maximumFractionDigits: currency === "COP" ? 0 : 2,
-  })
+    currencyDisplay: "narrowSymbol",
+    minimumFractionDigits: fractionDigits,
+    maximumFractionDigits: fractionDigits,
+  }).format(converted)
 
-  return formatter.format(value)
+  return withCode ? `${formatted} ${currency}` : formatted
 }

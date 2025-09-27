@@ -365,12 +365,14 @@ export default function ProductModal({
   const titleId = `modal-title-${product?.slug || "producto"}`;
 
   // ✅ Precios (COP base) convertidos a moneda seleccionada, usando el mismo helper del listado
-  const formattedPrice =
-    product?.priceCop != null ? formatPrice(product.priceCop, currency) : null;
+  const showPrice =
+    product?.priceCop != null
+      ? formatPrice(product.priceCop, currency, { withCode: true })
+      : null;
 
-  const formattedYearPrice =
+  const showYearPrice =
     product?.priceCopYear != null
-      ? formatPrice(product.priceCopYear, currency)
+      ? formatPrice(product.priceCopYear, currency, { withCode: true })
       : null;
 
   return (
@@ -398,8 +400,8 @@ export default function ProductModal({
         </div>
 
         <div className="grid gap-6 lg:grid-cols-[1fr_520px]">
-          {/* Der: carrusel sticky */}
-          <div className="hidden lg:block lg:sticky lg:top-6">
+          {/* Bloque de imágenes */}
+          <div className="lg:sticky lg:top-6">
             <div className="aspect-square overflow-hidden rounded-2xl bg-gray-100">
               <img
                 src={images[activeIndex]}
@@ -424,27 +426,28 @@ export default function ProductModal({
             </div>
           </div>
 
-          {/* Izq: scroll propio */}
-          <div className="max-h-[calc(100vh-220px)] overflow-y-auto pr-2">
+          {/* Información del producto */}
+          <div className="pr-2 lg:max-h-[calc(100vh-220px)] lg:overflow-y-auto">
             <h3 id={titleId} className="text-2xl font-bold text-gray-900">
               {product?.title || "Producto"}
             </h3>
 
             {/* ✅ Precio */}
-            {formattedPrice && (
-              formattedYearPrice ? (
+            {showPrice ? (
+              showYearPrice ? (
                 <>
-                  <p className="text-base font-bold text-gray-900">Desde: {formattedPrice}</p>
-                  <p className="text-xs text-gray-500">
-                    Premium:{" "}
-                    <span className="font-semibold text-gray-900">{formattedYearPrice}</span>
+                  <p className="mt-1 text-sm text-gray-700">
+                    Desde: <span className="font-semibold text-gray-900">{showPrice}</span>
+                    <span className="mx-2 text-gray-400">•</span>
+                    Premium: <span className="font-semibold text-gray-900">{showYearPrice}</span>
                   </p>
                 </>
               ) : (
-                <p className="text-base font-bold text-gray-900">Precio: {formattedPrice}</p>
+                <p className="mt-1 text-sm text-gray-700">
+                  Precio: <span className="font-semibold text-gray-900">{showPrice}</span>
+                </p>
               )
-            )}
-            {!formattedPrice && (
+            ) : (
               <p className="text-base font-semibold text-amber-700">Precio a consultar</p>
             )}
 
@@ -528,9 +531,26 @@ export default function ProductModal({
               </span>
             </div>
 
+            <div className="mt-1 flex items-center gap-2 text-[11px] text-gray-500">
+              <svg
+                className="h-3.5 w-3.5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M12 1v22" />
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7H14a3.5 3.5 0 0 1 0 7H6" />
+              </svg>
+              <span>Pagos procesados en USD por PayPal.</span>
+            </div>
+
             {/* Reseñas */}
             <div className="mt-6 space-y-4">
-               <p className="text-gray-700">Lee lo que dicen nuestros Clientes:</p>
+              <p className="text-gray-700">Lee lo que dicen nuestros clientes:</p>
               {(STATIC_REVIEWS[product?.slug] || STATIC_REVIEWS.default).map((rev, idx) => (
                 <div
                   key={`${product?.slug || "p"}-rev-${idx}-${rev.name}`}
