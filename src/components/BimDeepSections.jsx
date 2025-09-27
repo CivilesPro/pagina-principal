@@ -1,7 +1,7 @@
 import ImageFrame from "./ui/ImageFrame"
-import LODSection from "./bim/LODSection"
-import ProjectsSection from "./bim/ProjectsSection"
-import { deepSectionsIntro, pebSection } from "../data/BimDeepSections"
+import LODList from "./bim/LODList"
+import ProjectsList from "./bim/ProjectsList"
+import { deepSectionsIntro, pebSection, lodSection, projectsSection } from "../data/BimDeepSections"
 
 function PebSectionCard() {
   return (
@@ -37,6 +37,36 @@ function PebSectionCard() {
   )
 }
 
+function LODSectionCard() {
+  return (
+    <section className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-black/5 md:p-8">
+      <header className="space-y-2">
+        <h3 className="text-xl font-semibold text-slate-900 md:text-2xl">{lodSection.title}</h3>
+        <p className="text-sm text-slate-600 md:text-base">{lodSection.summary}</p>
+      </header>
+
+      <div className="mt-6">
+        <LODList />
+      </div>
+    </section>
+  )
+}
+
+function ProjectsSectionCard() {
+  return (
+    <section className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-black/5 md:p-8">
+      <header className="space-y-2">
+        <h3 className="text-xl font-semibold text-slate-900 md:text-2xl">{projectsSection.title}</h3>
+        <p className="text-sm text-slate-600 md:text-base">{projectsSection.summary}</p>
+      </header>
+
+      <div className="mt-6">
+        <ProjectsList />
+      </div>
+    </section>
+  )
+}
+
 export default function BimDeepSections() {
   return (
     <div className="space-y-8 md:space-y-10">
@@ -46,8 +76,8 @@ export default function BimDeepSections() {
       </div>
 
       <PebSectionCard />
-      <LODSection />
-      <ProjectsSection />
+      <LODSectionCard />
+      <ProjectsSectionCard />
     </div>
   )
 }
