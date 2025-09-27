@@ -43,6 +43,36 @@ export default function ProductosPage() {
   }, [])
 
   React.useEffect(() => {
+    if (!selectedProduct) return
+    if (typeof window === "undefined" || typeof document === "undefined") return
+
+    const scrollY = window.scrollY
+    const body = document.body
+    if (!body) return
+
+    const { style } = body
+    const previousStyles = {
+      overflow: style.overflow,
+      position: style.position,
+      top: style.top,
+      width: style.width,
+    }
+
+    style.overflow = "hidden"
+    style.position = "fixed"
+    style.top = `-${scrollY}px`
+    style.width = "100%"
+
+    return () => {
+      style.overflow = previousStyles.overflow || ""
+      style.position = previousStyles.position || ""
+      style.top = previousStyles.top || ""
+      style.width = previousStyles.width || ""
+      window.scrollTo(0, scrollY)
+    }
+  }, [selectedProduct])
+
+  React.useEffect(() => {
     const paramCurrency = normalizeCurrency(searchParams.get("currency"))
     if (paramCurrency && paramCurrency !== currency) {
       setCurrency(paramCurrency)
@@ -138,7 +168,21 @@ export default function ProductosPage() {
               return (
                 <article
                   key={product.slug}
-                  className="group relative flex h-full flex-col rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg"
+                  className={`group relative flex h-full flex-col rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg ${isConsultation ? "" : "cursor-pointer"}`}
+                  role="button"
+                  tabIndex={isConsultation ? -1 : 0}
+                  aria-disabled={isConsultation}
+                  onClick={() => {
+                    if (isConsultation) return
+                    handleOpenProduct(product)
+                  }}
+                  onKeyDown={(event) => {
+                    if (isConsultation) return
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault()
+                      handleOpenProduct(product)
+                    }
+                  }}
                 >
                   {badgeLabel ? (
                     <span className="absolute left-3 top-3 rounded-full bg-emerald-600 px-2 py-1 text-xs font-semibold text-white shadow">
@@ -179,7 +223,8 @@ export default function ProductosPage() {
                           ? "border border-emerald-700 bg-white text-emerald-700 hover:bg-emerald-50"
                           : "bg-emerald-700 text-white hover:bg-emerald-800"
                       }`}
-                      onClick={() => {
+                      onClick={(event) => {
+                        event.stopPropagation()
                         if (isConsultation) return
                         handleOpenProduct(product)
                       }}
