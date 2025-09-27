@@ -26,6 +26,13 @@ logger = logging.getLogger(__name__)
 DOWNLOAD_TOKEN_TTL_HOURS = int(os.environ.get("DOWNLOAD_TOKEN_TTL_HOURS", "24"))
 BACKEND_BASE_URL = os.environ.get("BACKEND_BASE_URL")
 
+SUPPORTED_PAYPAL = {"USD"}
+
+
+def normalize_for_paypal(currency: str) -> str:
+    cur = (currency or "USD").upper()
+    return cur if cur in SUPPORTED_PAYPAL else "USD"
+
 
 class CreateOrderRequest(BaseModel):
     slug: str = Field(..., description="Identificador del producto")
@@ -83,17 +90,31 @@ async def create_order_endpoint(payload: CreateOrderRequest, db: Session = Depen
         )
         return _json_error(400, "Este producto no está disponible para compra en línea.")
 
-    amount_decimal = catalog.convert_from_cop(product.price_cop, currency)
+    amount_ui = catalog.convert_from_cop(product.price_cop, currency)
+    paypal_currency = normalize_for_paypal(currency)
+    if paypal_currency != currency:
+        amount_for_paypal = catalog.convert_to_usd(amount_ui, currency)
+        logger.info(
+            "Falling back currency %s -> %s, value=%s",
+            currency,
+            paypal_currency,
+            _amount_to_string(amount_for_paypal),
+        )
+    else:
+        amount_for_paypal = amount_ui
+
     logger.info(
-        "Creating PayPal order for slug='%s' amount=%s %s",
+        "Creating PayPal order for slug='%s' amount=%s %s (paypal=%s %s)",
         payload.slug,
-        _amount_to_string(amount_decimal),
+        _amount_to_string(amount_ui),
         currency,
+        _amount_to_string(amount_for_paypal),
+        paypal_currency,
     )
     try:
         paypal_response = await paypal_create_order(
-            amount_value=_amount_to_string(amount_decimal),
-            currency_code=currency,
+            amount_value=_amount_to_string(amount_for_paypal),
+            currency_code=paypal_currency,
             description=f"CivilesPro - {product.title}",
             reference_id=product.slug,
         )
@@ -113,7 +134,7 @@ async def create_order_endpoint(payload: CreateOrderRequest, db: Session = Depen
         slug=product.slug,
         title=product.title,
         order_id=order_id,
-        amount=amount_decimal,
+        amount=amount_ui,
         currency=currency,
         status="CREATED",
     )

@@ -4,7 +4,8 @@ from __future__ import annotations
 
 import logging
 import os
-from typing import Any, Dict
+import re
+from typing import Any, Dict, Iterable
 
 import httpx
 
@@ -28,6 +29,58 @@ class PayPalError(RuntimeError):
     """Raised when the PayPal API returns an error."""
 
 
+_HTML_TAG_RE = re.compile(r"<[^>]+>")
+
+
+def _strip_html(text: str) -> str:
+    """Remove basic HTML tags from a text string."""
+
+    return _HTML_TAG_RE.sub("", text).strip()
+
+
+def _extract_message_from_dict(data: Dict[str, Any], keys: Iterable[str]) -> str | None:
+    for key in keys:
+        value = data.get(key)
+        if isinstance(value, str) and value.strip():
+            return value.strip()
+        if isinstance(value, list) and value:
+            first = value[0]
+            if isinstance(first, dict):
+                nested = _extract_message_from_dict(first, ("description", "detail", "issue", "message"))
+                if nested:
+                    return nested
+            else:
+                return str(first).strip()
+    return None
+
+
+def _paypal_error_message(response: httpx.Response, default: str) -> str:
+    """Extract a human readable error message from a PayPal HTTP response."""
+
+    message: str | None = None
+    try:
+        data = response.json()
+    except ValueError:
+        text = response.text
+    else:
+        if isinstance(data, dict):
+            message = _extract_message_from_dict(
+                data,
+                ("message", "error_description", "description", "detail", "error"),
+            )
+            if not message:
+                text = str(data)
+        else:
+            text = str(data)
+
+    if message is None:
+        text = locals().get("text", "")
+        message = text.strip() if text else None
+
+    clean = _strip_html(message or "").strip()
+    return clean or default
+
+
 async def _get_access_token() -> str:
     if not PAYPAL_CLIENT_ID or not PAYPAL_CLIENT_SECRET:
         raise PayPalError("Las credenciales de PayPal no están configuradas.")
@@ -45,7 +98,7 @@ async def _get_access_token() -> str:
         raise PayPalError("No se pudo conectar con PayPal para obtener el token de acceso.") from exc
 
     if response.status_code >= 400:
-        detail = response.text
+        detail = _paypal_error_message(response, f"HTTP {response.status_code}")
         logger.error(
             "PayPal token request returned %s: %s",
             response.status_code,
@@ -95,12 +148,13 @@ async def create_order(amount_value: str, currency_code: str, description: str, 
         raise PayPalError("No se pudo conectar con PayPal para crear la orden.") from exc
 
     if response.status_code >= 400:
+        detail = _paypal_error_message(response, f"HTTP {response.status_code}")
         logger.error(
             "PayPal create order request returned %s: %s",
             response.status_code,
-            response.text,
+            detail,
         )
-        raise PayPalError(f"Error al crear la orden en PayPal: {response.text}")
+        raise PayPalError(f"Error al crear la orden en PayPal: {detail}")
 
     return response.json()
 
@@ -124,12 +178,13 @@ async def capture_order(order_id: str) -> Dict[str, Any]:
         raise PayPalError("No se pudo conectar con PayPal para capturar la orden.") from exc
 
     if response.status_code >= 400:
+        detail = _paypal_error_message(response, f"HTTP {response.status_code}")
         logger.error(
             "PayPal capture order request returned %s for %s: %s",
             response.status_code,
             order_id,
-            response.text,
+            detail,
         )
-        raise PayPalError(f"Error al capturar la orden {order_id}: {response.text}")
+        raise PayPalError(f"Error al capturar la orden {order_id}: {detail}")
 
     return response.json()
