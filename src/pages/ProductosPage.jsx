@@ -123,15 +123,17 @@ export default function ProductosPage() {
       />
 
       <section className="py-16">
-        <div className="mx-auto max-w-4xl px-4 text-center">
-          <h1 className="text-4xl font-extrabold text-primary md:text-5xl">
-            Productos Civiles Pro
-          </h1>
-          <p className="mt-5 text-lg text-gray-700">
-            Plantillas, Excel y acceso a la plataforma para que calcules materiales, generes presupuestos y documentes tu obra sin complicaciones.
-          </p>
-        </div>
-      </section>
+  <div className="mx-auto max-w-4xl px-4 text-center">
+    <h1 className="text-4xl font-extrabold text-primary md:text-5xl">
+      Plantillas de Excel y recursos para construcción 🚧
+    </h1>
+
+    <p className="mt-5 text-lg text-gray-700">
+      Calcula materiales, controla acero y concreto, y genera presupuestos de obra en minutos con plantillas de Excel listas para usar.
+    </p>
+  </div>
+</section>
+
 
       <section id="productos" className="bg-gray-50 py-10">
         <div className="mx-auto max-w-7xl px-4">
