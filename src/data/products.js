@@ -10,8 +10,13 @@ const products = [
       "/productos/Excel Pedido de Acero.png",
     ],
     fileKey: "pedido-acero-v2.zip",
-    description:
-      "Plantilla para calcular pedidos de acero en longitudes comerciales y optimizar desperdicios.",
+    description: `
+    📐 Plantilla especializada para calcular pedidos de acero en longitudes comerciales,
+    optimizando el corte de varillas y reduciendo desperdicios. 
+    ✅ Define automáticamente las combinaciones más eficientes.
+    ✅ Genera reportes claros por diámetros, longitudes y totales.
+    ✅ Incluye control de sobrantes para reutilizar en otros pedidos.
+    Ideal para ingenieros, maestros y contratistas que necesitan rapidez y precisión en obra.`,
   },
   {
     slug: "control-acero",
@@ -24,11 +29,14 @@ const products = [
       "/productos/Excel de Control de Acero.png",
     ],
     fileKey: "control-acero-control.zip",
-    description:
-      "Control de existencias, cortes y consumos de acero con reportes rápidos.",
+    description: `
+    📊 Lleva un control detallado de existencias, cortes y consumos de acero.
+    ✅ Kardex automático con entradas y salidas.
+    ✅ Reportes listos para supervisión y control de obra.
+    ✅ Consolida cantidades por capítulo o frente de trabajo.
+    Perfecto para proyectos donde el acero representa el mayor costo estructural.`,
   },
   {
-
     slug: "almacen-obra",
     title: "Excel para el Control de Almacén de Obra",
     priceCop: 30000,
@@ -39,8 +47,12 @@ const products = [
       "/productos/Excel de Almacen.png",
     ],
     fileKey: "almacen-obra-control.zip",
-    description:
-      "Entradas, salidas y kardex de materiales con consolidado por capítulo.",
+    description: `
+    🏗 Gestiona el almacén de obra de forma simple.
+    ✅ Entradas y salidas con kardex automático.
+    ✅ Control de materiales por proveedor y por capítulo.
+    ✅ Consolidado general para informes de residente o interventoría.
+    Con esta plantilla sabes exactamente qué material entra, cuál sale y en qué frente se utiliza.`,
   },
   {
     slug: "formaletas-encofrados",
@@ -53,11 +65,14 @@ const products = [
       "/productos/Excel de Encofrados.png",
     ],
     fileKey: "formaletas-encofrados-kit.zip",
-    description:
-      "Planificación y control de encofrados por frente de trabajo.",
+    description: `
+    🪵 Controla la rotación de formaletas y encofrados en tu proyecto.
+    ✅ Planificación por frente de trabajo.
+    ✅ Registra ciclos de uso, cantidades instaladas y recuperadas.
+    ✅ Reduce pérdidas y optimiza la reutilización del material.
+    Especial para pavimentos, losas y elementos que requieren varios encofrados.`,
   },
   {
-
     slug: "cantidades-instant",
     title: "Excel para Materiales de Obra al Instante 2.0",
     priceCop: 165000,
@@ -68,8 +83,14 @@ const products = [
       "/productos/Excel de Cantidades de Materiales.png",
     ],
     fileKey: "cantidades-instant-2.zip",
-    description:
-      "Calcula materiales de múltiples partidas (concreto, muros, losas, acabados, cubiertas, etc.) al instante.",
+    description: `
+    ⚡ Calcula materiales de múltiples partidas al instante:
+    ✅ Concreto, ciclópeo, pavimento rígido, bordillos.
+    ✅ Muros en bloques, mampostería estructural y drywall.
+    ✅ Cubiertas (fibrocemento, UPVC, zinc, sándwich, standing seam).
+    ✅ Pisos (porcelanato, cerámica, pulido).
+    ✅ Acabados (pintura, yeso) y losas (concreto armado, placa fácil, losacero, aligerada).
+    Incluye exportación a PDF con reportes listos para obra y presupuesto.`,
   },
   {
     slug: "concretos-autohormigoneras",
@@ -82,10 +103,15 @@ const products = [
       "/productos/Excel de Concreto de Hormigueras.png",
     ],
     fileKey: "concretos-autohormigoneras.xlsx",
-    description:
-      "¡¡Esta plantilla de Concreto lo hace TODO!! ✅ Calcula cemento, arena, grava y aditivos por resistencia. ✅ Tiempos por tanda en trompos/mezcladoras/Carmix. ✅ Dosificación por ciclo. ✅ Entrega en m³, kg, baldes o viajes. ✅ Exporta PDF. ✅ Permite cargar nuevos diseños de mezcla.",
+    description: `
+    🏗 ¡¡Esta plantilla de Concreto lo hace TODO!!
+    ✅ Calcula cemento, arena, grava y aditivos según resistencia.
+    ✅ Dosificación precisa por tanda (trompos, mezcladoras, Carmix).
+    ✅ Te da el tiempo exacto por ciclo de mezcla.
+    ✅ Entrega cantidades en m³, kg, baldes o viajes de volqueta.
+    ✅ Exporta PDF con resultados y permite cargar nuevos diseños de mezcla.
+    Una herramienta indispensable en obra para controlar cada vaciado de concreto.`,
   },
-
   {
     slug: "plataforma-civilespro",
     title: "Plataforma CivilesPro (APU + Informes de Obra Diarios)",
@@ -98,8 +124,13 @@ const products = [
       "/productos/Excel de Cantidades de Materiales.png",
     ],
     fileKey: "plataforma-civilespro-plan.zip",
-    description:
-      "Genera presupuestos con APU conectados + Informes de Obra Diarios en Excel. Plan mensual y anual.",
+    description: `
+    🌐 Plataforma integral para presupuestar y documentar obra.
+    ✅ Genera presupuestos con APU conectados a tus materiales.
+    ✅ Reportes automáticos y exportación en Excel.
+    ✅ Incluye Informes de Obra Diarios (materiales, mano de obra, avances).
+    ✅ Plan mensual o anual con actualizaciones continuas.
+    Diseñada para centralizar el control de proyectos y acelerar la entrega de informes.`,
   },
   {
     slug: "plantillas-revit",
@@ -112,8 +143,12 @@ const products = [
       "/productos/Familia de Revit.png",
     ],
     fileKey: "plantillas-revit-pack.zip",
-    description:
-      "Incluye vistas, familias, detalles y parámetros compartidos listos para producción.",
+    description: `
+    🏛 Paquete de plantillas de Revit listas para producción:
+    ✅ Familias paramétricas estructurales y arquitectónicas.
+    ✅ Vistas preconfiguradas, filtros, estilos de línea y cotas.
+    ✅ Parámetros compartidos para coordinación entre disciplinas.
+    Ahorra tiempo en cada proyecto BIM y mejora la presentación de planos.`,
   },
   {
     slug: "bloques-dinamicos",
@@ -126,8 +161,12 @@ const products = [
       "/productos/Bloques Dinamicos.png",
     ],
     fileKey: "bloques-dinamicos-pack.zip",
-    description:
-      "Bloques dinámicos listos para acelerar dibujo y cuantificación en AutoCAD.",
+    description: `
+    📐 Biblioteca de bloques dinámicos para AutoCAD:
+    ✅ Arquitectura: puertas, ventanas, mobiliario, detalles.
+    ✅ Estructural: vigas, columnas, escaleras.
+    ✅ Sanitario y Eléctrico: accesorios y símbolos normalizados.
+    Listos para cuantificación, con atributos editables y escalables.`,
   },
   {
     slug: "megapack",
@@ -140,9 +179,20 @@ const products = [
       "/productos/Megapack.png",
     ],
     fileKey: null,
-    description:
-      "Acceso de por vida. Incluye programas FULL (Revit 2024, ArchiCAD 25, Tekla 2024, SketchUp 2024, AutoCAD 2024/2021, Office 2021/2024), 16 cursos PRO (Revit BIM, Estructural, MEP, ArchiCAD, Tekla, AutoCAD, 3ds Max, Project, CYPE, Navisworks y más), materiales extra (bloques dinámicos, LISP, familias Revit, componentes SketchUp, hatches, plugins), y galería de libros técnicos.",
+    description: `
+    🎯 ¡Acceso de por vida al paquete más completo!
+    📦 Programas FULL en español:
+      Revit 2024, ArchiCAD 25, Tekla Structures 2024, SketchUp 2024,
+      AutoCAD 2024 / 2021, Microsoft Office 2021 / 2024.
+    🎥 16 Cursos PRO:
+      Revit (Metodología BIM, Estructural, MEP), ArchiCAD Completo,
+      Tekla Avanzado, AutoCAD Avanzado + 3D, 3ds Max desde cero,
+      Project – Programación de obra, CYPE, Navisworks y más.
+    🛠 Material extra:
+      Bloques dinámicos, rutinas LISP, familias Revit, componentes SketchUp,
+      patrones hatch, plugins, libros técnicos de ingeniería y arquitectura.
+    Una biblioteca definitiva para tu carrera profesional.`,
   },
-]
+];
 
-export default products
+export default products;
