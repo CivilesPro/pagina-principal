@@ -1,255 +1,138 @@
-// src/components/BimDeepSections.jsx
-import React from "react";
+import React, { useState } from "react"
 
-// Utilidad para clases
-const cx = (...c) => c.filter(Boolean).join(" ");
+const PEB_DETAILS = [
+  "Definimos entregables, flujos de trabajo y canales de comunicación para que todas las disciplinas avancen alineadas.",
+  "Estructuramos la documentación en función de la ISO 19650 para asegurar trazabilidad y control de versiones.",
+  "Establecemos métricas de seguimiento para medir avances y tomar decisiones a tiempo.",
+]
 
-// Reutilizable: ítem con desplegable + imagen a la derecha
-function CollapsibleRow({ item, isOpen, onToggle }) {
-  const { title, teaser, details, img } = item;
+const LOD_DETAILS = [
+  "Adaptamos el nivel de detalle a la fase del proyecto para optimizar tiempos y esfuerzo.",
+  "Integramos geometría, datos y especificaciones para facilitar la coordinación interdisciplinar.",
+  "Validamos el modelo con revisiones colaborativas y control de colisiones.",
+]
+
+const PROJECTS_DETAILS = [
+  "Modelado de edificaciones industriales, comerciales y residenciales con equipos multidisciplinares.",
+  "Coordinación MEP y estructural en proyectos hospitalarios y educativos.",
+  "Implementaciones BIM para operación y mantenimiento posterior a la entrega.",
+]
+
+const BIM_DEEP_SECTIONS = [
+  {
+    id: "peb",
+    title: "Planes de Ejecución BIM (PEB)",
+    summary:
+      "Metodología y documentación para coordinar a todos los participantes desde la concepción hasta la entrega.",
+    image: "/bim/peb.jpg",
+    items: PEB_DETAILS,
+  },
+  {
+    id: "lod",
+    title: "LOD – Niveles de Desarrollo",
+    summary: "Escalamos la precisión del modelo según la etapa del proyecto y las decisiones que se necesitan tomar.",
+    image: "/bim/lod.jpg",
+    items: LOD_DETAILS,
+  },
+  {
+    id: "projects",
+    title: "Proyectos Ejecutados",
+    summary: "Experiencia comprobada implementando flujos BIM en proyectos reales de distintas escalas.",
+    image: "/bim/projects.jpg",
+    items: PROJECTS_DETAILS,
+  },
+]
+
+function ChevronIcon({ expanded }) {
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-4 md:p-5">
-      <button
-        type="button"
-        onClick={onToggle}
-        aria-expanded={isOpen}
-        className="flex w-full items-start justify-between gap-3 text-left"
-      >
-        <div>
-          <h4 className="text-base font-semibold text-gray-900">{title}</h4>
-          {teaser ? (
-            <p className="mt-1 text-sm text-gray-600">{teaser}</p>
-          ) : null}
-        </div>
-        <span
-          className={cx(
-            "inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-gray-600 transition",
-            isOpen ? "rotate-180 bg-gray-50" : "bg-white"
-          )}
-          aria-hidden
-        >
-          ▾
-        </span>
-      </button>
-
-      {/* Contenido expandible */}
-      <div
-        className={cx(
-          "grid transition-all duration-300",
-          isOpen ? "mt-4 grid-cols-1 md:grid-cols-[1fr_320px] gap-4" : "max-h-0 overflow-hidden"
-        )}
-      >
-        <div className="min-w-0">
-          {Array.isArray(details) ? (
-            <ul className="list-disc pl-5 text-sm text-gray-700 space-y-1">
-              {details.map((d, i) => (
-                <li key={i}>{d}</li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-sm text-gray-700">{details}</p>
-          )}
-        </div>
-
-        {/* Imagen al lado (abajo en móvil) */}
-        <div className="rounded-lg border border-gray-100 bg-gray-50 p-2">
-          <img
-            src={img}
-            alt={title}
-            className="h-56 w-full rounded-md object-contain md:h-48"
-            loading="lazy"
-          />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Bloque de lista con título/sección
-function CollapsibleGroup({ id, title, subtitle, items }) {
-  const [openIndex, setOpenIndex] = React.useState(0); // abre el primero por UX
-
-  return (
-    <section id={id} className="rounded-2xl border border-gray-200 bg-white p-5 md:p-6">
-      <header className="mb-4">
-        <h3 className="text-xl font-bold text-gray-900">{title}</h3>
-        {subtitle ? <p className="mt-1 text-gray-600">{subtitle}</p> : null}
-      </header>
-
-      <div className="space-y-3">
-        {items.map((item, idx) => (
-          <CollapsibleRow
-            key={`${id}-${idx}`}
-            item={item}
-            isOpen={openIndex === idx}
-            onToggle={() => setOpenIndex(openIndex === idx ? -1 : idx)}
-          />
-        ))}
-      </div>
-    </section>
-  );
+    <svg
+      aria-hidden="true"
+      className={`h-5 w-5 transition-transform duration-300 ${expanded ? "rotate-180" : "rotate-0"}`}
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth="1.5"
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+    </svg>
+  )
 }
 
 export default function BimDeepSections() {
-  // DATA — cambia las rutas de imagen por las tuyas
-  const PEB = [
-    {
-      title: "Definición de roles y responsabilidades",
-      teaser: "Estructuramos equipos y alcances desde el PEB.",
-      details: [
-        "Matriz RACI para clarificar responsables, consultados e informados.",
-        "Intercambios de información definidos (EIR/BEP).",
-        "Gobernanza del modelo: propietarios, revisores y aprobadores.",
-      ],
-      img: "/bim/peb-roles.png",
-    },
-    {
-      title: "Procesos de trabajo colaborativos",
-      teaser: "Flujos claros para federación, revisión y publicación.",
-      details: [
-        "Ciclos de coordinación con hitos y entregables por disciplina.",
-        "Uso de CDE (Common Data Environment) para control documental.",
-        "Worksets, naming y estados de revisión coherentes.",
-      ],
-      img: "/bim/peb-colaboracion.png",
-    },
-    {
-      title: "Estándares y normas internacionales",
-      teaser: "ISO 19650 y guías locales para consistencia y trazabilidad.",
-      details: [
-        "Convenciones de nomenclatura, unidades y plantillas.",
-        "Estados del modelo, versiones y auditorías.",
-        "IFC, COBie y formatos abiertos para interoperabilidad.",
-      ],
-      img: "/bim/peb-standards.png",
-    },
-    {
-      title: "Entregables BIM claros y estructurados",
-      teaser: "Qué, cuándo y cómo se entrega en cada hito del proyecto.",
-      details: [
-        "Modelos federados, reportes de interferencias, láminas y listados.",
-        "Entrega escalonada por LOD y capítulo.",
-        "Paquetes de publicación con metadatos y control de calidad.",
-      ],
-      img: "/bim/peb-entregables.png",
-    },
-  ];
+  const [openId, setOpenId] = useState(BIM_DEEP_SECTIONS[0]?.id ?? null)
 
-  const LOD = [
-    {
-      title: "LOD 100 — Idea / Anteproyecto conceptual",
-      teaser: "Volúmenes y parámetros globales.",
-      details:
-        "Representación conceptual para estimaciones iniciales, análisis de ocupación y decisiones tempranas sobre el alcance.",
-      img: "/bim/lod-100.png",
-    },
-    {
-      title: "LOD 200 — Diseño preliminar",
-      teaser: "Sistemas aproximados y ubicación.",
-      details:
-        "Geometrías genéricas, elementos aproximados, relaciones espaciales y primeras interferencias relevantes entre disciplinas.",
-      img: "/bim/lod-200.png",
-    },
-    {
-      title: "LOD 300 — Geometría precisa y coordinación",
-      teaser: "Dimensiones exactas y conexiones.",
-      details:
-        "Elementos con tamaño, forma y ubicación definidas para documentación, cómputos precisos y coordinación técnica.",
-      img: "/bim/lod-300.png",
-    },
-    {
-      title: "LOD 400 — Construcción y documentación",
-      teaser: "Listo para fabricación / montaje.",
-      details:
-        "Detalles constructivos, despieces y especificaciones para fabricación, montaje y secuencias en obra.",
-      img: "/bim/lod-400.png",
-    },
-    {
-      title: "LOD 500 — As-Built / Operación y mantenimiento",
-      teaser: "Modelo como construido con datos de activo.",
-      details:
-        "Modelo verificado en obra, con información para gestión de activos, operación y mantenimiento.",
-      img: "/bim/lod-500.png",
-    },
-  ];
-
-  const PROYECTOS = [
-    {
-      title: "Nave Industrial (Arquitectura + Estructuras)",
-      teaser: "Modelado federado y coordinación de interferencias.",
-      details:
-        "Resolución de colisiones tempranas, secuenciación de etapas y extracción de cómputos para fabricación.",
-      img: "/bim/proyecto-nave.png",
-    },
-    {
-      title: "Vivienda Unifamiliar (Arquitectura)",
-      teaser: "Optimización de áreas y costos.",
-      details:
-        "Iteraciones rápidas de diseño, análisis de iluminación y listados automáticos de materiales.",
-      img: "/bim/proyecto-vivienda.png",
-    },
-    {
-      title: "Edificio Residencial (Arquitectura + MEP)",
-      teaser: "Coordinación vertical y núcleos técnicos.",
-      details:
-        "Ruteo MEP sin conflictos, patios, shafts y espacios mecánicos validados antes de obra.",
-      img: "/bim/proyecto-residencial.png",
-    },
-    {
-      title: "Hospital de Primer Nivel (Arquitectura + Estructuras + MEP)",
-      teaser: "Criterios sanitarios y flujos funcionales.",
-      details:
-        "Áreas críticas, apoyos técnicos, instalaciones hospitalarias y control documental bajo ISO 19650.",
-      img: "/bim/proyecto-hospital.png",
-    },
-    {
-      title: "Bloque Escolar (Arquitectura + Estructuras)",
-      teaser: "Modularidad y eficiencia.",
-      details:
-        "Sistemas repetibles, detalles estructurales tipificados y modelado apto para licitación.",
-      img: "/bim/proyecto-escolar.png",
-    },
-    {
-      title: "Centros IPS (Arquitectura)",
-      teaser: "Trazabilidad y requisitos técnicos.",
-      details:
-        "EIR/PEB definidos, checklist normativo y entregables escalonados por fases.",
-      img: "/bim/proyecto-ips.png",
-    },
-    {
-      title: "Edificio Multifuncional (Estructuras)",
-      teaser: "Integración con análisis estructural.",
-      details:
-        "Interoperabilidad con software de cálculo y control de cambios en geometrías críticas.",
-      img: "/bim/proyecto-multifuncional.png",
-    },
-  ];
+  const handleToggle = (id) => {
+    setOpenId((current) => (current === id ? null : id))
+  }
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10 md:py-14 space-y-8">
-      {/* Grupo PEB */}
-      <CollapsibleGroup
-        id="peb"
-        title="Planes de Ejecución BIM (PEB)"
-        subtitle="Estructuramos el proyecto desde el día uno: responsables, flujos, estándares y entregables."
-        items={PEB}
-      />
+    <section className="bg-white py-16">
+      <div className="mx-auto max-w-7xl px-4">
+        <div className="mx-auto max-w-3xl text-center">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900">Profundiza en nuestro enfoque BIM</h2>
+          <p className="mt-3 text-gray-600">
+            Explora cómo estructuramos procesos, niveles de detalle y la experiencia que respalda cada proyecto que modelamos.
+          </p>
+        </div>
 
-      {/* Grupo LOD */}
-      <CollapsibleGroup
-        id="lod"
-        title="LOD – Niveles de Desarrollo"
-        subtitle="Adaptamos el nivel de detalle según la etapa: de idea a operación y mantenimiento."
-        items={LOD}
-      />
+        <div className="mt-10 space-y-6">
+          {BIM_DEEP_SECTIONS.map((section) => {
+            const isOpen = openId === section.id
+            const contentId = `${section.id}-content`
 
-      {/* Grupo Proyectos */}
-      <CollapsibleGroup
-        id="proyectos"
-        title="Proyectos ejecutados"
-        subtitle="Aplicamos la metodología BIM en tipologías diversas, priorizando coordinación y calidad de información."
-        items={PROYECTOS}
-      />
-    </div>
-  );
+            return (
+              <article key={section.id} className="rounded-2xl border border-gray-200 bg-gray-50 shadow-sm">
+                <button
+                  type="button"
+                  id={`${section.id}-trigger`}
+                  className="flex w-full items-center justify-between gap-4 rounded-2xl px-6 py-4 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                  aria-expanded={isOpen}
+                  aria-controls={contentId}
+                  onClick={() => handleToggle(section.id)}
+                >
+                  <div>
+                    <p className="text-lg font-semibold text-gray-900">{section.title}</p>
+                    <p className="mt-1 text-sm text-gray-600">{section.summary}</p>
+                  </div>
+                  <ChevronIcon expanded={isOpen} />
+                </button>
+
+                <div
+                  id={contentId}
+                  role="region"
+                  aria-labelledby={`${section.id}-trigger`}
+                  className={`grid transition-[grid-template-rows] duration-500 ease-in-out ${isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}
+                >
+                  <div className="overflow-hidden">
+                    <div className="border-t border-gray-200 px-6 py-6">
+                      <div className="flex flex-col gap-6 md:flex-row md:items-center">
+                        <div className="md:w-1/2">
+                          <ul className="space-y-3 text-sm text-gray-700">
+                            {section.items.map((item, index) => (
+                              <li key={index} className="flex items-start gap-2">
+                                <span className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full bg-primary"></span>
+                                <span>{item}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                        <div className="md:w-1/2">
+                          <img
+                            src={section.image}
+                            alt={section.title}
+                            loading="lazy"
+                            className="h-full w-full rounded-xl object-cover"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </article>
+            )
+          })}
+        </div>
+      </div>
+    </section>
+  )
 }
