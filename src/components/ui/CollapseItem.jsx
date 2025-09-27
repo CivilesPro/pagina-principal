@@ -1,101 +1,25 @@
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useState } from 'react';
 
-const levelStyles = {
-  main: {
-    container: "rounded-xl border border-slate-200/70 bg-slate-50",
-    header: "py-3 px-3 md:py-4 md:px-4",
-    title: "text-base font-semibold text-slate-800 md:text-lg",
-    subtitle: "text-sm text-slate-500",
-    body: "px-3 pb-3 pt-3 md:px-4",
-  },
-  sub: {
-    container: "rounded-lg border border-slate-200 bg-white",
-    header: "py-2.5 px-3",
-    title: "text-sm font-medium text-slate-700",
-    subtitle: "text-xs text-slate-500",
-    body: "px-3 pb-3 pt-2",
-  },
-}
-
-const baseChevronClasses =
-  "flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 transition-transform duration-300"
-
-export default function CollapseItem({
-  title,
-  subtitle,
-  defaultOpen = false,
-  children,
-  level = "main",
-  leadingIcon = null,
-  className = "",
-}) {
-  const [isOpen, setIsOpen] = useState(defaultOpen)
-  const [maxHeight, setMaxHeight] = useState(defaultOpen ? "none" : "0px")
-  const contentRef = useRef(null)
-
-  const styles = useMemo(() => levelStyles[level] ?? levelStyles.main, [level])
-
-  useEffect(() => {
-    const node = contentRef.current
-    if (!node) return
-
-    const height = node.scrollHeight
-
-    if (isOpen) {
-      setMaxHeight(`${height}px`)
-      const timeout = setTimeout(() => {
-        setMaxHeight("none")
-      }, 250)
-      return () => clearTimeout(timeout)
-    }
-
-    setMaxHeight(`${height}px`)
-    requestAnimationFrame(() => {
-      setMaxHeight("0px")
-    })
-  }, [isOpen])
-
+export default function CollapseItem({ title, subtitle, children, defaultOpen = false, level = 'main' }) {
+  const [open, setOpen] = useState(defaultOpen);
+  const styles =
+    level === 'sub'
+      ? 'rounded-lg border border-slate-200 bg-white'
+      : 'rounded-xl border border-slate-200/70 bg-slate-50';
   return (
-    <div className={`${styles.container} ${className}`.trim()}>
+    <div className={styles}>
       <button
         type="button"
-        className={`flex w-full items-center justify-between gap-4 cursor-pointer text-left ${styles.header}`}
-        onClick={() => setIsOpen((prev) => !prev)}
-        aria-expanded={isOpen}
+        onClick={() => setOpen((o) => !o)}
+        className="w-full flex items-center justify-between gap-4 py-3 px-3"
       >
-        <div className="flex flex-1 items-center gap-3">
-          {leadingIcon ? leadingIcon : null}
-          <div className="flex-1">
-            <p className={`${styles.title}`}>{title}</p>
-            {subtitle ? <p className={`${styles.subtitle} mt-1`}>{subtitle}</p> : null}
-          </div>
+        <div className="text-left">
+          <div className="text-slate-800 font-semibold">{title}</div>
+          {subtitle && <div className="text-slate-500 text-sm">{subtitle}</div>}
         </div>
-        <span className={`${baseChevronClasses} ${isOpen ? "rotate-180" : "rotate-0"}`} aria-hidden="true">
-          <svg
-            className="h-4 w-4"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="m6 9 6 6 6-6" />
-          </svg>
-        </span>
+        <span className={`transition-transform ${open ? 'rotate-180' : ''}`}>⌄</span>
       </button>
-      <div
-        style={{
-          maxHeight: maxHeight === "none" ? undefined : maxHeight,
-          overflow: "hidden",
-          transition: "max-height 0.25s ease, opacity 0.25s ease",
-          opacity: isOpen || maxHeight !== "0px" ? 1 : 0,
-        }}
-      >
-        <div ref={contentRef} className={`${styles.body}`.trim()}>
-          {children}
-        </div>
-      </div>
+      {open && <div className="px-3 pb-3">{children}</div>}
     </div>
-  )
+  );
 }
