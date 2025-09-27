@@ -1,12 +1,28 @@
-import { useState } from 'react';
-import CollapseItem from '../ui/CollapseItem';
-import ImageFrame from '../ui/ImageFrame';
 import { executedProjects } from '../../data/BimDeepSections';
+import { useState } from 'react';
 
-function Chip({ active, children, onClick }) {
+function Collapse({ title, subtitle, children }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="rounded-xl border border-slate-200/70 bg-slate-50">
+      <button
+        onClick={() => setOpen((o) => !o)}
+        className="w-full flex items-center justify-between gap-4 py-3 px-3"
+      >
+        <div className="text-left">
+          <div className="text-slate-800 font-semibold">{title}</div>
+          {subtitle && <div className="text-slate-500 text-sm">{subtitle}</div>}
+        </div>
+        <span className={`transition-transform ${open ? 'rotate-180' : ''}`}>⌄</span>
+      </button>
+      {open && <div className="px-3 pb-3">{children}</div>}
+    </div>
+  );
+}
+
+function Chip({ active, onClick, children }) {
   return (
     <button
-      type="button"
       onClick={onClick}
       className={`px-2 py-1 rounded-full border text-xs ${active ? 'bg-slate-800 text-white border-slate-800' : 'hover:bg-slate-50'}`}
     >
@@ -19,68 +35,67 @@ export default function ProjectsList() {
   return (
     <div className="space-y-4">
       {executedProjects.map((p) => (
-        <ProjectItem key={p.id} project={p} />
+        <Project key={p.id} p={p} />
       ))}
     </div>
   );
 }
 
-function ProjectItem({ project }) {
-  const [activeDiscipline, setActiveDiscipline] = useState(project.disciplines?.[0] || null);
-  const [activeLOD, setActiveLOD] = useState(project.lodLevels?.[0] || null);
+function Project({ p }) {
+  const [disc, setDisc] = useState(p.disciplines?.[0] || null);
+  const [lod, setLOD] = useState(p.lodLevels?.[0] || null);
 
-  const resolveImage = () => {
-    const imgs = project.images || {};
-    if (imgs.imagesByDisciplineAndLOD?.[activeDiscipline]?.[activeLOD])
-      return imgs.imagesByDisciplineAndLOD[activeDiscipline][activeLOD];
-    if (imgs.imagesByDiscipline?.[activeDiscipline]) return imgs.imagesByDiscipline[activeDiscipline];
-    if (imgs.imagesByLOD?.[activeLOD]) return imgs.imagesByLOD[activeLOD];
-    return imgs.main || '';
-  };
+  const img = (() => {
+    const i = p.images || {};
+    if (i.imagesByDisciplineAndLOD?.[disc]?.[lod]) return i.imagesByDisciplineAndLOD[disc][lod];
+    if (i.imagesByDiscipline?.[disc]) return i.imagesByDiscipline[disc];
+    if (i.imagesByLOD?.[lod]) return i.imagesByLOD[lod];
+    return i.main || '';
+  })();
 
   return (
-    <CollapseItem title={project.name} subtitle={project.intro} level="main" defaultOpen={false}>
+    <Collapse title={p.name} subtitle={p.intro}>
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
         <div className="lg:col-span-7 space-y-4">
-          {project.disciplines?.length ? (
-            <CollapseItem title="Disciplina" level="sub">
+          {p.disciplines?.length ? (
+            <Collapse title="Disciplina">
               <div className="flex flex-wrap gap-2">
-                {project.disciplines.map((d) => (
-                  <Chip key={d} active={d === activeDiscipline} onClick={() => setActiveDiscipline(d)}>
+                {p.disciplines.map((d) => (
+                  <Chip key={d} active={d === disc} onClick={() => setDisc(d)}>
                     {d}
                   </Chip>
                 ))}
               </div>
-            </CollapseItem>
+            </Collapse>
           ) : null}
 
-          {project.lodLevels?.length ? (
-            <CollapseItem title="Nivel de Detalle (LOD)" level="sub">
+          {p.lodLevels?.length ? (
+            <Collapse title="Nivel de Detalle (LOD)">
               <div className="flex flex-wrap gap-2">
-                {project.lodLevels.map((l) => (
-                  <Chip key={l} active={l === activeLOD} onClick={() => setActiveLOD(l)}>
+                {p.lodLevels.map((l) => (
+                  <Chip key={l} active={l === lod} onClick={() => setLOD(l)}>
                     {l}
                   </Chip>
                 ))}
               </div>
-            </CollapseItem>
+            </Collapse>
           ) : null}
 
-          {project.complexity?.text ? (
-            <CollapseItem title={project.complexity.title || 'Tipo de Edificio y Complejidad'} level="sub" defaultOpen={false}>
-              <p className="text-slate-600 text-sm leading-6">{project.complexity.text}</p>
-            </CollapseItem>
+          {p.complexity?.text ? (
+            <Collapse title={p.complexity.title || 'Tipo de Edificio y Complejidad'}>
+              <p className="text-slate-600 text-sm leading-6">{p.complexity.text}</p>
+            </Collapse>
           ) : null}
 
-          <p className="text-xs text-slate-500">Entregables: {(project.deliverables || ['IFC', 'PDF', 'DWG']).join(' / ')}</p>
+          <p className="text-xs text-slate-500">Entregables: {(p.deliverables || ['IFC', 'PDF', 'DWG']).join(' / ')}</p>
         </div>
 
         <div className="lg:col-span-5">
-          <ImageFrame>
-            <img src={resolveImage()} alt={project.name} className="w-full h-full object-cover" />
-          </ImageFrame>
+          <div className="aspect-video rounded-xl overflow-hidden bg-slate-100">
+            <img src={img} alt={p.name} className="w-full h-full object-cover" />
+          </div>
         </div>
       </div>
-    </CollapseItem>
+    </Collapse>
   );
 }
