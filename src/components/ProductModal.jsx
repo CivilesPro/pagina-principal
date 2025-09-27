@@ -168,6 +168,85 @@ function useRenderPayPalButtons({
   return ref;
 }
 
+
+/* === 1) Añade este componente dentro de ProductModal.jsx (arriba del export) === */
+
+// Render profesional para descripciones con bullets/encabezados
+function RichDescription({ text }) {
+  if (!text) return null;
+
+  // 1) Normalizamos: cortamos espacios y dividimos por líneas
+  const rawLines = text
+    .replace(/\r\n/g, "\n")
+    .split("\n")
+    .map(l => l.trim())
+    .filter(Boolean);
+
+  // 2) Clasificamos líneas: heading vs bullet vs párrafo
+  const isBullet = (l) =>
+    /^((✅|•|-|—|–|—|►|▪|▫|➤|➔|🛠|📦|🎯|📐|🏗|📊|🪵|🌐)\s+)/.test(l);
+
+  const isHeading = (l) =>
+    /^(🎯|📦|🎥|🛠|🏛|📊|⚡|🏗)\s/.test(l) || // emojis típicos de título
+    (/[:：]$/.test(l) && !isBullet(l));       // termina en “:”
+
+  // 3) Agrupamos bloques: headings con sus bullets/parrafos
+  const blocks = [];
+  let current = { heading: null, items: [], paragraphs: [] };
+
+  rawLines.forEach((line) => {
+    if (isHeading(line)) {
+      // cerramos bloque previo
+      if (current.heading || current.items.length || current.paragraphs.length) {
+        blocks.push(current);
+        current = { heading: null, items: [], paragraphs: [] };
+      }
+      current.heading = line.replace(/[:：]\s*$/, "");
+    } else if (isBullet(line)) {
+      current.items.push(line.replace(/^((✅|•|-|—|–|—|►|▪|▫|➤|➔|🛠|📦|🎯|📐|🏗|📊|🪵|🌐)\s+)/, ""));
+    } else {
+      current.paragraphs.push(line);
+    }
+  });
+  if (current.heading || current.items.length || current.paragraphs.length) {
+    blocks.push(current);
+  }
+
+  // 4) Render
+  return (
+    <div className="space-y-4 leading-relaxed text-gray-700">
+      {blocks.length === 0 && (
+        <p className="whitespace-pre-line">{text}</p>
+      )}
+
+      {blocks.map((b, i) => (
+        <div key={`desc-block-${i}`} className="space-y-2">
+          {b.heading && (
+            <h4 className="font-semibold text-gray-900">
+              {b.heading}
+            </h4>
+          )}
+
+          {b.paragraphs.map((p, j) => (
+            <p key={`p-${i}-${j}`} className="whitespace-pre-line">
+              {p}
+            </p>
+          ))}
+
+          {b.items.length > 0 && (
+            <ul className="ml-5 list-disc space-y-1">
+              {b.items.map((it, k) => (
+                <li key={`li-${i}-${k}`}>{it}</li>
+              ))}
+            </ul>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+
 export default function ProductModal({
   isOpen = true,
   product,
@@ -376,7 +455,9 @@ export default function ProductModal({
               <span className="ml-2 text-sm text-gray-500">(128 reseñas)</span>
             </div>
 
-            <p className="mb-4 text-gray-700">{product?.description}</p>
+            <div className="mb-4">
+              <RichDescription text={product?.description} />
+            </div>
 
             {/* Pago */}
             <div className="rounded-xl border border-gray-200 p-4" aria-live="polite">
@@ -424,8 +505,32 @@ export default function ProductModal({
               )}
             </div>
 
+            {/* Debajo de los botones PayPal */}
+            <div className="mt-2 flex items-center gap-2 text-xs text-gray-600">
+              {/* ícono */}
+              <svg
+                className="h-4 w-4 text-emerald-600"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+
+              <span>
+                Al pagar se activará el botón <span className="font-medium text-emerald-700">Descargar</span> para obtener el archivo al instante.
+              </span>
+            </div>
+
             {/* Reseñas */}
             <div className="mt-6 space-y-4">
+               <p className="text-gray-700">Lee lo que dicen nuestros Clientes:</p>
               {(STATIC_REVIEWS[product?.slug] || STATIC_REVIEWS.default).map((rev, idx) => (
                 <div
                   key={`${product?.slug || "p"}-rev-${idx}-${rev.name}`}
