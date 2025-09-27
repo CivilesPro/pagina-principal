@@ -1,10 +1,135 @@
-import React from "react"
-import SEO from "../components/SEO.jsx"
-import BimServiceCard from "../components/BimServiceCard.jsx"
-import LODList from "../components/bim/LODList.jsx"
-import ProjectsList from "../components/bim/ProjectsList.jsx"
+import React, { useMemo, useRef, useState } from "react";
+import SEO from "../components/SEO.jsx";
+import BimServiceCard from "../components/BimServiceCard.jsx";
+import LODList from "../components/bim/LODList.jsx";
+import ProjectsList from "../components/bim/ProjectsList.jsx";
+import SectionToolbar from "@/components/ui/SectionToolbar.jsx";
+import { lodItems, executedProjects } from "@/data/BimDeepSections";
 
-const SITE_URL = "https://civilespro.com"
+const SITE_URL = "https://civilespro.com";
+const ALL_LEVELS = lodItems.map((item) => item.id);
+
+function LodCardBody() {
+  const [q, setQ] = useState("");
+  const [expandAll, setExpandAll] = useState(false);
+  const [active, setActive] = useState(new Set());
+  const scrollHandlersRef = useRef({});
+
+  const chips = ALL_LEVELS.map((id) => ({
+    id,
+    label: id.replace("lod", "LOD "),
+    active: active.has(id),
+    onClick: () => {
+      setActive((prev) => {
+        const next = new Set(prev);
+        if (next.has(id)) {
+          next.delete(id);
+        } else {
+          next.add(id);
+          const handler = scrollHandlersRef.current?.[id];
+          if (handler) handler();
+        }
+        return next;
+      });
+    },
+  }));
+
+  return (
+    <>
+      <SectionToolbar
+        onSearch={setQ}
+        searchPlaceholder="Buscar en LOD…"
+        leftChips={chips}
+        showExpandToggle
+        expanded={expandAll}
+        onToggleExpand={() => setExpandAll((v) => !v)}
+        className="mb-4"
+      />
+      <LODList
+        query={q}
+        activeLevels={active}
+        expandAll={expandAll}
+        onItemRef={(map) => {
+          scrollHandlersRef.current = map;
+        }}
+      />
+    </>
+  );
+}
+
+function ProjectsCardBody() {
+  const [q, setQ] = useState("");
+  const [expandAll, setExpandAll] = useState(false);
+
+  const allDisc = useMemo(() => {
+    const s = new Set();
+    executedProjects.forEach((p) => (p.disciplines || []).forEach((d) => s.add(d)));
+    return Array.from(s);
+  }, []);
+  const allLOD = useMemo(() => {
+    const s = new Set();
+    executedProjects.forEach((p) => (p.lodLevels || []).forEach((l) => s.add(l)));
+    return Array.from(s);
+  }, []);
+
+  const [actDisc, setActDisc] = useState(new Set());
+  const [actLOD, setActLOD] = useState(new Set());
+
+  const discChips = allDisc.map((d) => ({
+    id: `disc:${d}`,
+    label: d,
+    active: actDisc.has(d),
+    onClick: () => {
+      setActDisc((prev) => {
+        const next = new Set(prev);
+        if (next.has(d)) {
+          next.delete(d);
+        } else {
+          next.add(d);
+        }
+        return next;
+      });
+    },
+  }));
+
+  const lodChips = allLOD.map((l) => ({
+    id: `lod:${l}`,
+    label: l,
+    active: actLOD.has(l),
+    onClick: () => {
+      setActLOD((prev) => {
+        const next = new Set(prev);
+        if (next.has(l)) {
+          next.delete(l);
+        } else {
+          next.add(l);
+        }
+        return next;
+      });
+    },
+  }));
+
+  return (
+    <>
+      <SectionToolbar
+        onSearch={setQ}
+        searchPlaceholder="Buscar proyectos…"
+        leftChips={discChips}
+        rightChips={lodChips}
+        showExpandToggle
+        expanded={expandAll}
+        onToggleExpand={() => setExpandAll((v) => !v)}
+        className="mb-4"
+      />
+      <ProjectsList
+        query={q}
+        filterDisciplines={actDisc}
+        filterLOD={actLOD}
+        expandAll={expandAll}
+      />
+    </>
+  );
+}
 
 export default function ModeladoBIMPage() {
   const jsonLd = {
@@ -20,7 +145,7 @@ export default function ModeladoBIMPage() {
     url: `${SITE_URL}/modelado-bim`,
     description:
       "Integramos todas las disciplinas de un proyecto bajo estándares BIM, asegurando coordinación y eficiencia de principio a fin.",
-  }
+  };
 
   return (
     <>
@@ -38,7 +163,8 @@ export default function ModeladoBIMPage() {
             Todo lo que un proyecto necesita, en un solo lugar
           </h1>
           <p className="mt-5 mx-auto max-w-2xl text-lg text-gray-700">
-            Ingenieros, arquitectos y maestros de obra compartiendo recursos, plantillas y herramientas para que tu obra sea más <b>rápida</b> y <b>confiable</b>.
+            Ingenieros, arquitectos y maestros de obra compartiendo recursos, plantillas y herramientas para que tu obra sea más
+            <b>rápida</b> y <b>confiable</b>.
           </p>
           <div className="mt-8 flex gap-3 justify-center">
             <a href="/blog?cat=manual" className="btn-primary">
@@ -78,7 +204,7 @@ export default function ModeladoBIMPage() {
                 <p className="text-slate-600 text-sm">Adaptamos el nivel de detalle según la etapa del proyecto.</p>
                 <div className="mt-4">
                   {/* contenido puro, sin tarjeta adicional */}
-                  <LODList />
+                  <LodCardBody />
                 </div>
               </div>
 
@@ -88,7 +214,7 @@ export default function ModeladoBIMPage() {
                 <p className="text-slate-600 text-sm">Experiencia comprobada en distintas escalas.</p>
                 <div className="mt-4">
                   {/* contenido puro, sin tarjeta adicional */}
-                  <ProjectsList />
+                  <ProjectsCardBody />
                 </div>
               </div>
 
@@ -115,7 +241,6 @@ export default function ModeladoBIMPage() {
           </div>
         </div>
       </section>
-
     </>
-  )
+  );
 }
