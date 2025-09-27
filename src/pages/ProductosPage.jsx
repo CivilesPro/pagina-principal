@@ -36,6 +36,13 @@ export default function ProductosPage() {
     return DEFAULT_CURRENCY
   })
 
+  const handleCurrencyChange = React.useCallback(
+    (nextCurrency) => {
+      setCurrency((current) => (current === nextCurrency ? current : nextCurrency))
+    },
+    []
+  )
+
   const [selectedProduct, setSelectedProduct] = React.useState(null)
 
   const handleOpenProduct = React.useCallback((product) => {
@@ -76,6 +83,9 @@ export default function ProductosPage() {
     const paramCurrency = normalizeCurrency(searchParams.get("currency"))
     if (paramCurrency && paramCurrency !== currency) {
       setCurrency(paramCurrency)
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem("currency", paramCurrency)
+      }
     }
   }, [searchParams, currency])
 
@@ -84,22 +94,31 @@ export default function ProductosPage() {
       window.localStorage.setItem("currency", currency)
     }
 
-    const currentParam = normalizeCurrency(searchParams.get("currency"))
-    if (currency === DEFAULT_CURRENCY) {
-      if (currentParam) {
-        const next = new URLSearchParams(searchParams)
-        next.delete("currency")
-        setSearchParams(next, { replace: true })
-      }
-      return
-    }
+    setSearchParams(
+      (previousParams) => {
+        const currentParam = normalizeCurrency(previousParams.get("currency"))
 
-    if (currency !== currentParam) {
-      const next = new URLSearchParams(searchParams)
-      next.set("currency", currency)
-      setSearchParams(next, { replace: true })
-    }
-  }, [currency, searchParams, setSearchParams])
+        if (currency === DEFAULT_CURRENCY) {
+          if (!currentParam) {
+            return previousParams
+          }
+
+          const nextParams = new URLSearchParams(previousParams)
+          nextParams.delete("currency")
+          return nextParams
+        }
+
+        if (currency === currentParam) {
+          return previousParams
+        }
+
+        const nextParams = new URLSearchParams(previousParams)
+        nextParams.set("currency", currency)
+        return nextParams
+      },
+      { replace: true }
+    )
+  }, [currency, setSearchParams])
 
   return (
     <>
@@ -144,7 +163,7 @@ export default function ProductosPage() {
                           ? "bg-emerald-600 text-white shadow"
                           : "text-gray-700 hover:bg-emerald-50"
                       }`}
-                      onClick={() => setCurrency(code)}
+                      onClick={() => handleCurrencyChange(code)}
                     >
                       {code}
                     </button>
