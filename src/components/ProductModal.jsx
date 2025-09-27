@@ -36,7 +36,7 @@ function usePayPalSDK(clientId) {
     if (document.getElementById(id)) { setReady(true); return; }
     const s = document.createElement("script");
     s.id = id;
-    s.src = `https://www.paypal.com/sdk/js?client-id=${clientId}`;
+    s.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&components=buttons&intent=capture`;
     s.async = true;
     s.onload = () => setReady(true);
     s.onerror = () => setReady(false);
@@ -46,24 +46,33 @@ function usePayPalSDK(clientId) {
 }
 
 /* Renderizar PayPal Buttons en un div */
-function useRenderPayPalButtons({ enabled, createOrder, onApprove, onError }) {
+function useRenderPayPalButtons({ enabled, createOrder, onApprove, onError, isOpen, productSlug }) {
   const ref = React.useRef(null);
   React.useEffect(() => {
-    if (!enabled || !window.paypal || !ref.current) return;
+    if (!enabled || !window.paypal || !ref.current || !isOpen) return;
     ref.current.innerHTML = "";
-    const btns = window.paypal.Buttons({
-      style: { layout: "vertical", label: "paypal" },
-      createOrder,
-      onApprove,
-      onError,
-      funding: { disallowed: [window.paypal.FUNDING.CARD] },
+    let btnsInstance = null;
+    const frameId = window.requestAnimationFrame(() => {
+      if (!ref.current) return;
+      btnsInstance = window.paypal.Buttons({
+        style: { layout: "vertical", label: "paypal" },
+        createOrder,
+        onApprove,
+        onError,
+        funding: { disallowed: [window.paypal.FUNDING.CARD] },
+      });
+      btnsInstance.render(ref.current);
     });
-    btns.render(ref.current);
     return () => {
-      try { btns.close(); } catch {}
-      if (ref.current) ref.current.innerHTML = "";
+      window.cancelAnimationFrame(frameId);
+      if (btnsInstance && typeof btnsInstance.close === "function") {
+        try { btnsInstance.close(); } catch {}
+      }
+      if (ref.current) {
+        ref.current.innerHTML = "";
+      }
     };
-  }, [enabled, createOrder, onApprove, onError]);
+  }, [enabled, createOrder, onApprove, onError, isOpen, productSlug]);
   return ref;
 }
 
@@ -148,6 +157,8 @@ export default function ProductModal({ isOpen = true, product, currency = "COP",
     createOrder,
     onApprove,
     onError,
+    isOpen,
+    productSlug: product?.slug,
   });
 
   const handleRetry = React.useCallback(() => {
