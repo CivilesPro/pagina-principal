@@ -236,7 +236,7 @@ export default function ProductosPage() {
           </div>
 
           <div className="mt-16 rounded-3xl border border-dashed border-gray-300 bg-white p-10 text-center text-gray-700">
-            ¿Buscas un producto a medida?
+            ¿Buscas una plantilla de Excel a la medida?
             <a
               href="https://wa.me/573127437848?text=Hola%20CivilesPro%2C%20necesito%20un%20producto%20a%20medida."
               target="_blank"
