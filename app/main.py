@@ -15,17 +15,24 @@ init_db()
 app = FastAPI(title="Civiles Pro API", version="1.0.0")
 
 DEFAULT_FRONTEND_ORIGIN = "http://localhost:5173"
+
+static_origins = {
+    DEFAULT_FRONTEND_ORIGIN,
+    "https://civilespro.com",
+    "https://www.civilespro.com",
+    "https://<tu-dominio-frontend>.vercel.app",
+    "https://<tu-dominio-frontend>.netlify.app",
+}
+
 raw_origins = os.environ.get("CORS_ORIGINS")
-
-allowed_origins = {DEFAULT_FRONTEND_ORIGIN}
 if raw_origins:
-    allowed_origins.update({origin.strip() for origin in raw_origins.split(",") if origin.strip()})
+    static_origins.update({origin.strip() for origin in raw_origins.split(",") if origin.strip()})
 
-if "*" in allowed_origins:
+if "*" in static_origins:
     allow_origins = ["*"]
     allow_credentials = False
 else:
-    allow_origins = sorted(allowed_origins)
+    allow_origins = sorted(static_origins)
     allow_credentials = True
 
 app.add_middleware(

@@ -1,6 +1,8 @@
 import React from "react";
 import { formatPrice } from "../utils/formatPrice.js";
 
+const API_BASE = (import.meta.env.VITE_API_URL || "http://127.0.0.1:8000").replace(/\/$/, "");
+
 /* Utils */
 const cx = (...c) => c.filter(Boolean).join(" ");
 
@@ -254,6 +256,7 @@ export default function ProductModal({
   onClose,
 }) {
   const PAYPAL_CLIENT_ID = import.meta.env.VITE_PAYPAL_CLIENT_ID;
+  const safeCurrency = React.useMemo(() => (currency || "USD").toUpperCase(), [currency]);
 
   // Estado general del modal
   const [activeIndex, setActiveIndex] = React.useState(0);
@@ -293,10 +296,10 @@ export default function ProductModal({
       setCreating(true);
       setErrorMsg(null);
 
-      const res = await fetch("/api/paypal/create-order", {
+      const res = await fetch(`${API_BASE}/api/paypal/create-order`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ slug: product.slug, currency }),
+        body: JSON.stringify({ slug: product.slug, currency: safeCurrency }),
       });
       const data = await parseSafe(res);
 
@@ -313,14 +316,14 @@ export default function ProductModal({
     } finally {
       setCreating(false);
     }
-  }, [product?.slug, currency]);
+  }, [product?.slug, safeCurrency]);
 
   const onApprove = React.useCallback(async (data) => {
     try {
       setCapturing(true);
       setErrorMsg(null);
 
-      const res = await fetch("/api/paypal/capture-order", {
+      const res = await fetch(`${API_BASE}/api/paypal/capture-order`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ orderID: data.orderID }),
@@ -367,12 +370,12 @@ export default function ProductModal({
   // ✅ Precios (COP base) convertidos a moneda seleccionada, usando el mismo helper del listado
   const showPrice =
     product?.priceCop != null
-      ? formatPrice(product.priceCop, currency, { withCode: true })
+      ? formatPrice(product.priceCop, safeCurrency, { withCode: false })
       : null;
 
   const showYearPrice =
     product?.priceCopYear != null
-      ? formatPrice(product.priceCopYear, currency, { withCode: true })
+      ? formatPrice(product.priceCopYear, safeCurrency, { withCode: false })
       : null;
 
   return (
@@ -437,14 +440,26 @@ export default function ProductModal({
               showYearPrice ? (
                 <>
                   <p className="mt-1 text-sm text-gray-700">
-                    Desde: <span className="font-semibold text-gray-900">{showPrice}</span>
+                    Desde:
+                    <span className="ml-1 font-semibold text-gray-900">
+                      {showPrice}
+                      <span className="ml-1 text-gray-500">{safeCurrency}</span>
+                    </span>
                     <span className="mx-2 text-gray-400">•</span>
-                    Premium: <span className="font-semibold text-gray-900">{showYearPrice}</span>
+                    Premium:
+                    <span className="ml-1 font-semibold text-gray-900">
+                      {showYearPrice}
+                      <span className="ml-1 text-gray-500">{safeCurrency}</span>
+                    </span>
                   </p>
                 </>
               ) : (
                 <p className="mt-1 text-sm text-gray-700">
-                  Precio: <span className="font-semibold text-gray-900">{showPrice}</span>
+                  Precio:
+                  <span className="ml-1 font-semibold text-gray-900">
+                    {showPrice}
+                    <span className="ml-1 text-gray-500">{safeCurrency}</span>
+                  </span>
                 </p>
               )
             ) : (
@@ -508,44 +523,16 @@ export default function ProductModal({
               )}
             </div>
 
-            {/* Debajo de los botones PayPal */}
-            <div className="mt-2 flex items-center gap-2 text-xs text-gray-600">
-              {/* ícono */}
-              <svg
-                className="h-4 w-4 text-emerald-600"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                <polyline points="7 10 12 15 17 10" />
-                <line x1="12" y1="15" x2="12" y2="3" />
-              </svg>
-
-              <span>
-                Al pagar se activará el botón <span className="font-medium text-emerald-700">Descargar</span> para obtener el archivo al instante.
-              </span>
+            {/* Avisos PayPal */}
+            <div className="mt-3 rounded-md border border-emerald-200 bg-emerald-50 p-2 text-sm text-emerald-800">
+              Al pagar se activará el botón <strong>Descargar</strong> para obtener el archivo al instante.
             </div>
 
-            <div className="mt-1 flex items-center gap-2 text-[11px] text-gray-500">
-              <svg
-                className="h-3.5 w-3.5"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M12 1v22" />
-                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7H14a3.5 3.5 0 0 1 0 7H6" />
+            <div className="mt-2 flex items-center gap-2 rounded-md border border-sky-200 bg-sky-50 p-2 text-sm text-sky-800">
+              <svg width="16" height="16" viewBox="0 0 24 24" className="shrink-0" aria-hidden="true">
+                <path fill="currentColor" d="M12 1l3 5l6 1l-4 4l1 6l-6-3l-6 3l1-6L1 7l6-1z" />
               </svg>
-              <span>Pagos procesados en USD por PayPal.</span>
+              Pagos procesados en <strong>USD</strong> por PayPal. El precio mostrado es referencial en {safeCurrency}.
             </div>
 
             {/* Reseñas */}
