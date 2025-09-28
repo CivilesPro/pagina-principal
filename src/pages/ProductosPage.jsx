@@ -150,10 +150,10 @@ export default function ProductosPage() {
 
           <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {products.map((product) => {
-              const formattedPrice = formatPrice(product.priceCop, currency, { withCode: true });
+              const formattedPrice = formatPrice(product.priceCop, currency, { withCode: false });
               const formattedYearPrice =
                 product.priceCopYear != null
-                  ? formatPrice(product.priceCopYear, currency, { withCode: true })
+                  ? formatPrice(product.priceCopYear, currency, { withCode: false })
                   : null;
 
               const badgeLabel = BADGES_BY_SLUG[product.slug];
@@ -206,13 +206,23 @@ export default function ProductosPage() {
                         <p className="text-base font-semibold text-amber-700">Precio a consultar</p>
                       ) : formattedYearPrice ? (
                         <>
-                          <p className="text-base font-bold text-gray-900">Desde: {formattedPrice}</p>
+                          <p className="text-base font-bold text-gray-900">
+                            Desde: {formattedPrice}
+                            <span className="ml-1 text-sm font-semibold text-gray-500">{currency}</span>
+                          </p>
                           <p className="text-xs text-gray-500">
-                            Premium: <span className="font-semibold text-gray-900">{formattedYearPrice}</span>
+                            Premium:
+                            <span className="ml-1 font-semibold text-gray-900">
+                              {formattedYearPrice}
+                              <span className="ml-1 text-gray-500">{currency}</span>
+                            </span>
                           </p>
                         </>
                       ) : (
-                        <p className="text-base font-bold text-gray-900">Precio: {formattedPrice}</p>
+                        <p className="text-base font-bold text-gray-900">
+                          Precio: {formattedPrice}
+                          <span className="ml-1 text-sm font-semibold text-gray-500">{currency}</span>
+                        </p>
                       )}
                     </div>
                     <button

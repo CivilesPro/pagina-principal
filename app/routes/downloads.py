@@ -86,4 +86,12 @@ async def download_file(token_id: str, db: Session = Depends(get_session)):
     if not file_path.exists():
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Archivo no encontrado")
 
-    return FileResponse(path=file_path, filename=safe_path.name)
+    return FileResponse(
+        path=file_path,
+        filename=safe_path.name,
+        media_type="application/octet-stream",
+        headers={
+            "Cache-Control": "no-store, max-age=0",
+            "Content-Disposition": f'attachment; filename="{safe_path.name}"',
+        },
+    )
