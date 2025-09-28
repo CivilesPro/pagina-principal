@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import os
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
 
 from .database import init_db
@@ -38,10 +38,17 @@ else:
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allow_origins,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization"],
     allow_credentials=allow_credentials,
 )
+
+
+@app.options("/{full_path:path}")
+async def preflight_handler(full_path: str) -> Response:
+    """Return an empty successful response for CORS preflight requests."""
+
+    return Response(status_code=204)
 
 app.include_router(paypal.router)
 app.include_router(downloads.router)
