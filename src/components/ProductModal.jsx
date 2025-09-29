@@ -296,7 +296,7 @@ export default function ProductModal({
       setCreating(true);
       setErrorMsg(null);
 
-      const res = await fetch(`${API_BASE}/api/paypal/create-order`, {
+      const res = await fetch(`/api/paypal/create-order.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ slug: product.slug, currency: safeCurrency }),
@@ -323,7 +323,7 @@ export default function ProductModal({
       setCapturing(true);
       setErrorMsg(null);
 
-      const res = await fetch(`${API_BASE}/api/paypal/capture-order`, {
+      await fetch(`/api/paypal/capture-order.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ orderID: data.orderID }),
