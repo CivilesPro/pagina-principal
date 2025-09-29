@@ -12,13 +12,9 @@ init_db()
 
 app = FastAPI(title="Civiles Pro API", version="1.0.0")
 
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://www.civilespro.com",
-        "https://app.civilespro.com",
-    ],
+    allow_origin_regex=r"^https://([a-z0-9-]+\.)*civilespro\.com$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
