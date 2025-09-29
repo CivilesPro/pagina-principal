@@ -9,7 +9,7 @@ from decimal import Decimal
 from typing import Optional
 from uuid import uuid4
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Response
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
@@ -148,6 +148,13 @@ def _build_download_url(token_id: str) -> str:
 def _json_error(status_code: int, message: str) -> JSONResponse:
     logger.warning("Responding with error %s: %s", status_code, message)
     return JSONResponse(status_code=status_code, content={"message": message})
+
+
+@router.options("/create-order", include_in_schema=False)
+async def options_create_order() -> Response:
+    """Handle CORS preflight requests for the create-order endpoint."""
+
+    return Response(status_code=204)
 
 
 @router.post("/create-order", response_model=CreateOrderResponse)
