@@ -253,12 +253,24 @@ function HowItWorks() {
     
   ];
   return (
-    <Reveal as="section" variant="fade-in" className="py-16">
+    <Reveal
+      as="section"
+      variant="fade-in"
+      once={false}
+      rootMargin="-15% 0px -15% 0px"
+      className="py-16"
+    >
       <div className="wrap-wide px-4">
         <h2 className="text-center text-3xl font-extrabold text-gray-900 sm:text-4xl">Y ademas...</h2>
         <div className="mx-auto mt-8 grid max-w-5xl grid-cols-1 gap-4 sm:grid-cols-2">
           {steps.map((s, i) => (
-            <Reveal key={s.title} variant="fade-up" delay={i * 90}>
+            <Reveal
+              key={s.title}
+              variant="fade-up"
+              delay={i * 90}
+              once={false}
+              rootMargin="-20% 0px -20% 0px"
+            >
               <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
                 <div className="inline-flex items-center gap-2 rounded-lg bg-emerald-50 px-3 py-1 text-emerald-700">
                   {s.icon}
@@ -300,13 +312,20 @@ function Plans() {
   const premiumMonth = Math.round(premiumYear / 12); // ≈ $12.500 / mes
 
   return (
-    <Reveal as="section" id="planes" variant="fade-in" className="py-16">
+    <Reveal
+      as="section"
+      id="planes"
+      variant="fade-in"
+      once={false}
+      rootMargin="-12% 0px -12% 0px"
+      className="py-16"
+    >
       <div className="wrap-wide px-4">
         <h2 className="text-center text-3xl font-extrabold text-gray-900 sm:text-4xl">Nuestros Planes</h2>
         <p className="mt-1 text-center text-gray-600">Elige el plan mas apropiado para tu obra.</p>
         <div className="mx-auto mt-10 grid max-w-5xl grid-cols-1 gap-6 sm:grid-cols-2">
           {/* -------- Plan Plus -------- */}
-          <Reveal variant="slide-right" delay={80}>
+          <Reveal variant="slide-right" delay={80} once={false}>
             <article className="group relative flex min-h-[460px] flex-col rounded-2xl border-2 border-emerald-200 bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
               <div className="text-lg font-semibold text-emerald-700">Plan Plus</div>
               <p className="mt-1 text-gray-600">Presupuesto + APU y exportación en Excel.</p>
@@ -339,7 +358,7 @@ function Plans() {
           </Reveal>
 
           {/* -------- Plan Premium -------- */}
-          <Reveal variant="slide-left" delay={160}>
+          <Reveal variant="slide-left" delay={160} once={false}>
             <article className="group relative flex min-h-[480px] flex-col rounded-2xl border-2 border-emerald-400 bg-emerald-50/40 p-6 shadow-md ring-1 ring-emerald-200 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg">
               {/* Franja superior: MÁS POPULAR */}
               <div className="-mx-6 -mt-6 mb-5 h-9 rounded-t-2xl bg-gradient-to-b from-emerald-500 to-emerald-600 text-white text-[11px] font-bold tracking-wide flex items-center justify-center shadow-sm">
@@ -430,9 +449,15 @@ function PlanComparison() {
   ];
 
   return (
-    <Reveal as="section" variant="fade-up" className="py-10">
+    <Reveal
+      as="section"
+      variant="fade-up"
+      once={false}
+      rootMargin="-10% 0px -10% 0px"
+      className="py-10"
+    >
       <div className="wrap-wide px-4">
-        <Reveal variant="fade-up" delay={80}>
+        <Reveal variant="fade-up" delay={80} once={false}>
           <div className="mx-auto max-w-5xl overflow-hidden rounded-2xl border border-emerald-100 bg-white shadow-sm">
             {/* Cabecera */}
             <div className="grid grid-cols-4 border-b bg-emerald-50/40 px-4 py-3 text-sm font-semibold text-emerald-900">
@@ -478,12 +503,24 @@ function Testimonials() {
     { name: "Luis G.", role: "Maestro de obra", rating: 5, text: "La biblioteca de APU me salva: parto de un APU y lo adapto a la obra en curso." },
   ];
   return (
-    <Reveal as="section" variant="fade-in" className="py-16">
+    <Reveal
+      as="section"
+      variant="fade-in"
+      once={false}
+      rootMargin="-12% 0px -12% 0px"
+      className="py-16"
+    >
       <div className="wrap-wide px-4">
         <h2 className="text-center text-3xl font-extrabold text-gray-900 sm:text-4xl">Testimonios</h2>
         <div className="mx-auto mt-8 grid max-w-5xl grid-cols-1 gap-4 sm:grid-cols-3">
           {items.map((t, i) => (
-            <Reveal key={t.name} variant="fade-up" delay={i * 120}>
+            <Reveal
+              key={t.name}
+              variant="fade-up"
+              delay={i * 120}
+              once={false}
+              rootMargin="-20% 0px -20% 0px"
+            >
               <article className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
                 <Stars value={t.rating} />
                 <p className="mt-3 text-gray-800 italic">“{t.text}”</p>
