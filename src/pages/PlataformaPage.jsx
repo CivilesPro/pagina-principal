@@ -5,6 +5,7 @@ import { LuCalculator, LuDownload, LuListChecks, LuWallet, LuFileSpreadsheet, Lu
 import { LuUser } from "react-icons/lu";
 import SEO from "../components/SEO.jsx";
 import { LuCircleCheck, LuCircleX, LuCrown } from "react-icons/lu";
+import Reveal from "../components/Reveal.jsx";
 
 
 
@@ -252,22 +253,24 @@ function HowItWorks() {
     
   ];
   return (
-    <section className="py-16">
+    <Reveal as="section" variant="fade-in" className="py-16">
       <div className="wrap-wide px-4">
         <h2 className="text-center text-3xl font-extrabold text-gray-900 sm:text-4xl">Y ademas...</h2>
         <div className="mx-auto mt-8 grid max-w-5xl grid-cols-1 gap-4 sm:grid-cols-2">
-          {steps.map((s) => (
-            <div key={s.title} className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-              <div className="inline-flex items-center gap-2 rounded-lg bg-emerald-50 px-3 py-1 text-emerald-700">
-                {s.icon}
-                <span className="text-xs font-semibold uppercase">{s.title}</span>
+          {steps.map((s, i) => (
+            <Reveal key={s.title} variant="fade-up" delay={i * 90}>
+              <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+                <div className="inline-flex items-center gap-2 rounded-lg bg-emerald-50 px-3 py-1 text-emerald-700">
+                  {s.icon}
+                  <span className="text-xs font-semibold uppercase">{s.title}</span>
+                </div>
+                <p className="mt-3 text-gray-700">{s.text}</p>
               </div>
-              <p className="mt-3 text-gray-700">{s.text}</p>
-            </div>
+            </Reveal>
           ))}
         </div>
       </div>
-    </section>
+    </Reveal>
   );
 }
 
@@ -297,90 +300,94 @@ function Plans() {
   const premiumMonth = Math.round(premiumYear / 12); // ≈ $12.500 / mes
 
   return (
-    <section id="planes" className="py-16">
+    <Reveal as="section" id="planes" variant="fade-in" className="py-16">
       <div className="wrap-wide px-4">
         <h2 className="text-center text-3xl font-extrabold text-gray-900 sm:text-4xl">Nuestros Planes</h2>
-      <p className="mt-1 text-center text-gray-600">Elige el plan mas apropiado para tu obra.</p>
+        <p className="mt-1 text-center text-gray-600">Elige el plan mas apropiado para tu obra.</p>
         <div className="mx-auto mt-10 grid max-w-5xl grid-cols-1 gap-6 sm:grid-cols-2">
           {/* -------- Plan Plus -------- */}
-          <article className="group relative flex min-h-[460px] flex-col rounded-2xl border-2 border-emerald-200 bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-            <div className="text-lg font-semibold text-emerald-700">Plan Plus</div>
-            <p className="mt-1 text-gray-600">Presupuesto + APU y exportación en Excel.</p>
+          <Reveal variant="slide-right" delay={80}>
+            <article className="group relative flex min-h-[460px] flex-col rounded-2xl border-2 border-emerald-200 bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
+              <div className="text-lg font-semibold text-emerald-700">Plan Plus</div>
+              <p className="mt-1 text-gray-600">Presupuesto + APU y exportación en Excel.</p>
 
-            <div className="mt-5">
-              <div className="text-[40px] font-extrabold leading-10 text-gray-900">
-                ${formatCOP(plusYear)}
+              <div className="mt-5">
+                <div className="text-[40px] font-extrabold leading-10 text-gray-900">
+                  ${formatCOP(plusYear)}
+                </div>
+                <div className="text-gray-500">Pago anual</div>
+                <div className="mt-1 text-sm text-gray-500">Es igual a ${formatCOP(plusMonth)} / mes</div>
               </div>
-              <div className="text-gray-500">Pago anual</div>
-              <div className="mt-1 text-sm text-gray-500">Es igual a ${formatCOP(plusMonth)} / mes</div>
-            </div>
 
-            <p className="mt-3 text-sm text-gray-600">Ideal para cotizar rápido con APU y exportar.</p>
+              <p className="mt-3 text-sm text-gray-600">Ideal para cotizar rápido con APU y exportar.</p>
 
-            <div className="mt-6 space-y-3">
-              <Feature ok>Presupuesto + APU</Feature>
-              <Feature ok>Exportar a Excel</Feature>
-              <Feature>Cálculos</Feature>
-              <Feature>Registro Diario</Feature>
-            </div>
+              <div className="mt-6 space-y-3">
+                <Feature ok>Presupuesto + APU</Feature>
+                <Feature ok>Exportar a Excel</Feature>
+                <Feature>Cálculos</Feature>
+                <Feature>Registro Diario</Feature>
+              </div>
 
-            <a
-              href="#"
-              className="mt-auto inline-flex h-12 w-full items-center justify-center rounded-lg px-5 font-semibold text-white transition-colors"
-              style={{ backgroundColor: "#03a042ff" }}
-            >
-              Activar Plus anual
-            </a>
-          </article>
+              <a
+                href="#"
+                className="mt-auto inline-flex h-12 w-full items-center justify-center rounded-lg px-5 font-semibold text-white transition-colors"
+                style={{ backgroundColor: "#03a042ff" }}
+              >
+                Activar Plus anual
+              </a>
+            </article>
+          </Reveal>
 
           {/* -------- Plan Premium -------- */}
-          <article className="group relative flex min-h-[480px] flex-col rounded-2xl border-2 border-emerald-400 bg-emerald-50/40 p-6 shadow-md ring-1 ring-emerald-200 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg">
-            {/* Franja superior: MÁS POPULAR */}
-            <div className="-mx-6 -mt-6 mb-5 h-9 rounded-t-2xl bg-gradient-to-b from-emerald-500 to-emerald-600 text-white text-[11px] font-bold tracking-wide flex items-center justify-center shadow-sm">
-              MÁS POPULAR
-            </div>
-
-            <div className="inline-flex items-center gap-2 text-lg font-semibold text-emerald-700">
-              <LuCrown className="h-5 w-5 text-emerald-700" />
-              Plan Premium
-            </div>
-            <p className="mt-1 text-gray-600">Todo CivilesPro por un año.</p>
-
-            <div className="mt-5">
-              <div className="text-[40px] font-extrabold leading-10 text-gray-900">
-                ${formatCOP(premiumYear)}
+          <Reveal variant="slide-left" delay={160}>
+            <article className="group relative flex min-h-[480px] flex-col rounded-2xl border-2 border-emerald-400 bg-emerald-50/40 p-6 shadow-md ring-1 ring-emerald-200 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg">
+              {/* Franja superior: MÁS POPULAR */}
+              <div className="-mx-6 -mt-6 mb-5 h-9 rounded-t-2xl bg-gradient-to-b from-emerald-500 to-emerald-600 text-white text-[11px] font-bold tracking-wide flex items-center justify-center shadow-sm">
+                MÁS POPULAR
               </div>
-              <div className="text-gray-500">Pago anual</div>
-              <div className="mt-1 text-sm text-gray-500">Es igual a ${formatCOP(premiumMonth)} / mes</div>
 
-              {/* Ahorro vs mensual (sin decir % exacto) */}
-              <div className="mt-2 inline-flex items-center rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">
-                Ahorra más del 70% si decides luego cambiar de plan
+              <div className="inline-flex items-center gap-2 text-lg font-semibold text-emerald-700">
+                <LuCrown className="h-5 w-5 text-emerald-700" />
+                Plan Premium
               </div>
-            </div>
+              <p className="mt-1 text-gray-600">Todo CivilesPro por un año.</p>
 
-            <p className="mt-3 text-sm text-gray-600">
-              Para obra completa: cálculo, presupuesto y registro.
-            </p>
+              <div className="mt-5">
+                <div className="text-[40px] font-extrabold leading-10 text-gray-900">
+                  ${formatCOP(premiumYear)}
+                </div>
+                <div className="text-gray-500">Pago anual</div>
+                <div className="mt-1 text-sm text-gray-500">Es igual a ${formatCOP(premiumMonth)} / mes</div>
 
-            <div className="mt-6 space-y-3">
-              <Feature ok>Presupuesto + APU</Feature>
-              <Feature ok>Exportar a Excel</Feature>
-              <Feature ok>Cálculos</Feature>
-              <Feature ok>Registro Diario</Feature>
-            </div>
+                {/* Ahorro vs mensual (sin decir % exacto) */}
+                <div className="mt-2 inline-flex items-center rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">
+                  Ahorra más del 70% si decides luego cambiar de plan
+                </div>
+              </div>
 
-            <a
-              href="#"
-              className="mt-7 inline-flex h-12 w-full items-center justify-center rounded-lg px-5 font-semibold text-white transition-colors"
-              style={{ backgroundColor: "#03a042ff" }}
-            >
-              Activar Premium anual
-            </a>
-          </article>
+              <p className="mt-3 text-sm text-gray-600">
+                Para obra completa: cálculo, presupuesto y registro.
+              </p>
+
+              <div className="mt-6 space-y-3">
+                <Feature ok>Presupuesto + APU</Feature>
+                <Feature ok>Exportar a Excel</Feature>
+                <Feature ok>Cálculos</Feature>
+                <Feature ok>Registro Diario</Feature>
+              </div>
+
+              <a
+                href="#"
+                className="mt-7 inline-flex h-12 w-full items-center justify-center rounded-lg px-5 font-semibold text-white transition-colors"
+                style={{ backgroundColor: "#03a042ff" }}
+              >
+                Activar Premium anual
+              </a>
+            </article>
+          </Reveal>
         </div>
       </div>
-    </section>
+    </Reveal>
   );
 }
 
@@ -423,36 +430,38 @@ function PlanComparison() {
   ];
 
   return (
-    <section className="py-10">
+    <Reveal as="section" variant="fade-up" className="py-10">
       <div className="wrap-wide px-4">
-        <div className="mx-auto max-w-5xl overflow-hidden rounded-2xl border border-emerald-100 bg-white shadow-sm">
-          {/* Cabecera */}
-          <div className="grid grid-cols-4 border-b bg-emerald-50/40 px-4 py-3 text-sm font-semibold text-emerald-900">
-            <div>Características</div>
-            <div className="text-center">Gratis</div>
-            <div className="text-center">Plus</div>
-            <div className="text-center">Premium</div>
+        <Reveal variant="fade-up" delay={80}>
+          <div className="mx-auto max-w-5xl overflow-hidden rounded-2xl border border-emerald-100 bg-white shadow-sm">
+            {/* Cabecera */}
+            <div className="grid grid-cols-4 border-b bg-emerald-50/40 px-4 py-3 text-sm font-semibold text-emerald-900">
+              <div>Características</div>
+              <div className="text-center">Gratis</div>
+              <div className="text-center">Plus</div>
+              <div className="text-center">Premium</div>
+            </div>
+
+            {/* Filas */}
+            <div className="divide-y">
+              {rows.map((r) => (
+                <div key={r.f} className="grid grid-cols-4 items-center px-4 py-3">
+                  <div className="text-gray-900">{r.f}</div>
+                  <div className="text-center"><Cell v={r.free} /></div>
+                  <div className="text-center"><Cell v={r.plus} /></div>
+                  <div className="text-center"><Cell v={r.premium} /></div>
+                </div>
+              ))}
+            </div>
           </div>
 
-          {/* Filas */}
-          <div className="divide-y">
-            {rows.map((r) => (
-              <div key={r.f} className="grid grid-cols-4 items-center px-4 py-3">
-                <div className="text-gray-900">{r.f}</div>
-                <div className="text-center"><Cell v={r.free} /></div>
-                <div className="text-center"><Cell v={r.plus} /></div>
-                <div className="text-center"><Cell v={r.premium} /></div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Nota mini opcional */}
-        {/* <p className="mx-auto mt-3 max-w-5xl px-1 text-sm text-gray-500">
-          Algunas funciones pueden variar según promociones o impuestos aplicables.
-        </p> */}
+          {/* Nota mini opcional */}
+          {/* <p className="mx-auto mt-3 max-w-5xl px-1 text-sm text-gray-500">
+            Algunas funciones pueden variar según promociones o impuestos aplicables.
+          </p> */}
+        </Reveal>
       </div>
-    </section>
+    </Reveal>
   );
 }
 
@@ -469,21 +478,23 @@ function Testimonials() {
     { name: "Luis G.", role: "Maestro de obra", rating: 5, text: "La biblioteca de APU me salva: parto de un APU y lo adapto a la obra en curso." },
   ];
   return (
-    <section className="py-16">
+    <Reveal as="section" variant="fade-in" className="py-16">
       <div className="wrap-wide px-4">
         <h2 className="text-center text-3xl font-extrabold text-gray-900 sm:text-4xl">Testimonios</h2>
         <div className="mx-auto mt-8 grid max-w-5xl grid-cols-1 gap-4 sm:grid-cols-3">
-          {items.map((t) => (
-            <article key={t.name} className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-              <Stars value={t.rating} />
-              <p className="mt-3 text-gray-800 italic">“{t.text}”</p>
-              <div className="mt-4 font-semibold text-gray-900">{t.name}</div>
-              <div className="text-sm text-gray-500">{t.role} ✅</div>
-            </article>
+          {items.map((t, i) => (
+            <Reveal key={t.name} variant="fade-up" delay={i * 120}>
+              <article className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+                <Stars value={t.rating} />
+                <p className="mt-3 text-gray-800 italic">“{t.text}”</p>
+                <div className="mt-4 font-semibold text-gray-900">{t.name}</div>
+                <div className="text-sm text-gray-500">{t.role} ✅</div>
+              </article>
+            </Reveal>
           ))}
         </div>
       </div>
-    </section>
+    </Reveal>
   );
 }
 
