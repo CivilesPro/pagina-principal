@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react"
-import { FaWhatsapp } from "react-icons/fa"
-import { LuCalculator, LuDownload, LuListChecks, LuWallet } from "react-icons/lu"
+import { FaWhatsapp } from "react-icons/fa6";
+import { LuCalculator, LuDownload, LuListChecks, LuWallet } from "react-icons/lu";
 import { useLocation } from "react-router-dom"
 import SEO from "../components/SEO.jsx"
 
