@@ -1,21 +1,23 @@
 import React from "react";
 
 /**
- * Reveal: anima su contenido cuando entra al viewport.
+ * Reveal: anima su contenido al entrar/salir del viewport.
  * Props:
- *  - as: tag contenedor (div/section/etc)
+ *  - as: contenedor (div/section/...)
  *  - variant: "fade-up" | "fade-in" | "slide-left" | "slide-right"
- *  - delay: ms (stagger)
- *  - threshold: porcentaje visible para disparar (0..1)
- *  - once: si true, no se oculta al salir (default true)
- *  - duration: ms transición
+ *  - delay: ms
+ *  - threshold: 0..1 (cuánta porción debe verse)
+ *  - rootMargin: "top right bottom left" (para adelantar/retrasar el disparo)
+ *  - once: si true, anima solo la 1ª vez; si false, también se oculta al salir
+ *  - duration: ms
  */
 export default function Reveal({
   as: Tag = "div",
   variant = "fade-up",
   delay = 0,
-  threshold = 0.2,
-  once = true,
+  threshold = 0.25,
+  rootMargin = "-12% 0px -12% 0px",
+  once = false, // ⬅️ ahora por defecto vuelve a ocultar/al mostrar
   duration = 700,
   className = "",
   children,
@@ -25,7 +27,7 @@ export default function Reveal({
   const [visible, setVisible] = React.useState(false);
 
   React.useEffect(() => {
-    // Si el usuario prefiere menos animación, mostrar directo
+    // Respeto de accesibilidad
     if (
       typeof window !== "undefined" &&
       window.matchMedia &&
@@ -37,6 +39,7 @@ export default function Reveal({
 
     const el = ref.current;
     if (!el) return;
+
     const io = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -46,13 +49,13 @@ export default function Reveal({
           setVisible(false);
         }
       },
-      { threshold }
+      { threshold, rootMargin }
     );
+
     io.observe(el);
     return () => io.disconnect();
-  }, [threshold, once]);
+  }, [threshold, rootMargin, once]);
 
-  // Variantes
   const variants = {
     "fade-up": { x: 0, y: 20 },
     "fade-in": { x: 0, y: 0 },
