@@ -5,8 +5,6 @@ const SECONDARY = "#111111ff"
 
 const NAV_ITEMS = [
   { to: "/", label: "Productos", end: true },
-  { to: "/modelado-bim", label: "Modelado BIM" },
-  { to: "/cursos-certificados", label: "Cursos y Certificados" },
   { to: "/plataforma", label: "Plataforma", aliases: ["/calculadora-de-materiales"] },
   { to: "/blog", label: "Blog" },
 ]
