@@ -2,7 +2,6 @@ import React from "react";
 
 export default function VideoLoop({ webm, mp4, poster, className }) {
   const ref = React.useRef(null);
-  const [loaded, setLoaded] = React.useState(false);
 
   const prefersReduced =
     typeof window !== "undefined" &&
@@ -14,47 +13,14 @@ export default function VideoLoop({ webm, mp4, poster, className }) {
     if (!v) return;
 
     if (typeof IntersectionObserver === "undefined") {
-      if (!loaded) {
-        const sources = [];
-        if (webm) {
-          const source = document.createElement("source");
-          source.src = webm;
-          source.type = "video/webm";
-          sources.push(source);
-        }
-        if (mp4) {
-          const source = document.createElement("source");
-          source.src = mp4;
-          source.type = "video/mp4";
-          sources.push(source);
-        }
-        sources.forEach((source) => v.appendChild(source));
-        v.load();
-        setLoaded(true);
+      if (!prefersReduced) {
+        v.play().catch(() => {});
       }
       return;
     }
 
     const onIntersect = ([entry]) => {
       if (entry.isIntersecting) {
-        if (!loaded) {
-          const sources = [];
-          if (webm) {
-            const source = document.createElement("source");
-            source.src = webm;
-            source.type = "video/webm";
-            sources.push(source);
-          }
-          if (mp4) {
-            const source = document.createElement("source");
-            source.src = mp4;
-            source.type = "video/mp4";
-            sources.push(source);
-          }
-          sources.forEach((source) => v.appendChild(source));
-          v.load();
-          setLoaded(true);
-        }
         if (!prefersReduced) {
           v.play().catch(() => {});
         }
@@ -64,13 +30,12 @@ export default function VideoLoop({ webm, mp4, poster, className }) {
     };
 
     const observer = new IntersectionObserver(onIntersect, {
-      threshold: 0.4,
-      rootMargin: "-10% 0px -10% 0px",
+      threshold: 0.15,
     });
 
     observer.observe(v);
     return () => observer.disconnect();
-  }, [webm, mp4, loaded, prefersReduced]);
+  }, [prefersReduced]);
 
   return (
     <video
@@ -79,8 +44,14 @@ export default function VideoLoop({ webm, mp4, poster, className }) {
       muted
       loop
       playsInline
-      preload="none"
+      preload="metadata"
       poster={poster}
-    />
+      onLoadedData={(e) => {
+        if (!prefersReduced) e.currentTarget.play().catch(() => {});
+      }}
+    >
+      {webm && <source src={webm} type="video/webm" />}
+      {mp4 && <source src={mp4} type="video/mp4" />}
+    </video>
   );
 }
