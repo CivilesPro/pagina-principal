@@ -680,7 +680,7 @@ export default function PlataformaPage() {
                 className="btn"
                 style={{ backgroundColor: SECONDARY, borderColor: SECONDARY, color: "#fff" }}
               >
-                Crear cuenta
+                Crear cuenta Gratis
               </a>
               <a
                 href="https://wa.me/573127437848?text=Hola%2C%20quiero%20saber%20m%C3%A1s%20sobre%20la%20Plataforma%20de%20Presupuesto"
