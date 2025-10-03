@@ -6,6 +6,7 @@ import { LuUser } from "react-icons/lu";
 import SEO from "../components/SEO.jsx";
 import { LuCircleCheck, LuCircleX, LuCrown } from "react-icons/lu";
 import Reveal from "../components/Reveal.jsx";
+import VideoLoop from "@/components/VideoLoop";
 
 
 
@@ -162,7 +163,17 @@ function Stars({ value = 5 }) {
 }
 
 // Beneficio con GIF a la izquierda y texto a la derecha
-function BenefitRow({ title, text, itemunico, gif, pngFallback, icon, index = 0 }) {
+function BenefitRow({
+  title,
+  text,
+  itemunico,
+  gif,
+  pngFallback,
+  videoWebm,
+  poster,
+  icon,
+  index = 0,
+}) {
   const ref = React.useRef(null);
   const [visible, setVisible] = React.useState(false);
 
@@ -204,20 +215,30 @@ function BenefitRow({ title, text, itemunico, gif, pngFallback, icon, index = 0 
         ].join(" ")}
         style={{ transitionDelay: `${Math.min(index * 60, 240)}ms` }} // leve “stagger”
       >
-        <div className="order-1 md:order-none">
-          <picture>
-            <source srcSet={gif} type="image/gif" />
-            <img
-              src={pngFallback}
-              alt={title}
-              loading="lazy"
+        <div
+          className="order-1 md:order-none"
+          style={{
+            transform: "rotateZ(6deg)",
+            perspective: "1000px",
+          }}
+        >
+          {videoWebm ? (
+            <VideoLoop
+              webm={videoWebm}
+              poster={poster}
               className="mx-auto h-48 w-auto rounded-xl object-contain shadow-md md:h-56"
-              style={{
-                transform: "rotateZ(6deg)",
-                perspective: "1000px",
-              }}
             />
-          </picture>
+          ) : (
+            <picture>
+              <source srcSet={gif} type="image/gif" />
+              <img
+                src={pngFallback || poster}
+                alt={title}
+                loading="lazy"
+                className="mx-auto h-48 w-auto rounded-xl object-contain shadow-md md:h-56"
+              />
+            </picture>
+          )}
         </div>
 
         <div className="flex flex-col items-start">
@@ -611,12 +632,14 @@ export default function PlataformaPage() {
     {/* El contenedor usa scroll snapping del viewport (funciona bien con min-h en cada card) */}
     <div className="mx-auto mt-10 max-w-5xl space-y-8 snap-y">
       {[
-       {
+        {
           itemunico: "APU Faciles de hacer",
           title: "Crear APU en segundos",
           text: "Arma APU con materiales, mano de obra, equipos y transporte sin perder tiempo.",
           gif: "/gif/beneficio-apu-segundos.gif",
           pngFallback: "/gif/beneficio-apu-segundos.png",
+          videoWebm: "/apuvideos/apu-crear.webm",
+          poster: "/gif/beneficio-apu-segundos.png",
           icon: <LuCalculator className="h-4 w-4" aria-hidden="true" />,
         },
         {
@@ -625,6 +648,8 @@ export default function PlataformaPage() {
           text: "Usa, edita y guarda APU de nuestra biblioteca; agrega los tuyos.",
           gif: "/gif/beneficio-biblioteca-180.gif",
           pngFallback: "/gif/beneficio-biblioteca-180.png",
+          videoWebm: "/apuvideos/apu-biblioteca.webm",
+          poster: "/gif/beneficio-biblioteca-180.png",
           icon: <LuListChecks className="h-4 w-4" aria-hidden="true" />,
         },
         {
@@ -633,6 +658,8 @@ export default function PlataformaPage() {
           text: "Vista dividida enfocada: APU a la izquierda, Presupuesto a la derecha.",
           gif: "/gif/beneficio-splitview.gif",
           pngFallback: "/gif/beneficio-splitview.png",
+          videoWebm: "/apuvideos/apu-interfaz.webm",
+          poster: "/gif/beneficio-splitview.png",
           icon: <LuWallet className="h-4 w-4" aria-hidden="true" />,
         },
         {
@@ -641,6 +668,8 @@ export default function PlataformaPage() {
           text: "Lleva tu presupuesto y sus APU enlazados a Excel para cotizar al instante.",
           gif: "/gif/beneficio-export-excel.gif",
           pngFallback: "/gif/beneficio-export-excel.png",
+          videoWebm: "/apuvideos/excel-exportar.webm",
+          poster: "/gif/beneficio-export-excel.png",
           icon: <LuFileSpreadsheet className="h-4 w-4" aria-hidden="true" />,
         },
 
