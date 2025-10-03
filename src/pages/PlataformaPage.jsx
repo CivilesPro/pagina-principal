@@ -6,7 +6,6 @@ import { LuUser } from "react-icons/lu";
 import SEO from "../components/SEO.jsx";
 import { LuCircleCheck, LuCircleX, LuCrown } from "react-icons/lu";
 import Reveal from "../components/Reveal.jsx";
-import VideoLoop from "@/components/VideoLoop";
 
 
 
@@ -167,9 +166,7 @@ function BenefitRow({
   title,
   text,
   itemunico,
-  gif,
-  pngFallback,
-  videoWebm,
+  videoMp4,
   poster,
   icon,
   index = 0,
@@ -207,7 +204,7 @@ function BenefitRow({
     >
       <div
         className={[
-          "grid grid-cols-1 items-center gap-6 rounded-2xl border border-emerald-100 bg-white p-4 sm:p-6 md:grid-cols-2",
+          "group grid grid-cols-12 gap-6 rounded-2xl border border-emerald-100 bg-white p-4 sm:p-6",
           "transition-all duration-700 will-change-transform",
           visible
             ? "opacity-100 translate-y-0 scale-100"
@@ -215,33 +212,34 @@ function BenefitRow({
         ].join(" ")}
         style={{ transitionDelay: `${Math.min(index * 60, 240)}ms` }} // leve “stagger”
       >
-        <div
-          className="order-1 md:order-none"
-          style={{
-            transform: "rotateZ(6deg)",
-            perspective: "1000px",
-          }}
-        >
-          {videoWebm ? (
-            <VideoLoop
-              webm={videoWebm}
-              poster={poster}
-              className="mx-auto h-48 w-auto rounded-xl object-contain shadow-md md:h-56"
-            />
-          ) : (
-            <picture>
-              <source srcSet={gif} type="image/gif" />
-              <img
-                src={pngFallback || poster}
-                alt={title}
-                loading="lazy"
-                className="mx-auto h-48 w-auto rounded-xl object-contain shadow-md md:h-56"
-              />
-            </picture>
-          )}
+        <div className="col-span-12 flex justify-center lg:col-span-7">
+          <div
+            className="mx-auto w-[min(92vw,1000px)] sm:w-[min(92vw,1100px)] -rotate-3 sm:-rotate-6 lg:-rotate-[10deg] transform-gpu will-change-transform -mt-6 sm:-mt-10 lg:-mt-12 transition-transform duration-700 ease-out group-hover:-rotate-[12deg]"
+          >
+            <div className="aspect-[16/9] w-full overflow-hidden rounded-2xl ring-1 ring-black/5 shadow-2xl shadow-black/20 bg-white/40 backdrop-blur-[1px]">
+              {videoMp4 ? (
+                <video
+                  src={videoMp4}
+                  poster={poster}
+                  className="h-full w-full object-cover"
+                  playsInline
+                  muted
+                  loop
+                  preload="none"
+                />
+              ) : (
+                <img
+                  src={poster}
+                  alt={title}
+                  loading="lazy"
+                  className="h-full w-full object-cover"
+                />
+              )}
+            </div>
+          </div>
         </div>
 
-        <div className="flex flex-col items-start">
+        <div className="col-span-12 flex flex-col items-start lg:col-span-5">
           <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-emerald-700">
             {icon}
             <span className="text-xs font-semibold uppercase tracking-wide">
@@ -622,7 +620,7 @@ export default function PlataformaPage() {
         </div>
       </section>
 
-     {/* ===== Beneficios con GIF (reemplaza tu sección actual) ===== */}
+     {/* ===== Beneficios con video ===== */}
 <section className="py-16">
   <div className="wrap-wide px-4">
     <h2 className="text-center text-3xl font-extrabold text-gray-900 sm:text-4xl">
@@ -636,40 +634,32 @@ export default function PlataformaPage() {
           itemunico: "APU Faciles de hacer",
           title: "Crear APU en segundos",
           text: "Arma APU con materiales, mano de obra, equipos y transporte sin perder tiempo.",
-          gif: "/gif/beneficio-apu-segundos.gif",
-          pngFallback: "/gif/beneficio-apu-segundos.png",
-          videoWebm: "/apuvideos/apu-crear.webm",
-          poster: "/gif/beneficio-apu-segundos.png",
+          videoMp4: "/video/apu-crear.mp4",
+          poster: "/img/poster/apu-crear.png",
           icon: <LuCalculator className="h-4 w-4" aria-hidden="true" />,
         },
         {
           itemunico: "Listos para usar",
           title: "Biblioteca de +180 APU",
           text: "Usa, edita y guarda APU de nuestra biblioteca; agrega los tuyos.",
-          gif: "/gif/beneficio-biblioteca-180.gif",
-          pngFallback: "/gif/beneficio-biblioteca-180.png",
-          videoWebm: "/apuvideos/apu-biblioteca.webm",
-          poster: "/gif/beneficio-biblioteca-180.png",
+          videoMp4: "/video/apu-biblioteca.mp4",
+          poster: "/img/poster/apu-biblioteca.png",
           icon: <LuListChecks className="h-4 w-4" aria-hidden="true" />,
         },
         {
           itemunico: "Interfaz fácil de usar",
           title: "Presupuesto en una sola pantalla",
           text: "Vista dividida enfocada: APU a la izquierda, Presupuesto a la derecha.",
-          gif: "/gif/beneficio-splitview.gif",
-          pngFallback: "/gif/beneficio-splitview.png",
-          videoWebm: "/apuvideos/apu-interfaz.webm",
-          poster: "/gif/beneficio-splitview.png",
+          videoMp4: "/video/apu-interfaz.mp4",
+          poster: "/img/poster/apu-interfaz.png",
           icon: <LuWallet className="h-4 w-4" aria-hidden="true" />,
         },
         {
           itemunico: "Excel listo para enviar",
           title: "Exportar a Excel con APU conectados",
           text: "Lleva tu presupuesto y sus APU enlazados a Excel para cotizar al instante.",
-          gif: "/gif/beneficio-export-excel.gif",
-          pngFallback: "/gif/beneficio-export-excel.png",
-          videoWebm: "/apuvideos/excel-exportar.webm",
-          poster: "/gif/beneficio-export-excel.png",
+          videoMp4: "/video/excel-exportar.mp4",
+          poster: "/img/poster/excel-exportar.png",
           icon: <LuFileSpreadsheet className="h-4 w-4" aria-hidden="true" />,
         },
 
