@@ -11,6 +11,7 @@ import BlogPage from "./pages/BlogPage.jsx"
 import Servicios from "./pages/Servicios.jsx"
 import Planes from "./pages/Planes.jsx"
 import Entrar from "./pages/Entrar.jsx"
+import Gracias from "./pages/Gracias.jsx"
 import { HelmetProvider } from "react-helmet-async"
 
 ReactDOM.createRoot(document.getElementById("root")).render(
@@ -32,6 +33,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
             <Route path="/servicios" element={<Servicios />} />
             <Route path="/planes" element={<Planes />} />
             <Route path="/entrar" element={<Entrar />} />
+            <Route path="/gracias" element={<Gracias />} />
           </Route>
         </Routes>
       </BrowserRouter>

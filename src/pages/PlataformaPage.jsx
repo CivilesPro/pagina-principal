@@ -388,7 +388,7 @@ function Plans() {
               </div>
 
               <a
-                href="#"
+                href="https://checkout.wompi.co/l/vyKSFA"
                 className="mt-auto inline-flex h-12 w-full items-center justify-center rounded-lg px-5 font-semibold text-white transition-colors"
                 style={{ backgroundColor: "#03a042ff" }}
               >
@@ -436,7 +436,7 @@ function Plans() {
               </div>
 
               <a
-                href="#"
+                href="https://checkout.wompi.co/l/Wcbaj4"
                 className="mt-7 inline-flex h-12 w-full items-center justify-center rounded-lg px-5 font-semibold text-white transition-colors"
                 style={{ backgroundColor: "#03a042ff" }}
               >
