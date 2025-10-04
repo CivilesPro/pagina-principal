@@ -641,7 +641,7 @@ export default function PlataformaPage() {
               {
                 itemunico: "APU Faciles de hacer",
                 title: "Crear APU en segundos",
-                text: "Arma APU con materiales, mano de obra, equipos y transporte sin perder tiempo.",
+                text: "Arma APU con nuestra biblioteca de materiales, mano de obra, equipos y transporte sin perder tiempo.",
                 gif: "/gif/beneficio-apu-segundos.gif",
                 pngFallback: "/gif/beneficio-apu-segundos.png",
                 videoWebm: "/apuvideos/apu-crear.webm",

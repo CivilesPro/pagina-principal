@@ -1,69 +1,53 @@
 <?php
 declare(strict_types=1);
-
-$method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 header('Content-Type: application/json; charset=utf-8');
 
-if (isset($_GET['debug'])) {
-  echo json_encode(['where' => 'capture-order.php', 'method' => $method]);
+require __DIR__ . '/config.php';
+
+$method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+if ($method === 'OPTIONS' || $method === 'HEAD') { http_response_code(204); exit; }
+if ($method !== 'POST') { http_response_code(405); echo json_encode(['error'=>'Method not allowed','got'=>$method]); exit; }
+
+$raw = file_get_contents('php://input') ?: '{}';
+$in  = json_decode($raw, true);
+$orderID = is_array($in) ? ($in['orderID'] ?? null) : null;
+$slug     = is_array($in) ? ($in['slug']     ?? null) : null;
+
+if (!$orderID || !$slug) {
+  http_response_code(400);
+  echo json_encode(['error'=>'invalid_input','detail'=>'faltan orderID y/o slug']);
   exit;
 }
-if (!in_array($method, ['POST', 'OPTIONS', 'HEAD'], true)) {
-  http_response_code(405);
-  echo json_encode(['error' => 'Method not allowed', 'got' => $method]);
-  exit;
-}
-if ($method === 'OPTIONS' || $method === 'HEAD') {
-  http_response_code(204);
-  exit;
-}
 
-$BACKEND_BASE = 'https://plantilladecantidades.onrender.com';
-$pathNoSlash  = '/api/paypal/capture-order';
-$pathWith     = '/api/paypal/capture-order/';
+// Captura
+[$code, $body, $err] = paypal_post_empty('/v2/checkout/orders/' . rawurlencode($orderID) . '/capture');
 
-$input = file_get_contents('php://input');
-if ($input === false) {
-  $input = '{}';
-}
-
-function forward_json(string $url, string $body): array {
-  $ch = curl_init($url);
-  curl_setopt_array($ch, [
-    CURLOPT_RETURNTRANSFER => true,
-    CURLOPT_POST           => true,
-    CURLOPT_HTTPHEADER     => [
-      'Content-Type: application/json',
-      'Accept: application/json',
-      'Expect:'
-    ],
-    CURLOPT_POSTFIELDS     => $body,
-    CURLOPT_TIMEOUT        => 30,
-  ]);
-  $respBody = curl_exec($ch);
-  $err      = curl_error($ch);
-  $code     = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
-  curl_close($ch);
-  return [$code, $respBody, $err];
-}
-
-[$code, $body, $err] = forward_json($BACKEND_BASE . $pathNoSlash, $input);
 if ($err) {
   http_response_code(502);
-  echo json_encode(['error' => 'Upstream error', 'detail' => $err]);
+  echo json_encode(['error'=>'paypal_upstream','detail'=>$err]);
   exit;
 }
-if (in_array($code, [404, 405], true)) {
-  $altPath = ($pathNoSlash[strlen($pathNoSlash) - 1] === '/') ? rtrim($pathNoSlash, '/') : $pathWith;
-  [$code2, $body2, $err2] = forward_json($BACKEND_BASE . $altPath, $input);
-  if ($err2) {
-    http_response_code(502);
-    echo json_encode(['error' => 'Upstream error (alt)', 'detail' => $err2]);
-    exit;
-  }
-  http_response_code($code2 ?: 200);
-  echo $body2 ?: '{}';
-  exit;
-}
+
 http_response_code($code ?: 200);
-echo $body ?: '{}';
+$out = json_decode($body, true);
+
+// Valida estado (acepta COMPLETED)
+$status = $out['status'] ?? null;
+if ($status !== 'COMPLETED') {
+  echo json_encode(['error'=>'capture_not_completed','raw'=>$out]);
+  exit;
+}
+
+// Aquí devuelves tu URL de descarga según el slug (ejemplo estático)
+$downloads = [
+  'almacen-obra' => 'https://www.civilespro.com/descargas/almacen-obra.zip',
+  'control-acero' => 'https://www.civilespro.com/descargas/control-acero.zip',
+  'pedido-acero' => 'https://www.civilespro.com/descargas/pedido-acero.zip'
+];
+$downloadUrl = $downloads[$slug] ?? null;
+
+echo json_encode([
+  'status'=>'ok',
+  'downloadUrl'=>$downloadUrl,
+  'raw'=>$out
+]);
