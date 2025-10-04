@@ -4,11 +4,9 @@ import { FaWhatsapp } from "react-icons/fa6";
 import { LuCalculator, LuDownload, LuListChecks, LuWallet, LuFileSpreadsheet, LuPercent, LuBuilding2, LuFileText, LuArrowRight, LuCopyCheck } from "react-icons/lu";
 import { LuUser } from "react-icons/lu";
 import SEO from "../components/SEO.jsx";
-import { LuCircleCheck, LuCircleX, LuCrown } from "react-icons/lu";
+import { LuCircleCheck, LuCircleX, LuCrown, LuLock } from "react-icons/lu";
 import Reveal from "../components/Reveal.jsx";
 import VideoLoop from "@/components/VideoLoop";
-
-
 
 /**
  * PlataformaPage.jsx
@@ -112,7 +110,6 @@ function HeroScreens() {
   );
 }
 
-
 function useTypewriter(words, speed = 90, pause = 900) {
   const [index, setIndex] = useState(0);
   const [typed, setTyped] = useState("");
@@ -207,7 +204,7 @@ function BenefitRow({
     >
       <div
         className={[
-          "grid grid-cols-1 items-center gap-6 rounded-2xl border border-emerald-100 bg-white p-4 sm:p-6 md:grid-cols-2",
+          "grid grid-cols-1 items-center gap-6 rounded-2xl  bg-white p-4 sm:p-6 md:grid-cols-[70%_30%]",
           "transition-all duration-700 will-change-transform",
           visible
             ? "opacity-100 translate-y-0 scale-100"
@@ -216,18 +213,22 @@ function BenefitRow({
         style={{ transitionDelay: `${Math.min(index * 60, 240)}ms` }} // leve “stagger”
       >
         <div
-          className="order-1 md:order-none"
+          className=" order-1 md:order-none flex justify-center"
           style={{
-            transform: "rotateZ(6deg)",
-            perspective: "1000px",
+            perspective: "1200px", // Profundidad 3D
           }}
         >
           {videoWebm ? (
-            <VideoLoop
-              webm={videoWebm}
-              poster={poster}
-              className="mx-auto h-48 w-auto rounded-xl object-contain shadow-md md:h-56"
-            />
+            <div
+              className="order-1 md:order-none flex justify-center w-full"
+              style={{ perspective: "1200px" }}
+            >
+              <VideoLoop
+                webm={videoWebm}
+                poster={poster}
+                className="w-full h-auto [clip-path:inset(0_2%_0_0)]"
+              />
+            </div>
           ) : (
             <picture>
               <source srcSet={gif} type="image/gif" />
@@ -235,13 +236,14 @@ function BenefitRow({
                 src={pngFallback || poster}
                 alt={title}
                 loading="lazy"
-                className="mx-auto h-48 w-auto rounded-xl object-contain shadow-md md:h-56"
+                className="w-full max-w-6xl rounded-2xl shadow-2xl transform 
+                          rotate-y-[-15deg] rotate-x-[2deg] scale-[1.05]"
               />
             </picture>
           )}
         </div>
 
-        <div className="flex flex-col items-start">
+        <div className="flex flex-col  items-start">
           <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-emerald-700">
             {icon}
             <span className="text-xs font-semibold uppercase tracking-wide">
@@ -258,7 +260,6 @@ function BenefitRow({
   );
 }
 
-
 function HowItWorks() {
   const steps = [
     {
@@ -271,7 +272,6 @@ function HowItWorks() {
       text: "Agrega costos indirectos, directos y impuestos claros.",
       icon: <LuCalculator className="h-5 w-5" aria-hidden="true" />,
     },
-    
   ];
   return (
     <Reveal
@@ -283,6 +283,8 @@ function HowItWorks() {
     >
       <div className="wrap-wide px-4">
         <h2 className="text-center text-3xl font-extrabold text-gray-900 sm:text-4xl">Y ademas...</h2>
+
+        {/* Grid 2 columnas */}
         <div className="mx-auto mt-8 grid max-w-5xl grid-cols-1 gap-4 sm:grid-cols-2">
           {steps.map((s, i) => (
             <Reveal
@@ -302,6 +304,24 @@ function HowItWorks() {
             </Reveal>
           ))}
         </div>
+
+        {/* Banner verde de privacidad – ocupa el ancho de ambas tarjetas */}
+        <Reveal variant="fade-up" delay={120} once={false} rootMargin="-20% 0px -20% 0px">
+          <div className="mx-auto mt-4 max-w-5xl">
+            <div className="rounded-2xl border border-emerald-700 bg-emerald-600 p-6 shadow-sm">
+              <div className="inline-flex items-center gap-2 rounded-lg bg-emerald-500/30 px-3 py-1 text-white">
+                <LuLock className="h-5 w-5" aria-hidden="true" />
+                <span className="text-xs font-semibold uppercase">Privacidad</span>
+              </div>
+              <h3 className="mt-2 text-xl font-extrabold text-white">
+                Tus presupuestos son <span className="underline decoration-white/50">Privados</span>.
+              </h3>
+              <p className="mt-2 text-emerald-50">
+                Nadie ve tus precios, APU o cantidades a menos que tú los compartas. Tu información está segura.
+              </p>
+            </div>
+          </div>
+        </Reveal>
       </div>
     </Reveal>
   );
@@ -324,7 +344,6 @@ function Plans() {
   // precios
   const plusYear = 60000;
   const premiumYear = 150000;
-
 
   const formatCOP = (n) =>
     n.toLocaleString("es-CO", { maximumFractionDigits: 0, minimumFractionDigits: 0 });
@@ -500,22 +519,11 @@ function PlanComparison() {
               ))}
             </div>
           </div>
-
-          {/* Nota mini opcional */}
-          {/* <p className="mx-auto mt-3 max-w-5xl px-1 text-sm text-gray-500">
-            Algunas funciones pueden variar según promociones o impuestos aplicables.
-          </p> */}
         </Reveal>
       </div>
     </Reveal>
   );
 }
-
-
-
-
-
-
 
 function Testimonials() {
   const items = [
@@ -577,7 +585,7 @@ export default function PlataformaPage() {
         canonical={`${SITE_URL}/plataforma`}
       />
 
-      {/* ===== Hero (mantener estilo base) ===== */}
+      {/* ===== Hero ===== */}
       <section className="relative overflow-hidden bg-gradient-to-b from-white to-emerald-50">
         <div className="wrap-wide px-4 py-20 md:py-24 lg:py-28 min-h-[560px] lg:min-h-[720px]">
           <div className="grid grid-cols-1 items-center gap-10 md:grid-cols-2">
@@ -611,9 +619,8 @@ export default function PlataformaPage() {
               </div>
             </div>
 
-            {/* Mock visual (imagen estática para ahora) */}
+            {/* Mock visual */}
             <div className="">
-              {/* Mock visual del Hero: reemplazar todo este div por <HeroScreens /> */}
               <div className="relative flex justify-center md:justify-end">
                 <HeroScreens />
               </div>
@@ -622,70 +629,64 @@ export default function PlataformaPage() {
         </div>
       </section>
 
-     {/* ===== Beneficios con GIF (reemplaza tu sección actual) ===== */}
-<section className="py-16">
-  <div className="wrap-wide px-4">
-    <h2 className="text-center text-3xl font-extrabold text-gray-900 sm:text-4xl">
-      Beneficios para tu presupuesto
-    </h2>
+      {/* ===== Beneficios con GIF ===== */}
+      <section className="py-16">
+        <div className="wrap-wide px-4">
+          <h2 className="text-center text-3xl font-extrabold text-gray-900 sm:text-4xl">
+            Beneficios para tu presupuesto
+          </h2>
 
-    {/* El contenedor usa scroll snapping del viewport (funciona bien con min-h en cada card) */}
-    <div className="mx-auto mt-10 max-w-5xl space-y-8 snap-y">
-      {[
-        {
-          itemunico: "APU Faciles de hacer",
-          title: "Crear APU en segundos",
-          text: "Arma APU con materiales, mano de obra, equipos y transporte sin perder tiempo.",
-          gif: "/gif/beneficio-apu-segundos.gif",
-          pngFallback: "/gif/beneficio-apu-segundos.png",
-          videoWebm: "/apuvideos/apu-crear.webm",
-          poster: "/gif/beneficio-apu-segundos.png",
-          icon: <LuCalculator className="h-4 w-4" aria-hidden="true" />,
-        },
-        {
-          itemunico: "Listos para usar",
-          title: "Biblioteca de +180 APU",
-          text: "Usa, edita y guarda APU de nuestra biblioteca; agrega los tuyos.",
-          gif: "/gif/beneficio-biblioteca-180.gif",
-          pngFallback: "/gif/beneficio-biblioteca-180.png",
-          videoWebm: "/apuvideos/apu-biblioteca.webm",
-          poster: "/gif/beneficio-biblioteca-180.png",
-          icon: <LuListChecks className="h-4 w-4" aria-hidden="true" />,
-        },
-        {
-          itemunico: "Interfaz fácil de usar",
-          title: "Presupuesto en una sola pantalla",
-          text: "Vista dividida enfocada: APU a la izquierda, Presupuesto a la derecha.",
-          gif: "/gif/beneficio-splitview.gif",
-          pngFallback: "/gif/beneficio-splitview.png",
-          videoWebm: "/apuvideos/apu-interfaz.webm",
-          poster: "/gif/beneficio-splitview.png",
-          icon: <LuWallet className="h-4 w-4" aria-hidden="true" />,
-        },
-        {
-          itemunico: "Excel listo para enviar",
-          title: "Exportar a Excel con APU conectados",
-          text: "Lleva tu presupuesto y sus APU enlazados a Excel para cotizar al instante.",
-          gif: "/gif/beneficio-export-excel.gif",
-          pngFallback: "/gif/beneficio-export-excel.png",
-          videoWebm: "/apuvideos/excel-exportar.webm",
-          poster: "/gif/beneficio-export-excel.png",
-          icon: <LuFileSpreadsheet className="h-4 w-4" aria-hidden="true" />,
-        },
-
-       
-      ].map((b, i) => (
-        <BenefitRow key={b.title} index={i} {...b} />
-      ))}
-    </div>
-  </div>
-</section>
-
+          <div className="mx-auto mt-10 max-w-10xl space-y-8 snap-y">
+            {[
+              {
+                itemunico: "APU Faciles de hacer",
+                title: "Crear APU en segundos",
+                text: "Arma APU con materiales, mano de obra, equipos y transporte sin perder tiempo.",
+                gif: "/gif/beneficio-apu-segundos.gif",
+                pngFallback: "/gif/beneficio-apu-segundos.png",
+                videoWebm: "/apuvideos/apu-crear.webm",
+                poster: "/gif/beneficio-apu-segundos.png",
+                icon: <LuCalculator className="h-4 w-4" aria-hidden="true" />,
+              },
+              {
+                itemunico: "Listos para usar",
+                title: "Biblioteca de +180 APU",
+                text: "Usa, edita y duplica nuestra biblioteca Privada de APU. Nuestra meta es agregar 1000 APU.",
+                gif: "/gif/beneficio-biblioteca-180.gif",
+                pngFallback: "/gif/beneficio-biblioteca-180.png",
+                videoWebm: "/apuvideos/apu-biblioteca.webm",
+                poster: "/gif/beneficio-biblioteca-180.png",
+                icon: <LuListChecks className="h-4 w-4" aria-hidden="true" />,
+              },
+              {
+                itemunico: "Interfaz fácil de usar",
+                title: "Crea un Presupuesto en una sola pantalla",
+                text: "Vista dividida enfocada: APU a la izquierda, Presupuesto a la derecha.",
+                gif: "/gif/beneficio-splitview.gif",
+                pngFallback: "/gif/beneficio-splitview.png",
+                videoWebm: "/apuvideos/apu-interfaz.webm",
+                poster: "/gif/beneficio-splitview.png",
+                icon: <LuWallet className="h-4 w-4" aria-hidden="true" />,
+              },
+              {
+                itemunico: "Excel listo para enviar",
+                title: "Exportar a Excel con APU conectados",
+                text: "Lleva tu presupuesto y sus APU enlazados a Excel para cotizar al instante.",
+                gif: "/gif/beneficio-export-excel.gif",
+                pngFallback: "/gif/beneficio-export-excel.png",
+                videoWebm: "/apuvideos/excel-exportar.webm",
+                poster: "/gif/beneficio-export-excel.png",
+                icon: <LuFileSpreadsheet className="h-4 w-4" aria-hidden="true" />,
+              },
+            ].map((b, i) => (
+              <BenefitRow key={b.title} index={i} {...b} />
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* ===== Cómo funciona ===== */}
       <HowItWorks />
-
-    
 
       {/* ===== Planes ===== */}
       <Plans />
