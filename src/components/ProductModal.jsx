@@ -7,61 +7,19 @@ const cx = (...c) => c.filter(Boolean).join(" ");
 // Reseñas por producto (puedes ajustar nombres/orden)
 const STATIC_REVIEWS = {
   "pedido-acero": [
-    {
-      name: "Arq Jeckner Gallegos",
-      rating: 4,
-      text:
-        "Me ha ayudado ahorrando full tiempo, tengo todas las plantillas que necesito y hago presupuesto rapidísimo.",
-    },
-    {
-      name: "Jairo Antonio Gutierrez",
-      rating: 4,
-      text: "¡Muy buen producto! Ya lo adquirí y es demasiado útil.",
-    },
-    {
-      name: "Nestor Evelio Parra",
-      rating: 5,
-      text:
-        "Muy buen producto. Además de la atención prestada. Solicité soporte técnico y me atendieron de inmediato. ¡Recomendado!",
-    },
+    { name: "Arq Jeckner Gallegos", rating: 4, text: "Me ha ayudado ahorrando full tiempo, tengo todas las plantillas que necesito y hago presupuesto rapidísimo." },
+    { name: "Jairo Antonio Gutierrez", rating: 4, text: "¡Muy buen producto! Ya lo adquirí y es demasiado útil." },
+    { name: "Nestor Evelio Parra", rating: 5, text: "Muy buen producto. Además de la atención prestada. Solicité soporte técnico y me atendieron de inmediato. ¡Recomendado!" },
   ],
   "control-acero": [
-    {
-      name: "Jairo Antonio Gutierrez",
-      rating: 4,
-      text: "¡Muy buen producto! Ya lo adquirí y es demasiado útil.",
-    },
-    {
-      name: "Nestor Evelio Parra",
-      rating: 5,
-      text:
-        "Muy buen producto. Además de la atención prestada. Solicité soporte técnico y me atendieron de inmediato. ¡Recomendado!",
-    },
-    {
-      name: "Arq Jeckner Gallegos",
-      rating: 4,
-      text:
-        "Me ha ayudado ahorrando full tiempo, tengo todas las plantillas que necesito y hago presupuesto rapidísimo.",
-    },
+    { name: "Jairo Antonio Gutierrez", rating: 4, text: "¡Muy buen producto! Ya lo adquirí y es demasiado útil." },
+    { name: "Nestor Evelio Parra", rating: 5, text: "Muy buen producto. Además de la atención prestada. Solicité soporte técnico y me atendieron de inmediato. ¡Recomendado!" },
+    { name: "Arq Jeckner Gallegos", rating: 4, text: "Me ha ayudado ahorrando full tiempo, tengo todas las plantillas que necesito y hago presupuesto rapidísimo." },
   ],
   default: [
-    {
-      name: "Arq Jeckner Gallegos",
-      rating: 4,
-      text:
-        "Me ha ayudado ahorrando full tiempo, tengo todas las plantillas que necesito y hago presupuesto rapidísimo.",
-    },
-    {
-      name: "Jairo Antonio Gutierrez",
-      rating: 4,
-      text: "¡Muy buen producto! Ya lo adquirí y es demasiado útil.",
-    },
-    {
-      name: "Nestor Evelio Parra",
-      rating: 5,
-      text:
-        "Muy buen producto. Además de la atención prestada. Solicité soporte técnico y me atendieron de inmediato. ¡Recomendado!",
-    },
+    { name: "Arq Jeckner Gallegos", rating: 4, text: "Me ha ayudado ahorrando full tiempo, tengo todas las plantillas que necesito y hago presupuesto rapidísimo." },
+    { name: "Jairo Antonio Gutierrez", rating: 4, text: "¡Muy buen producto! Ya lo adquirí y es demasiado útil." },
+    { name: "Nestor Evelio Parra", rating: 5, text: "Muy buen producto. Además de la atención prestada. Solicité soporte técnico y me atendieron de inmediato. ¡Recomendado!" },
   ],
 };
 
@@ -70,11 +28,7 @@ function Stars({ value, max = 5 }) {
   const full = "★".repeat(value);
   const empty = "☆".repeat(Math.max(0, max - value));
   return (
-    <span
-      className="text-amber-500"
-      aria-label={`${value} de ${max} estrellas`}
-      title={`${value} de ${max} estrellas`}
-    >
+    <span className="text-amber-500" aria-label={`${value} de ${max} estrellas`} title={`${value} de ${max} estrellas`}>
       {full}
       <span className="text-gray-300">{empty}</span>
     </span>
@@ -84,36 +38,21 @@ function Stars({ value, max = 5 }) {
 async function parseSafe(res) {
   const contentType = res.headers?.get?.("content-type") || "";
   const text = await res.text();
-
   if (!text) return { message: `HTTP ${res.status}` };
-
   if (contentType.includes("application/json")) {
-    try {
-      return JSON.parse(text);
-    } catch {}
+    try { return JSON.parse(text); } catch {}
   }
-  try {
-    return JSON.parse(text);
-  } catch {
-    return { message: text };
-  }
+  try { return JSON.parse(text); } catch { return { message: text }; }
 }
 
 /* Cargar PayPal SDK (una vez) */
 function usePayPalSDK(clientId) {
   const [ready, setReady] = React.useState(!!window.paypal);
   React.useEffect(() => {
-    if (window.paypal) {
-      setReady(true);
-      return;
-    }
+    if (window.paypal) { setReady(true); return; }
     if (!clientId) return;
-
     const id = "paypal-sdk-script";
-    if (document.getElementById(id)) {
-      setReady(true);
-      return;
-    }
+    if (document.getElementById(id)) { setReady(true); return; }
     const s = document.createElement("script");
     s.id = id;
     s.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&components=buttons&intent=capture`;
@@ -126,22 +65,12 @@ function usePayPalSDK(clientId) {
 }
 
 /* Renderizar PayPal Buttons en un div */
-function useRenderPayPalButtons({
-  enabled,
-  createOrder,
-  onApprove,
-  onError,
-  isOpen,
-  productSlug,
-}) {
+function useRenderPayPalButtons({ enabled, createOrder, onApprove, onError, isOpen, productSlug }) {
   const ref = React.useRef(null);
-
   React.useEffect(() => {
     if (!enabled || !window.paypal || !ref.current || !isOpen) return;
-
     ref.current.innerHTML = "";
     let btnsInstance = null;
-
     const frameId = window.requestAnimationFrame(() => {
       if (!ref.current) return;
       btnsInstance = window.paypal.Buttons({
@@ -153,53 +82,27 @@ function useRenderPayPalButtons({
       });
       btnsInstance.render(ref.current);
     });
-
     return () => {
       window.cancelAnimationFrame(frameId);
-      if (btnsInstance && typeof btnsInstance.close === "function") {
-        try {
-          btnsInstance.close();
-        } catch {}
-      }
+      if (btnsInstance?.close) { try { btnsInstance.close(); } catch {} }
       if (ref.current) ref.current.innerHTML = "";
     };
   }, [enabled, createOrder, onApprove, onError, isOpen, productSlug]);
-
   return ref;
 }
 
-
-/* === 1) Añade este componente dentro de ProductModal.jsx (arriba del export) === */
-
-// Render profesional para descripciones con bullets/encabezados
+/* Render profesional para descripciones con bullets/encabezados */
 function RichDescription({ text }) {
   if (!text) return null;
-
-  // 1) Normalizamos: cortamos espacios y dividimos por líneas
-  const rawLines = text
-    .replace(/\r\n/g, "\n")
-    .split("\n")
-    .map(l => l.trim())
-    .filter(Boolean);
-
-  // 2) Clasificamos líneas: heading vs bullet vs párrafo
-  const isBullet = (l) =>
-    /^((✅|•|-|—|–|—|►|▪|▫|➤|➔|🛠|📦|🎯|📐|🏗|📊|🪵|🌐)\s+)/.test(l);
-
-  const isHeading = (l) =>
-    /^(🎯|📦|🎥|🛠|🏛|📊|⚡|🏗)\s/.test(l) || // emojis típicos de título
-    (/[:：]$/.test(l) && !isBullet(l));       // termina en “:”
-
-  // 3) Agrupamos bloques: headings con sus bullets/parrafos
+  const rawLines = text.replace(/\r\n/g, "\n").split("\n").map(l => l.trim()).filter(Boolean);
+  const isBullet = (l) => /^((✅|•|-|—|–|—|►|▪|▫|➤|➔|🛠|📦|🎯|📐|🏗|📊|🪵|🌐)\s+)/.test(l);
+  const isHeading = (l) => /^(🎯|📦|🎥|🛠|🏛|📊|⚡|🏗)\s/.test(l) || (/[:：]$/.test(l) && !isBullet(l));
   const blocks = [];
   let current = { heading: null, items: [], paragraphs: [] };
-
   rawLines.forEach((line) => {
     if (isHeading(line)) {
-      // cerramos bloque previo
       if (current.heading || current.items.length || current.paragraphs.length) {
-        blocks.push(current);
-        current = { heading: null, items: [], paragraphs: [] };
+        blocks.push(current); current = { heading: null, items: [], paragraphs: [] };
       }
       current.heading = line.replace(/[:：]\s*$/, "");
     } else if (isBullet(line)) {
@@ -208,36 +111,17 @@ function RichDescription({ text }) {
       current.paragraphs.push(line);
     }
   });
-  if (current.heading || current.items.length || current.paragraphs.length) {
-    blocks.push(current);
-  }
-
-  // 4) Render
+  if (current.heading || current.items.length || current.paragraphs.length) blocks.push(current);
   return (
     <div className="space-y-4 leading-relaxed text-gray-700">
-      {blocks.length === 0 && (
-        <p className="whitespace-pre-line">{text}</p>
-      )}
-
+      {blocks.length === 0 && <p className="whitespace-pre-line">{text}</p>}
       {blocks.map((b, i) => (
         <div key={`desc-block-${i}`} className="space-y-2">
-          {b.heading && (
-            <h4 className="font-semibold text-gray-900">
-              {b.heading}
-            </h4>
-          )}
-
-          {b.paragraphs.map((p, j) => (
-            <p key={`p-${i}-${j}`} className="whitespace-pre-line">
-              {p}
-            </p>
-          ))}
-
+          {b.heading && <h4 className="font-semibold text-gray-900">{b.heading}</h4>}
+          {b.paragraphs.map((p, j) => (<p key={`p-${i}-${j}`} className="whitespace-pre-line">{p}</p>))}
           {b.items.length > 0 && (
             <ul className="ml-5 list-disc space-y-1">
-              {b.items.map((it, k) => (
-                <li key={`li-${i}-${k}`}>{it}</li>
-              ))}
+              {b.items.map((it, k) => (<li key={`li-${i}-${k}`}>{it}</li>))}
             </ul>
           )}
         </div>
@@ -246,13 +130,7 @@ function RichDescription({ text }) {
   );
 }
 
-
-export default function ProductModal({
-  isOpen = true,
-  product,
-  currency = "COP",
-  onClose,
-}) {
+export default function ProductModal({ isOpen = true, product, currency = "COP", onClose }) {
   const PAYPAL_CLIENT_ID = import.meta.env.VITE_PAYPAL_CLIENT_ID;
   const safeCurrency = React.useMemo(() => (currency || "COP").toUpperCase(), [currency]);
   const slug = product?.slug ?? null;
@@ -268,10 +146,7 @@ export default function ProductModal({
 
   // Imágenes del carrusel
   const images = React.useMemo(() => {
-    const arr =
-      (product?.images && product.images.length > 0
-        ? product.images
-        : [product?.image].filter(Boolean)) || [];
+    const arr = (product?.images?.length ? product.images : [product?.image].filter(Boolean)) || [];
     return arr;
   }, [product?.images, product?.image, product?.slug]);
 
@@ -294,19 +169,17 @@ export default function ProductModal({
     try {
       setCreating(true);
       setErrorMsg(null);
-
       const res = await fetch(`/api/paypal/create-order.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ slug, currency: safeCurrency }),
       });
       const data = await parseSafe(res);
-
       if (!res.ok || !data?.orderID) {
         throw new Error(data?.message || data?.detail || "No se pudo crear la orden.");
       }
       setOrderId(data.orderID);
-      return data.orderID;
+      return data.orderID; // PayPal Buttons espera el orderID
     } catch (error) {
       const message = error?.message || "No se pudo crear la orden.";
       setOrderId(null);
@@ -318,30 +191,21 @@ export default function ProductModal({
   }, [safeCurrency, slug]);
 
   const onApprove = React.useCallback(async (data) => {
-    if (!slug) {
-      setErrorMsg("Producto inválido (falta slug).");
-      return;
-    }
+    if (!slug) { setErrorMsg("Producto inválido (falta slug)."); return; }
     try {
       setCapturing(true);
       setErrorMsg(null);
-
-      const orderID = data?.orderID;
-      if (!orderID) {
-        throw new Error("La respuesta de PayPal no incluye orderID.");
-      }
-
+      const orderID = data?.orderID || orderId;
+      if (!orderID) throw new Error("La respuesta de PayPal no incluye orderID.");
       const res = await fetch(`/api/paypal/capture-order.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ orderID, slug }),
       });
       const out = await parseSafe(res);
-
       if (!res.ok || !out?.downloadUrl) {
         throw new Error(out?.message || out?.detail || "Error capturando el pago.");
       }
-
       setPaid(true);
       setDownloadUrl(out.downloadUrl);
     } catch (e) {
@@ -351,7 +215,7 @@ export default function ProductModal({
     } finally {
       setCapturing(false);
     }
-  }, [slug]);
+  }, [slug, orderId]);
 
   const onError = React.useCallback((err) => {
     setErrorMsg(err?.message || "Error en PayPal.");
@@ -375,16 +239,12 @@ export default function ProductModal({
   const canClose = true;
   const titleId = `modal-title-${product?.slug || "producto"}`;
 
-  // ✅ Precios (COP base) convertidos a moneda seleccionada, usando el mismo helper del listado
+  // Precios (COP base) convertidos a moneda seleccionada
   const showPrice =
-    product?.priceCop != null
-      ? formatPrice(product.priceCop, safeCurrency, { withCode: false })
-      : null;
+    product?.priceCop != null ? formatPrice(product.priceCop, safeCurrency, { withCode: false }) : null;
 
   const showYearPrice =
-    product?.priceCopYear != null
-      ? formatPrice(product.priceCopYear, safeCurrency, { withCode: false })
-      : null;
+    product?.priceCopYear != null ? formatPrice(product.priceCopYear, safeCurrency, { withCode: false }) : null;
 
   return (
     <div
@@ -443,21 +303,19 @@ export default function ProductModal({
               {product?.title || "Producto"}
             </h3>
 
-            {/* ✅ Precio */}
+            {/* Precio */}
             {showPrice ? (
               showYearPrice ? (
                 <>
                   <p className="mt-1 text-sm text-gray-700">
                     Desde:
                     <span className="ml-1 font-semibold text-gray-900">
-                      {showPrice}
-                      <span className="ml-1 text-gray-500">{safeCurrency}</span>
+                      {showPrice}<span className="ml-1 text-gray-500">{safeCurrency}</span>
                     </span>
                     <span className="mx-2 text-gray-400">•</span>
                     Premium:
                     <span className="ml-1 font-semibold text-gray-900">
-                      {showYearPrice}
-                      <span className="ml-1 text-gray-500">{safeCurrency}</span>
+                      {showYearPrice}<span className="ml-1 text-gray-500">{safeCurrency}</span>
                     </span>
                   </p>
                 </>
@@ -465,8 +323,7 @@ export default function ProductModal({
                 <p className="mt-1 text-sm text-gray-700">
                   Precio:
                   <span className="ml-1 font-semibold text-gray-900">
-                    {showPrice}
-                    <span className="ml-1 text-gray-500">{safeCurrency}</span>
+                    {showPrice}<span className="ml-1 text-gray-500">{safeCurrency}</span>
                   </span>
                 </p>
               )
@@ -475,9 +332,7 @@ export default function ProductModal({
             )}
 
             <div className="mb-2 mt-2 flex items-center gap-1 text-amber-500" aria-hidden>
-              {"★★★★★".split("").map((s, i) => (
-                <span key={`star-${i}`}>★</span>
-              ))}
+              {"★★★★★".split("").map((s, i) => (<span key={`star-${i}`}>★</span>))}
               <span className="ml-2 text-sm text-gray-500">(128 reseñas)</span>
             </div>
 
@@ -547,10 +402,7 @@ export default function ProductModal({
             <div className="mt-6 space-y-4">
               <p className="text-gray-700">Lee lo que dicen nuestros clientes:</p>
               {(STATIC_REVIEWS[product?.slug] || STATIC_REVIEWS.default).map((rev, idx) => (
-                <div
-                  key={`${product?.slug || "p"}-rev-${idx}-${rev.name}`}
-                  className="rounded-xl border border-gray-200 p-4"
-                >
+                <div key={`${product?.slug || "p"}-rev-${idx}-${rev.name}`} className="rounded-xl border border-gray-200 p-4">
                   <div className="mb-1 flex items-center justify-between">
                     <div className="font-semibold text-gray-800">{rev.name}</div>
                     <Stars value={rev.rating} />
