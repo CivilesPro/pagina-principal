@@ -95,7 +95,7 @@ const products = [
   {
     slug: "concretos-autohormigoneras",
     title: "Excel para Concretos en Autohormigoneras & Mezcladoras",
-    priceCop: 20000,
+    priceCop: 27000,
     image: "/productos/Excel de Concreto de Hormigueras.png",
     images: [
       "/productos/Excel de Concreto de Hormigueras.png",
