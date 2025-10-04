@@ -1,8 +1,6 @@
 import React from "react";
 import { formatPrice } from "../utils/formatPrice.js";
 
-const API_BASE = (import.meta.env.VITE_API_URL || "http://127.0.0.1:8000").replace(/\/$/, "");
-
 /* Utils */
 const cx = (...c) => c.filter(Boolean).join(" ");
 
@@ -256,7 +254,8 @@ export default function ProductModal({
   onClose,
 }) {
   const PAYPAL_CLIENT_ID = import.meta.env.VITE_PAYPAL_CLIENT_ID;
-  const safeCurrency = React.useMemo(() => (currency || "USD").toUpperCase(), [currency]);
+  const safeCurrency = React.useMemo(() => (currency || "COP").toUpperCase(), [currency]);
+  const slug = product?.slug ?? null;
 
   // Estado general del modal
   const [activeIndex, setActiveIndex] = React.useState(0);
@@ -285,13 +284,13 @@ export default function ProductModal({
     setPaid(false);
     setDownloadUrl(null);
     setErrorMsg(null);
-  }, [product?.slug]);
+  }, [slug]);
 
   // PayPal
   const paypalReady = usePayPalSDK(PAYPAL_CLIENT_ID);
 
   const createOrder = React.useCallback(async () => {
-    if (!product?.slug) throw new Error("Producto inválido.");
+    if (!slug) throw new Error("Producto inválido (falta slug).");
     try {
       setCreating(true);
       setErrorMsg(null);
@@ -299,7 +298,7 @@ export default function ProductModal({
       const res = await fetch(`/api/paypal/create-order.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ slug: product.slug, currency: safeCurrency }),
+        body: JSON.stringify({ slug, currency: safeCurrency }),
       });
       const data = await parseSafe(res);
 
@@ -316,17 +315,26 @@ export default function ProductModal({
     } finally {
       setCreating(false);
     }
-  }, [product?.slug, safeCurrency]);
+  }, [safeCurrency, slug]);
 
   const onApprove = React.useCallback(async (data) => {
+    if (!slug) {
+      setErrorMsg("Producto inválido (falta slug).");
+      return;
+    }
     try {
       setCapturing(true);
       setErrorMsg(null);
 
-      await fetch(`/api/paypal/capture-order.php`, {
+      const orderID = data?.orderID;
+      if (!orderID) {
+        throw new Error("La respuesta de PayPal no incluye orderID.");
+      }
+
+      const res = await fetch(`/api/paypal/capture-order.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ orderID: data.orderID }),
+        body: JSON.stringify({ orderID, slug }),
       });
       const out = await parseSafe(res);
 
@@ -343,7 +351,7 @@ export default function ProductModal({
     } finally {
       setCapturing(false);
     }
-  }, []);
+  }, [slug]);
 
   const onError = React.useCallback((err) => {
     setErrorMsg(err?.message || "Error en PayPal.");
@@ -355,7 +363,7 @@ export default function ProductModal({
     onApprove,
     onError,
     isOpen,
-    productSlug: product?.slug,
+    productSlug: slug,
   });
 
   const handleRetry = React.useCallback(() => {
