@@ -55,7 +55,7 @@ function usePayPalSDK(clientId) {
     if (document.getElementById(id)) { setReady(true); return; }
     const s = document.createElement("script");
     s.id = id;
-    s.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&components=buttons&intent=capture`;
+    s.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&components=buttons&intent=capture&currency=USD`;
     s.async = true;
     s.onload = () => setReady(true);
     s.onerror = () => setReady(false);
@@ -65,29 +65,45 @@ function usePayPalSDK(clientId) {
 }
 
 /* Renderizar PayPal Buttons en un div */
-function useRenderPayPalButtons({ enabled, createOrder, onApprove, onError, isOpen, productSlug }) {
+function useRenderPayPalButtons({ enabled, createOrder, onApprove, onError, productSlug }) {
   const ref = React.useRef(null);
+  const createRef = React.useRef(createOrder);
+  const approveRef = React.useRef(onApprove);
+  const errorRef = React.useRef(onError);
+
+  React.useEffect(() => { createRef.current = createOrder; }, [createOrder]);
+  React.useEffect(() => { approveRef.current = onApprove; }, [onApprove]);
+  React.useEffect(() => { errorRef.current = onError; }, [onError]);
+
   React.useEffect(() => {
-    if (!enabled || !window.paypal || !ref.current || !isOpen) return;
+    if (!enabled || !window.paypal || !ref.current) return;
+
     ref.current.innerHTML = "";
-    let btnsInstance = null;
-    const frameId = window.requestAnimationFrame(() => {
-      if (!ref.current) return;
-      btnsInstance = window.paypal.Buttons({
-        style: { layout: "vertical", label: "paypal" },
-        createOrder,
-        onApprove,
-        onError,
-        funding: { disallowed: [window.paypal.FUNDING.CARD] },
-      });
-      btnsInstance.render(ref.current);
+
+    const buttons = window.paypal.Buttons({
+      style: { layout: "vertical", label: "paypal" },
+      createOrder: (...args) => createRef.current?.(...args),
+      onApprove: (...args) => approveRef.current?.(...args),
+      onError: (...args) => errorRef.current?.(...args),
     });
+
+    buttons.render(ref.current).catch((err) => {
+      console.error("Error rendering PayPal Buttons", err);
+      errorRef.current?.(err);
+    });
+
     return () => {
-      window.cancelAnimationFrame(frameId);
-      if (btnsInstance?.close) { try { btnsInstance.close(); } catch {} }
-      if (ref.current) ref.current.innerHTML = "";
+      try {
+        buttons.close?.();
+      } catch (err) {
+        console.warn("Error closing PayPal Buttons", err);
+      }
+      if (ref.current) {
+        ref.current.innerHTML = "";
+      }
     };
-  }, [enabled, createOrder, onApprove, onError, isOpen, productSlug]);
+  }, [enabled, productSlug]);
+
   return ref;
 }
 
@@ -137,8 +153,6 @@ export default function ProductModal({ isOpen = true, product, currency = "COP",
 
   // Estado general del modal
   const [activeIndex, setActiveIndex] = React.useState(0);
-  const [orderId, setOrderId] = React.useState(null);
-  const [creating, setCreating] = React.useState(false);
   const [capturing, setCapturing] = React.useState(false);
   const [paid, setPaid] = React.useState(false);
   const [downloadUrl, setDownloadUrl] = React.useState(null);
@@ -153,8 +167,6 @@ export default function ProductModal({ isOpen = true, product, currency = "COP",
   // Reset al cambiar de producto
   React.useEffect(() => {
     setActiveIndex(0);
-    setOrderId(null);
-    setCreating(false);
     setCapturing(false);
     setPaid(false);
     setDownloadUrl(null);
@@ -166,27 +178,38 @@ export default function ProductModal({ isOpen = true, product, currency = "COP",
 
   const createOrder = React.useCallback(async () => {
     if (!slug) throw new Error("Producto inválido (falta slug).");
+
     try {
-      setCreating(true);
-      setErrorMsg(null);
       const res = await fetch(`/api/paypal/create-order.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ slug, currency: safeCurrency }),
       });
       const data = await parseSafe(res);
+
       if (!res.ok || !data?.orderID) {
-        throw new Error(data?.message || data?.detail || "No se pudo crear la orden.");
+        const message = data?.message || data?.detail || "No se pudo crear la orden.";
+        setTimeout(() => {
+          setPaid(false);
+          setDownloadUrl(null);
+          setErrorMsg(message);
+        }, 0);
+        throw new Error(message);
       }
-      setOrderId(data.orderID);
-      return data.orderID; // PayPal Buttons espera el orderID
-    } catch (error) {
-      const message = error?.message || "No se pudo crear la orden.";
-      setOrderId(null);
-      setErrorMsg(message);
-      throw error;
-    } finally {
-      setCreating(false);
+
+      setTimeout(() => {
+        setErrorMsg(null);
+      }, 0);
+
+      return data.orderID;
+    } catch (err) {
+      const message = err?.message || "No se pudo crear la orden.";
+      setTimeout(() => {
+        setPaid(false);
+        setDownloadUrl(null);
+        setErrorMsg(message);
+      }, 0);
+      throw err instanceof Error ? err : new Error(message);
     }
   }, [safeCurrency, slug]);
 
@@ -195,7 +218,7 @@ export default function ProductModal({ isOpen = true, product, currency = "COP",
     try {
       setCapturing(true);
       setErrorMsg(null);
-      const orderID = data?.orderID || orderId;
+      const orderID = data?.orderID;
       if (!orderID) throw new Error("La respuesta de PayPal no incluye orderID.");
       const res = await fetch(`/api/paypal/capture-order.php`, {
         method: "POST",
@@ -203,11 +226,11 @@ export default function ProductModal({ isOpen = true, product, currency = "COP",
         body: JSON.stringify({ orderID, slug }),
       });
       const out = await parseSafe(res);
-      if (!res.ok || !out?.downloadUrl) {
+      if (!res.ok || out?.status !== "ok") {
         throw new Error(out?.message || out?.detail || "Error capturando el pago.");
       }
       setPaid(true);
-      setDownloadUrl(out.downloadUrl);
+      setDownloadUrl(out.downloadUrl || null);
     } catch (e) {
       setPaid(false);
       setDownloadUrl(null);
@@ -215,24 +238,25 @@ export default function ProductModal({ isOpen = true, product, currency = "COP",
     } finally {
       setCapturing(false);
     }
-  }, [slug, orderId]);
+  }, [slug]);
 
   const onError = React.useCallback((err) => {
     setErrorMsg(err?.message || "Error en PayPal.");
   }, []);
 
   const paypalContainerRef = useRenderPayPalButtons({
-    enabled: paypalReady && !paid,
+    enabled: paypalReady && !paid && isOpen,
     createOrder,
     onApprove,
     onError,
-    isOpen,
     productSlug: slug,
   });
 
   const handleRetry = React.useCallback(() => {
-    if (!creating) createOrder().catch(() => {});
-  }, [creating, createOrder]);
+    setErrorMsg(null);
+    setPaid(false);
+    setDownloadUrl(null);
+  }, []);
 
   if (!isOpen) return null;
 
@@ -352,8 +376,7 @@ export default function ProductModal({ isOpen = true, product, currency = "COP",
                   )}
                 </div>
               )}
-              <div ref={paypalContainerRef} className="min-h-[48px]" />
-              {creating && <p className="mt-2 text-sm text-gray-500">Preparando orden…</p>}
+              <div ref={paypalContainerRef} className="relative z-20 min-h-[48px]" />
               {capturing && <p className="mt-2 text-sm text-gray-500">Procesando pago…</p>}
 
               {errorMsg && !paid && (
