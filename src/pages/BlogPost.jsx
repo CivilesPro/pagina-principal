@@ -34,20 +34,18 @@ export default function BlogPost() {
 
     setStatus("loading")
 
-    import(`../blog/${slug}.md`)
-      .then((module) => fetch(module.default))
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error("No se pudo cargar el artículo")
-        }
-        return res.text()
-      })
-      .then((text) => {
-        if (cancelled) return
-        const { data, content: markdown } = matter(text)
+    setMeta({})
+    setContent("")
+
+    import(`../blog/${slug}.md?raw`)
+      .then((module) => {
+        if (cancelled) return null
+        const rawContent = module.default
+        const { data, content: markdown } = matter(rawContent)
         setMeta(data)
         setContent(markdown)
         setStatus("ready")
+        return null
       })
       .catch(() => {
         if (cancelled) return
