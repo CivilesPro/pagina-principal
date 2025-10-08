@@ -1,0 +1,30 @@
+[
+  {
+    "slug": "presupuesto-obra",
+    "title": "Cómo se calcula un presupuesto de obra desde cero",
+    "description": "Aprende a crear un presupuesto civil completo con CivilesPro.",
+    "date": "2025-10-08",
+    "category": "manual"
+  },
+  {
+    "slug": "calcular-materiales",
+    "title": "Cómo calcular los materiales de obra",
+    "description": "Calcula materiales de construcción en segundos.",
+    "date": "2025-09-12",
+    "category": "manual"
+  },
+  {
+    "slug": "registro-diario",
+    "title": "Registro Diario de Obra",
+    "description": "Controla personal, equipos y avances en la nube.",
+    "date": "2025-08-20",
+    "category": "blog"
+  },
+  {
+    "slug": "que-es-un-apu",
+    "title": "Qué es un APU y cómo se usa en Presupuesto",
+    "description": "Conoce el análisis de precios unitarios y su aplicación.",
+    "date": "2025-07-05",
+    "category": "blog"
+  }
+]
