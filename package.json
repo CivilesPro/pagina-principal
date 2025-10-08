@@ -5,9 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && node scripts/generate-sitemap.mjs && node scripts/generate-robots.mjs",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "seo:scan": "node scripts/scan-routes.mjs",
+    "seo:sitemap": "node scripts/generate-sitemap.mjs",
+    "seo:robots": "node scripts/generate-robots.mjs",
+    "seo:all": "npm run build"
   },
   "dependencies": {
     "react": "^19.1.1",
