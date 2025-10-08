@@ -7,7 +7,8 @@ import ProductosPage from "./pages/ProductosPage.jsx"
 import ModeladoBIMPage from "./pages/ModeladoBIMPage.jsx"
 import CursosCertificadosPage from "./pages/CursosCertificadosPage.jsx"
 import PlataformaPage from "./pages/PlataformaPage.jsx"
-import BlogPage from "./pages/BlogPage.jsx"
+import Blog from "./pages/Blog.jsx"
+import BlogPost from "./pages/BlogPost.jsx"
 import Servicios from "./pages/Servicios.jsx"
 import Planes from "./pages/Planes.jsx"
 import Entrar from "./pages/Entrar.jsx"
@@ -29,7 +30,8 @@ ReactDOM.createRoot(document.getElementById("root")).render(
             <Route path="/plataforma" element={<PlataformaPage />} />
             <Route path="/calculadora-de-materiales" element={<PlataformaPage />} />
             <Route path="/manual-de-uso" element={<Navigate to="/blog?cat=manual" replace />} />
-            <Route path="/blog" element={<BlogPage />} />
+            <Route path="/blog" element={<Blog />} />
+            <Route path="/blog/:slug" element={<BlogPost />} />
             <Route path="/servicios" element={<Servicios />} />
             <Route path="/planes" element={<Planes />} />
             <Route path="/entrar" element={<Entrar />} />

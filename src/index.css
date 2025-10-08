@@ -17,6 +17,25 @@ body { margin: 0; background: #fff; color: #111; }
 .wrap-wide  { @apply mx-auto w-full max-w-screen-2xl; }     /* ~1536px */
 .wrap-fluid { @apply w-full; }                               /* 100% */
 
+/* Estilos para contenido de blog renderizado desde Markdown */
+.blog-content { @apply space-y-6 text-lg leading-relaxed text-gray-800; }
+.blog-content h1 { @apply text-4xl font-extrabold text-gray-900; }
+.blog-content h2 { @apply text-3xl font-bold text-gray-900; }
+.blog-content h3 { @apply text-2xl font-semibold text-gray-900; }
+.blog-content h4 { @apply text-xl font-semibold text-gray-900; }
+.blog-content p { @apply text-gray-700; }
+.blog-content strong { @apply font-semibold text-gray-900; }
+.blog-content em { @apply italic; }
+.blog-content a { @apply text-primary underline underline-offset-4; }
+.blog-content ul { @apply list-disc space-y-2 pl-6; }
+.blog-content ol { @apply list-decimal space-y-2 pl-6; }
+.blog-content li { @apply text-gray-700; }
+.blog-content blockquote {
+  @apply border-l-4 border-primary/40 bg-primary/5 px-6 py-4 italic text-gray-700;
+}
+.blog-content img { @apply my-8 w-full rounded-2xl; }
+.blog-content hr { @apply my-10 border-t border-gray-200; }
+
 /* Announcement bar marquee */
 @keyframes announcement-marquee {
   0% {
