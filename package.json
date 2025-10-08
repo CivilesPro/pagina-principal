@@ -14,13 +14,15 @@
     "seo:all": "npm run build"
   },
   "dependencies": {
-    "gray-matter": "^4.0.3",
+    "gray-matter": "4.0.3",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-helmet-async": "2.0.5",
     "react-icons": "5.5.0",
-    "react-markdown": "^9.0.1",
-    "react-router-dom": "^7.9.1"
+    "react-markdown": "9.1.0",
+    "react-router-dom": "^7.9.1",
+    "rehype-raw": "7.0.0",
+    "remark-gfm": "4.0.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.35.0",
