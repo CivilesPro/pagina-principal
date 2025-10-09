@@ -5,6 +5,8 @@ import matter from "gray-matter"
 import blogs from "../data/blogList.json"
 import SEO from "../components/SEO.jsx"
 
+const BLOG_POSTS = import.meta.glob("../blog/*.md", { as: "raw" })
+
 const SITE_URL = "https://civilespro.com"
 
 const formatDate = (value) => {
@@ -37,10 +39,18 @@ export default function BlogPost() {
     setMeta({})
     setContent("")
 
-    import(`../blog/${slug}.md?raw`)
-      .then((module) => {
+    const importer = BLOG_POSTS[`../blog/${slug}.md`]
+
+    if (!importer) {
+      setStatus("error")
+      return () => {
+        cancelled = true
+      }
+    }
+
+    importer()
+      .then((rawContent) => {
         if (cancelled) return null
-        const rawContent = module.default
         const { data, content: markdown } = matter(rawContent)
         setMeta(data)
         setContent(markdown)
