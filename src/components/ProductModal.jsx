@@ -374,10 +374,10 @@ export default function ProductModal({ isOpen = true, product, currency = "COP",
         >
           <div
             ref={panelRef}
-            className="relative mx-4 w-full max-w-6xl rounded-2xl bg-white p-6 shadow-xl pointer-events-auto sm:mx-6 lg:mx-auto"
+            className="relative mx-4 w-full max-w-6xl overflow-hidden rounded-2xl bg-white p-6 shadow-xl pointer-events-auto sm:mx-6 lg:mx-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="sticky top-0 z-20 -mx-6 bg-white/90 px-6 pt-4 pb-3 backdrop-blur supports-[backdrop-filter]:backdrop-blur border-b border-gray-200">
+            <div className="sticky top-0 z-20 bg-white/90 px-6 pt-4 pb-3 backdrop-blur supports-[backdrop-filter]:backdrop-blur border-b border-gray-200">
               <div className="flex items-center justify-between gap-3">
                 <h3 id={titleId} className="text-lg font-semibold text-gray-900 sm:text-2xl">
                   {product?.title || "Producto"}
@@ -398,7 +398,7 @@ export default function ProductModal({ isOpen = true, product, currency = "COP",
               <div className="grid gap-6 lg:grid-cols-[1fr_520px]">
                 {/* Bloque de imágenes */}
                 <div className="lg:sticky lg:top-6">
-                  <div className="overflow-hidden rounded-2xl bg-gray-100 aspect-[4/5] sm:aspect-[3/4] lg:aspect-square">
+                  <div className="overflow-hidden rounded-2xl bg-gray-100 aspect-square">
                     <img
                       src={images[activeIndex]}
                       alt={`${product?.title || "Producto"} - vista ${activeIndex + 1}`}
