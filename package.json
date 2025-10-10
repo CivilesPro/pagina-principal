@@ -14,6 +14,7 @@
     "seo:all": "npm run build"
   },
   "dependencies": {
+    "front-matter": "^4.0.2",
     "gray-matter": "4.0.3",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",

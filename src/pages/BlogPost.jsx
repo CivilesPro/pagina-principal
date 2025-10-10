@@ -1,136 +1,151 @@
-import { useEffect, useMemo, useState } from "react"
-import { Link, useParams } from "react-router-dom"
-import ReactMarkdown from "react-markdown"
-import matter from "gray-matter"
-import blogs from "../data/blogList.json"
-import SEO from "../components/SEO.jsx"
+// src/pages/BlogPost.jsx
+import { useMemo } from "react";
+import { useParams, Link } from "react-router-dom";
+import fm from "front-matter"
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
-const BLOG_POSTS = import.meta.glob("../blog/*.md", { as: "raw" })
+/**
+ * Cargamos TODOS los .md del blog como texto (raw) de forma EAGER.
+ * La ruta absoluta '/src/blog/*.md' funciona igual en dev y en build.
+ */
+const BLOG_RAWS = import.meta.glob("/src/blog/*.md", {
+  as: "raw",
+  eager: true,
+});
 
-const SITE_URL = "https://civilespro.com"
-
-const formatDate = (value) => {
-  if (!value) return null
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) return null
-  return date.toLocaleDateString("es-PE", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
+/**
+ * Construimos un índice en tiempo de carga:
+ *  - key: slug (nombre de archivo sin .md)
+ *  - value: { meta (frontmatter), content (markdown), path }
+ */
+const POSTS_BY_SLUG = Object.fromEntries(
+  Object.entries(BLOG_RAWS).map(([path, raw]) => {
+    const slug = path.split("/").pop().replace(/\.md$/, "");
+    const parsed = fm(raw);
+      return [
+        slug.toLowerCase(),
+        {
+          slug,
+          path,
+          meta: parsed.attributes || {},
+          content: parsed.body || "",
+        },
+      ];
   })
-}
+);
+
+/** Lista ordenada por fecha (si existe en frontmatter) para navegación opcional */
+const POSTS_SORTED = Object.values(POSTS_BY_SLUG).sort((a, b) => {
+  const ad = a.meta?.date || "";
+  const bd = b.meta?.date || "";
+  return bd.localeCompare(ad);
+});
 
 export default function BlogPost() {
-  const { slug } = useParams()
-  const [content, setContent] = useState("")
-  const [meta, setMeta] = useState({})
-  const [status, setStatus] = useState("loading")
+  const { slug: rawSlug } = useParams();
+  const slug = decodeURIComponent(rawSlug || "").toLowerCase();
 
-  const listMeta = useMemo(
-    () => blogs.find((item) => item.slug === slug) ?? null,
-    [slug],
-  )
+  // Busca el post por slug normalizado:
+  const post = POSTS_BY_SLUG[slug];
 
-  useEffect(() => {
-    let cancelled = false
+  // Saca prev/next para navegar (opcional)
+  const { prev, next } = useMemo(() => {
+    if (!post) return { prev: null, next: null };
+    const idx = POSTS_SORTED.findIndex((p) => p.slug.toLowerCase() === slug);
+    return {
+      prev: idx > 0 ? POSTS_SORTED[idx - 1] : null,
+      next: idx >= 0 && idx < POSTS_SORTED.length - 1 ? POSTS_SORTED[idx + 1] : null,
+    };
+  }, [post, slug]);
 
-    setStatus("loading")
-
-    setMeta({})
-    setContent("")
-
-    const importer = BLOG_POSTS[`../blog/${slug}.md`]
-
-    if (!importer) {
-      setStatus("error")
-      return () => {
-        cancelled = true
-      }
-    }
-
-    importer()
-      .then((rawContent) => {
-        if (cancelled) return null
-        const { data, content: markdown } = matter(rawContent)
-        setMeta(data)
-        setContent(markdown)
-        setStatus("ready")
-        return null
-      })
-      .catch(() => {
-        if (cancelled) return
-        setStatus("error")
-      })
-
-    return () => {
-      cancelled = true
-    }
-  }, [slug])
-
-  if (status === "error") {
+  if (!post) {
     return (
-      <section className="py-16">
-        <div className="mx-auto max-w-3xl px-4 text-center">
-          <p className="text-sm font-semibold uppercase tracking-wide text-primary">Blog</p>
-          <h1 className="mt-4 text-3xl font-bold text-gray-900">Artículo no encontrado</h1>
-          <p className="mt-4 text-gray-600">
-            El contenido que buscas no existe o fue actualizado. Vuelve al listado para encontrar más recursos.
-          </p>
-          <Link to="/blog" className="mt-6 inline-flex items-center font-semibold text-primary">
-            Ir al blog
-          </Link>
-        </div>
-      </section>
-    )
+      <main className="max-w-3xl mx-auto px-4 py-16 text-center">
+        <p className="text-xs tracking-widest text-green-700 font-semibold">BLOG</p>
+        <h1 className="mt-2 text-3xl font-bold">Artículo no encontrado</h1>
+        <p className="mt-2 text-gray-600">
+          El contenido que buscas no existe o fue actualizado. Vuelve al listado para encontrar más
+          recursos.
+        </p>
+        <Link to="/blog" className="mt-6 inline-block text-green-700 font-semibold underline">
+          Ir al blog
+        </Link>
+      </main>
+    );
   }
 
-  const pageTitle = meta.title || listMeta?.title || "Blog"
-  const pageDescription = meta.description || listMeta?.description
-  const canonical = `${SITE_URL}/blog/${slug}`
-  const publishedDate = meta.date || listMeta?.date
-  const formattedDate = formatDate(publishedDate)
-  
+  const { meta, content } = post;
+
   return (
-    <>
-      <SEO
-        title={pageTitle}
-        description={pageDescription}
-        url={canonical}
-        canonical={canonical}
-        image={meta.image}
-      />
+    <main className="max-w-3xl mx-auto px-4 py-12">
+      {/* Encabezado */}
+      <p className="text-xs tracking-widest text-green-700 font-semibold">BLOG</p>
+      <h1 className="mt-2 text-3xl font-bold">{meta.title || post.slug}</h1>
+      {meta.description && <p className="mt-2 text-gray-600">{meta.description}</p>}
+      {meta.date && (
+        <p className="mt-1 text-sm text-gray-400">
+          {new Date(meta.date).toLocaleDateString("es-CO", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          })}
+        </p>
+      )}
 
-      <section className="py-16">
-        <div className="mx-auto max-w-3xl px-4">
-          <Link to="/blog" className="text-sm font-semibold text-primary">
-            ← Volver al blog
+      {/* Imagen de portada opcional (frontmatter: cover: "/ruta.jpg") */}
+      {meta.cover && (
+        <img
+          src={meta.cover}
+          alt={meta.title || post.slug}
+          className="mt-6 w-full rounded-xl border"
+          loading="lazy"
+        />
+      )}
+
+        {/* Galería desde front-matter (PNG/JPG/GIF) */}
+        {Array.isArray(meta?.images) && meta.images.length > 0 && (
+          <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {meta.images.map((src, i) => (
+              <img
+                key={i}
+                src={src}
+                alt={`${meta?.title || post.slug} – imagen ${i + 1}`}
+                className="w-full rounded-xl border shadow-sm"
+                loading="lazy"
+              />
+            ))}
+          </div>
+        )}
+
+      {/* Contenido */}
+      <article className="prose max-w-none mt-8 prose-headings:scroll-mt-24">
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+      </article>
+
+      {/* Navegación prev/next */}
+      <nav className="mt-12 flex items-center justify-between gap-4">
+        {prev ? (
+          <Link
+            to={`/blog/${prev.slug}`}
+            className="inline-block rounded-lg border px-4 py-2 hover:bg-gray-50"
+          >
+            ← {prev.meta?.title || prev.slug}
           </Link>
-
-          <article className="mt-8">
-            {status === "loading" ? (
-              <div className="animate-pulse space-y-4">
-                <div className="h-8 w-3/4 rounded bg-gray-200" />
-                <div className="h-4 w-full rounded bg-gray-200" />
-                <div className="h-4 w-5/6 rounded bg-gray-200" />
-                <div className="h-96 w-full rounded bg-gray-200" />
-              </div>
-            ) : (
-              <>
-                <header className="mb-8">
-                  <p className="text-sm font-semibold uppercase tracking-wide text-primary">
-                    {meta.category === "manual" || listMeta?.category === "manual" ? "Manual de uso" : "Blog"}
-                  </p>
-                  <h1 className="mt-3 text-4xl font-extrabold text-gray-900">{pageTitle}</h1>
-                  {formattedDate && <p className="mt-2 text-sm text-gray-500">{formattedDate}</p>}
-                  {pageDescription && <p className="mt-4 text-lg text-gray-600">{pageDescription}</p>}
-                </header>
-
-                <ReactMarkdown className="blog-content">{content}</ReactMarkdown>
-              </>
-            )}
-          </article>
-        </div>
-      </section>
-    </>
-  )
+        ) : (
+          <span />
+        )}
+        {next ? (
+          <Link
+            to={`/blog/${next.slug}`}
+            className="inline-block rounded-lg border px-4 py-2 hover:bg-gray-50"
+          >
+            {next.meta?.title || next.slug} →
+          </Link>
+        ) : (
+          <span />
+        )}
+      </nav>
+    </main>
+  );
 }
