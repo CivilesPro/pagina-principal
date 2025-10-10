@@ -146,6 +146,9 @@ function RichDescription({ text }) {
   );
 }
 
+let bodyScrollLockCounter = 0;
+let previousBodyOverflow = null;
+
 export default function ProductModal({ isOpen = true, product, currency = "COP", onClose }) {
   const PAYPAL_CLIENT_ID = import.meta.env.VITE_PAYPAL_CLIENT_ID;
   const safeCurrency = React.useMemo(() => (currency || "COP").toUpperCase(), [currency]);
@@ -258,6 +261,88 @@ export default function ProductModal({ isOpen = true, product, currency = "COP",
     setDownloadUrl(null);
   }, []);
 
+  const panelRef = React.useRef(null);
+  const closeButtonRef = React.useRef(null);
+  const previouslyFocusedRef = React.useRef(null);
+
+  React.useEffect(() => {
+    if (!isOpen) return undefined;
+    if (typeof document === "undefined") return undefined;
+
+    const body = document.body;
+    if (!body) return undefined;
+    if (bodyScrollLockCounter === 0) {
+      previousBodyOverflow = body.style.overflow;
+      body.style.overflow = "hidden";
+    }
+    bodyScrollLockCounter += 1;
+
+    return () => {
+      bodyScrollLockCounter = Math.max(0, bodyScrollLockCounter - 1);
+      if (bodyScrollLockCounter === 0) {
+        body.style.overflow = previousBodyOverflow || "";
+        previousBodyOverflow = null;
+      }
+    };
+  }, [isOpen]);
+
+  React.useEffect(() => {
+    if (!isOpen) return undefined;
+    if (typeof document === "undefined") return undefined;
+
+    previouslyFocusedRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+
+    const node = closeButtonRef.current;
+    node?.focus({ preventScroll: true });
+
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        event.stopPropagation();
+        if (onClose) {
+          onClose();
+        }
+        return;
+      }
+
+      if (event.key !== "Tab" || !panelRef.current) return;
+
+      const focusableSelectors = [
+        "a[href]",
+        "button:not([disabled])",
+        "textarea:not([disabled])",
+        "input:not([disabled])",
+        "select:not([disabled])",
+        "[tabindex]:not([tabindex='-1'])",
+      ];
+      const focusable = panelRef.current.querySelectorAll(focusableSelectors.join(","));
+      if (!focusable.length) return;
+
+      const focusableArray = Array.from(focusable);
+      const first = focusableArray[0];
+      const last = focusableArray[focusableArray.length - 1];
+
+      if (event.shiftKey) {
+        if (document.activeElement === first || !panelRef.current.contains(document.activeElement)) {
+          event.preventDefault();
+          last.focus({ preventScroll: true });
+        }
+      } else if (document.activeElement === last) {
+        event.preventDefault();
+        first.focus({ preventScroll: true });
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown, true);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown, true);
+      const toFocus = previouslyFocusedRef.current;
+      if (toFocus && toFocus instanceof HTMLElement) {
+        toFocus.focus({ preventScroll: true });
+      }
+    };
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   const canClose = true;
@@ -271,175 +356,187 @@ export default function ProductModal({ isOpen = true, product, currency = "COP",
     product?.priceCopYear != null ? formatPrice(product.priceCopYear, safeCurrency, { withCode: false }) : null;
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby={titleId}
-      className="fixed inset-0 z-50 flex items-center justify-center"
-      onClick={() => canClose && onClose?.()}
-    >
-      {/* modal */}
+    <div className="fixed inset-0 z-50">
       <div
-        className="relative z-10 w-full max-w-6xl rounded-2xl bg-white p-6 shadow-xl"
-        onClick={(e) => e.stopPropagation()}
+        className="absolute inset-0 z-10 bg-black/60"
+        onClick={() => canClose && onClose?.()}
+        aria-hidden="true"
+      />
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        className="relative z-20 flex h-full w-full pointer-events-none"
       >
-        <div className="mb-4 flex items-start justify-between gap-4">
-          <button
-            type="button"
-            onClick={() => canClose && onClose?.()}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-full border text-gray-600 hover:bg-gray-50"
-            aria-label="Cerrar"
+        <div
+          className="min-h-screen w-full overflow-y-auto overscroll-contain scroll-smooth touch-pan-y py-6 pointer-events-auto"
+          onClick={() => canClose && onClose?.()}
+        >
+          <div
+            ref={panelRef}
+            className="relative mx-4 w-full max-w-6xl rounded-2xl bg-white p-6 shadow-xl pointer-events-auto sm:mx-6 lg:mx-auto"
+            onClick={(e) => e.stopPropagation()}
           >
-            ✕
-          </button>
-        </div>
-
-        <div className="grid gap-6 lg:grid-cols-[1fr_520px]">
-          {/* Bloque de imágenes */}
-          <div className="lg:sticky lg:top-6">
-            <div className="aspect-square overflow-hidden rounded-2xl bg-gray-100">
-              <img
-                src={images[activeIndex]}
-                alt={`${product?.title || "Producto"} - vista ${activeIndex + 1}`}
-                className="h-full w-full object-contain"
-              />
-            </div>
-            <div className="mt-3 flex gap-2 overflow-x-auto">
-              {images.map((src, i) => (
+            <div className="sticky top-0 z-20 -mx-6 bg-white/90 px-6 pt-4 pb-3 backdrop-blur supports-[backdrop-filter]:backdrop-blur border-b border-gray-200">
+              <div className="flex items-center justify-between gap-3">
+                <h3 id={titleId} className="text-lg font-semibold text-gray-900 sm:text-2xl">
+                  {product?.title || "Producto"}
+                </h3>
                 <button
-                  key={`${product?.slug || "p"}-thumb-${i}`}
-                  onClick={() => setActiveIndex(i)}
-                  className={cx(
-                    "h-16 w-16 shrink-0 overflow-hidden rounded-lg border bg-white",
-                    i === activeIndex ? "border-emerald-600" : "border-gray-300"
-                  )}
-                  aria-label={`Vista ${i + 1}`}
+                  ref={closeButtonRef}
+                  type="button"
+                  onClick={() => canClose && onClose?.()}
+                  className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-gray-200 text-base font-semibold text-gray-700 transition hover:bg-gray-50 active:scale-[.98]"
+                  aria-label="Cerrar"
                 >
-                  <img src={src} alt={`Vista ${i + 1}`} className="h-full w-full object-contain" />
+                  ✕
                 </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Información del producto */}
-          <div className="pr-2 lg:max-h-[calc(100vh-220px)] lg:overflow-y-auto">
-            <h3 id={titleId} className="text-2xl font-bold text-gray-900">
-              {product?.title || "Producto"}
-            </h3>
-
-            {/* Precio */}
-            {showPrice ? (
-              showYearPrice ? (
-                <>
-                  <p className="mt-1 text-sm text-gray-700">
-                    Desde:
-                    <span className="ml-1 font-semibold text-gray-900">
-                      {showPrice}<span className="ml-1 text-gray-500">{safeCurrency}</span>
-                    </span>
-                    <span className="mx-2 text-gray-400">•</span>
-                    Premium:
-                    <span className="ml-1 font-semibold text-gray-900">
-                      {showYearPrice}<span className="ml-1 text-gray-500">{safeCurrency}</span>
-                    </span>
-                  </p>
-                </>
-              ) : (
-                <p className="mt-1 text-sm text-gray-700">
-                  Precio:
-                  <span className="ml-1 font-semibold text-gray-900">
-                    {showPrice}<span className="ml-1 text-gray-500">{safeCurrency}</span>
-                  </span>
-                </p>
-              )
-            ) : (
-              <p className="text-base font-semibold text-amber-700">Precio a consultar</p>
-            )}
-
-            <div className="mb-2 mt-2 flex items-center gap-1 text-amber-500" aria-hidden>
-              {"★★★★★".split("").map((s, i) => (<span key={`star-${i}`}>★</span>))}
-              <span className="ml-2 text-sm text-gray-500">(128 reseñas)</span>
+              </div>
             </div>
 
-            <div className="mb-4">
-              <RichDescription text={product?.description} />
-            </div>
+            <div className="pt-4">
+              <div className="grid gap-6 lg:grid-cols-[1fr_520px]">
+                {/* Bloque de imágenes */}
+                <div className="lg:sticky lg:top-6">
+                  <div className="overflow-hidden rounded-2xl bg-gray-100 aspect-[4/5] sm:aspect-[3/4] lg:aspect-square">
+                    <img
+                      src={images[activeIndex]}
+                      alt={`${product?.title || "Producto"} - vista ${activeIndex + 1}`}
+                      className="h-full w-full object-contain"
+                    />
+                  </div>
+                  <div className="mt-3 flex gap-2 overflow-x-auto">
+                    {images.map((src, i) => (
+                      <button
+                        key={`${product?.slug || "p"}-thumb-${i}`}
+                        onClick={() => setActiveIndex(i)}
+                        className={cx(
+                          "h-16 w-16 shrink-0 overflow-hidden rounded-lg border bg-white",
+                          i === activeIndex ? "border-emerald-600" : "border-gray-300"
+                        )}
+                        aria-label={`Vista ${i + 1}`}
+                      >
+                        <img src={src} alt={`Vista ${i + 1}`} className="h-full w-full object-contain" />
+                      </button>
+                    ))}
+                  </div>
+                </div>
 
-            {/* Pago */}
-            <div className="rounded-xl border border-gray-200 p-4" aria-live="polite">
-              {!paypalReady && (
-                <div className="text-sm text-gray-500">
-                  Cargando PayPal…
-                  {!PAYPAL_CLIENT_ID && (
-                    <div className="mt-2 rounded border border-amber-300 bg-amber-50 p-2 text-amber-800">
-                      Falta VITE_PAYPAL_CLIENT_ID en .env.local (raíz). Reinicia el dev server.
-                    </div>
+                {/* Información del producto */}
+                <div className="pr-2 lg:max-h-[calc(100vh-220px)] lg:overflow-y-auto">
+                  {/* Precio */}
+                  {showPrice ? (
+                    showYearPrice ? (
+                      <>
+                        <p className="mt-1 text-sm text-gray-700">
+                          Desde:
+                          <span className="ml-1 font-semibold text-gray-900">
+                            {showPrice}<span className="ml-1 text-gray-500">{safeCurrency}</span>
+                          </span>
+                          <span className="mx-2 text-gray-400">•</span>
+                          Premium:
+                          <span className="ml-1 font-semibold text-gray-900">
+                            {showYearPrice}<span className="ml-1 text-gray-500">{safeCurrency}</span>
+                          </span>
+                        </p>
+                      </>
+                    ) : (
+                      <p className="mt-1 text-sm text-gray-700">
+                        Precio:
+                        <span className="ml-1 font-semibold text-gray-900">
+                          {showPrice}<span className="ml-1 text-gray-500">{safeCurrency}</span>
+                        </span>
+                      </p>
+                    )
+                  ) : (
+                    <p className="text-base font-semibold text-amber-700">Precio a consultar</p>
                   )}
-                </div>
-              )}
-              <div ref={paypalContainerRef} className="relative z-20 min-h-[48px]" />
-              {capturing && <p className="mt-2 text-sm text-gray-500">Procesando pago…</p>}
 
-              {errorMsg && !paid && (
-                <div className="mt-3 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
-                  {errorMsg}
-                  <div className="mt-2">
-                    <button
-                      type="button"
-                      onClick={handleRetry}
-                      className="rounded-md border px-3 py-1.5 text-gray-700 hover:bg-gray-50"
-                    >
-                      Reintentar
-                    </button>
+                  <div className="mb-2 mt-3 flex items-center gap-1 text-amber-500" aria-hidden>
+                    {"★★★★★".split("").map((s, i) => (<span key={`star-${i}`}>★</span>))}
+                    <span className="ml-2 text-sm text-gray-500">(128 reseñas)</span>
+                  </div>
+
+                  <div className="mb-4">
+                    <RichDescription text={product?.description} />
+                  </div>
+
+                  {/* Pago */}
+                  <div className="rounded-xl border border-gray-200 p-4" aria-live="polite">
+                    {!paypalReady && (
+                      <div className="text-sm text-gray-500">
+                        Cargando PayPal…
+                        {!PAYPAL_CLIENT_ID && (
+                          <div className="mt-2 rounded border border-amber-300 bg-amber-50 p-2 text-amber-800">
+                            Falta VITE_PAYPAL_CLIENT_ID en .env.local (raíz). Reinicia el dev server.
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    <div ref={paypalContainerRef} className="relative z-20 min-h-[48px]" />
+                    {capturing && <p className="mt-2 text-sm text-gray-500">Procesando pago…</p>}
+
+                    {errorMsg && !paid && (
+                      <div className="mt-3 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+                        {errorMsg}
+                        <div className="mt-2">
+                          <button
+                            type="button"
+                            onClick={handleRetry}
+                            className="rounded-md border px-3 py-1.5 text-gray-700 hover:bg-gray-50"
+                          >
+                            Reintentar
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {paid && downloadUrl && (
+                      <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3">
+                        <p className="font-medium text-emerald-800">Pago exitoso ✅</p>
+                        <a
+                          href={downloadUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="mt-2 inline-flex items-center justify-center rounded-md bg-emerald-700 px-4 py-2 font-semibold text-white hover:bg-emerald-800"
+                        >
+                          Descargar
+                        </a>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Avisos PayPal */}
+                  <div className="mt-3 rounded-md border border-emerald-200 bg-emerald-50 p-2 text-sm text-emerald-800">
+                    Al pagar se activará el botón <strong>Descargar</strong> para obtener el archivo al instante.
+                  </div>
+
+                  <div className="mt-2 flex items-center gap-2 rounded-md border border-sky-200 bg-sky-50 p-2 text-sm text-sky-800">
+                    <svg width="16" height="16" viewBox="0 0 24 24" className="shrink-0" aria-hidden="true">
+                      <path fill="currentColor" d="M12 1l3 5l6 1l-4 4l1 6l-6-3l-6 3l1-6L1 7l6-1z" />
+                    </svg>
+                    Pagos procesados en <strong>USD</strong> por PayPal. El precio mostrado es referencial en {safeCurrency}.
+                  </div>
+
+                  {/* Reseñas */}
+                  <div className="mt-8 space-y-4">
+                    <p className="text-gray-700">Lee lo que dicen nuestros clientes:</p>
+                    {(STATIC_REVIEWS[product?.slug] || STATIC_REVIEWS.default).map((rev, idx) => (
+                      <div key={`${product?.slug || "p"}-rev-${idx}-${rev.name}`} className="rounded-xl border border-gray-200 p-4">
+                        <div className="mb-1 flex items-center justify-between">
+                          <div className="font-semibold text-gray-800">{rev.name}</div>
+                          <Stars value={rev.rating} />
+                        </div>
+                        <p className="text-sm text-gray-600">{rev.text}</p>
+                      </div>
+                    ))}
                   </div>
                 </div>
-              )}
-
-              {paid && downloadUrl && (
-                <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3">
-                  <p className="font-medium text-emerald-800">Pago exitoso ✅</p>
-                  <a
-                    href={downloadUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="mt-2 inline-flex items-center justify-center rounded-md bg-emerald-700 px-4 py-2 font-semibold text-white hover:bg-emerald-800"
-                  >
-                    Descargar
-                  </a>
-                </div>
-              )}
-            </div>
-
-            {/* Avisos PayPal */}
-            <div className="mt-3 rounded-md border border-emerald-200 bg-emerald-50 p-2 text-sm text-emerald-800">
-              Al pagar se activará el botón <strong>Descargar</strong> para obtener el archivo al instante.
-            </div>
-
-            <div className="mt-2 flex items-center gap-2 rounded-md border border-sky-200 bg-sky-50 p-2 text-sm text-sky-800">
-              <svg width="16" height="16" viewBox="0 0 24 24" className="shrink-0" aria-hidden="true">
-                <path fill="currentColor" d="M12 1l3 5l6 1l-4 4l1 6l-6-3l-6 3l1-6L1 7l6-1z" />
-              </svg>
-              Pagos procesados en <strong>USD</strong> por PayPal. El precio mostrado es referencial en {safeCurrency}.
-            </div>
-
-            {/* Reseñas */}
-            <div className="mt-6 space-y-4">
-              <p className="text-gray-700">Lee lo que dicen nuestros clientes:</p>
-              {(STATIC_REVIEWS[product?.slug] || STATIC_REVIEWS.default).map((rev, idx) => (
-                <div key={`${product?.slug || "p"}-rev-${idx}-${rev.name}`} className="rounded-xl border border-gray-200 p-4">
-                  <div className="mb-1 flex items-center justify-between">
-                    <div className="font-semibold text-gray-800">{rev.name}</div>
-                    <Stars value={rev.rating} />
-                  </div>
-                  <p className="text-sm text-gray-600">{rev.text}</p>
-                </div>
-              ))}
+              </div>
             </div>
           </div>
         </div>
       </div>
-
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-black/60" />
     </div>
   );
 }
