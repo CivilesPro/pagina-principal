@@ -146,9 +146,6 @@ function RichDescription({ text }) {
   );
 }
 
-let bodyScrollLockCounter = 0;
-let previousBodyOverflow = null;
-
 export default function ProductModal({ isOpen = true, product, currency = "COP", onClose }) {
   const PAYPAL_CLIENT_ID = import.meta.env.VITE_PAYPAL_CLIENT_ID;
   const safeCurrency = React.useMemo(() => (currency || "COP").toUpperCase(), [currency]);
@@ -160,6 +157,7 @@ export default function ProductModal({ isOpen = true, product, currency = "COP",
   const [paid, setPaid] = React.useState(false);
   const [downloadUrl, setDownloadUrl] = React.useState(null);
   const [errorMsg, setErrorMsg] = React.useState(null);
+  const [orderId, setOrderId] = React.useState(null); // <-- para WhatsApp
 
   // Imágenes del carrusel
   const images = React.useMemo(() => {
@@ -174,6 +172,7 @@ export default function ProductModal({ isOpen = true, product, currency = "COP",
     setPaid(false);
     setDownloadUrl(null);
     setErrorMsg(null);
+    setOrderId(null);
   }, [slug]);
 
   // PayPal
@@ -223,6 +222,9 @@ export default function ProductModal({ isOpen = true, product, currency = "COP",
       setErrorMsg(null);
       const orderID = data?.orderID;
       if (!orderID) throw new Error("La respuesta de PayPal no incluye orderID.");
+
+      setOrderId(orderID); // guardar para WhatsApp
+
       const res = await fetch(`/api/paypal/capture-order.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -259,36 +261,45 @@ export default function ProductModal({ isOpen = true, product, currency = "COP",
     setErrorMsg(null);
     setPaid(false);
     setDownloadUrl(null);
+    setOrderId(null);
   }, []);
 
   const panelRef = React.useRef(null);
   const closeButtonRef = React.useRef(null);
   const previouslyFocusedRef = React.useRef(null);
 
+  // === BLOQUEO/RESTAURACIÓN DEL SCROLL DEL FONDO (simple y a prueba de balas) ===
+React.useEffect(() => {
+  const body = document.body;
+  const html = document.documentElement;
+
+  if (isOpen) {
+    // guardar posición para restaurar luego (opcional)
+    body.dataset.modalScrollY = String(window.scrollY || window.pageYOffset || 0);
+
+    // bloquear scroll del fondo (sin position:fixed)
+    body.classList.add("overflow-hidden");
+    html.classList.add("overflow-hidden");
+  } else {
+    // restaurar scroll al cerrar
+    const y = parseInt(body.dataset.modalScrollY || "0", 10);
+    body.classList.remove("overflow-hidden");
+    html.classList.remove("overflow-hidden");
+    delete body.dataset.modalScrollY;
+    window.scrollTo(0, y);
+  }
+
+  // safety cleanup por si el componente se desmonta
+  return () => {
+    body.classList.remove("overflow-hidden");
+    html.classList.remove("overflow-hidden");
+  };
+}, [isOpen]);
+
+
+  // Trap de foco + Esc
   React.useEffect(() => {
     if (!isOpen) return undefined;
-    if (typeof document === "undefined") return undefined;
-
-    const body = document.body;
-    if (!body) return undefined;
-    if (bodyScrollLockCounter === 0) {
-      previousBodyOverflow = body.style.overflow;
-      body.style.overflow = "hidden";
-    }
-    bodyScrollLockCounter += 1;
-
-    return () => {
-      bodyScrollLockCounter = Math.max(0, bodyScrollLockCounter - 1);
-      if (bodyScrollLockCounter === 0) {
-        body.style.overflow = previousBodyOverflow || "";
-        previousBodyOverflow = null;
-      }
-    };
-  }, [isOpen]);
-
-  React.useEffect(() => {
-    if (!isOpen) return undefined;
-    if (typeof document === "undefined") return undefined;
 
     previouslyFocusedRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
 
@@ -298,9 +309,7 @@ export default function ProductModal({ isOpen = true, product, currency = "COP",
     const handleKeyDown = (event) => {
       if (event.key === "Escape") {
         event.stopPropagation();
-        if (onClose) {
-          onClose();
-        }
+        onClose?.();
         return;
       }
 
@@ -317,9 +326,9 @@ export default function ProductModal({ isOpen = true, product, currency = "COP",
       const focusable = panelRef.current.querySelectorAll(focusableSelectors.join(","));
       if (!focusable.length) return;
 
-      const focusableArray = Array.from(focusable);
-      const first = focusableArray[0];
-      const last = focusableArray[focusableArray.length - 1];
+      const arr = Array.from(focusable);
+      const first = arr[0];
+      const last = arr[arr.length - 1];
 
       if (event.shiftKey) {
         if (document.activeElement === first || !panelRef.current.contains(document.activeElement)) {
@@ -355,13 +364,25 @@ export default function ProductModal({ isOpen = true, product, currency = "COP",
   const showYearPrice =
     product?.priceCopYear != null ? formatPrice(product.priceCopYear, safeCurrency, { withCode: false }) : null;
 
+  // Número de WhatsApp (reemplazar por el real de CivilesPro)
+  const WHATSAPP_NUMBER = "573001112233";
+
+  // Mensaje para WhatsApp
+  const whatsappMessage = `¡Hola! Acabo de comprar la plantilla "${product?.title || "CivilesPro"}" 🚀
+ID de transacción: ${orderId || "N/A"}`;
+
+  const whatsappHref = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(whatsappMessage)}`;
+
   return (
     <div className="fixed inset-0 z-50">
+      {/* Overlay */}
       <div
         className="absolute inset-0 z-10 bg-black/60"
         onClick={() => canClose && onClose?.()}
         aria-hidden="true"
       />
+
+      {/* Contenedor scrollable del modal */}
       <div
         role="dialog"
         aria-modal="true"
@@ -374,9 +395,10 @@ export default function ProductModal({ isOpen = true, product, currency = "COP",
         >
           <div
             ref={panelRef}
-            className="relative mx-4 w-full max-w-6xl overflow-hidden rounded-2xl bg-white p-6 shadow-xl pointer-events-auto sm:mx-6 lg:mx-auto"
+            className="relative mx-4 max-w-6xl overflow-hidden rounded-2xl bg-white p-6 shadow-xl pointer-events-auto sm:mx-6 lg:mx-auto"
             onClick={(e) => e.stopPropagation()}
           >
+            {/* Header sticky */}
             <div className="sticky top-0 z-20 bg-white/90 px-6 pt-4 pb-3 backdrop-blur supports-[backdrop-filter]:backdrop-blur border-b border-gray-200">
               <div className="flex items-center justify-between gap-3">
                 <h3 id={titleId} className="text-lg font-semibold text-gray-900 sm:text-2xl">
@@ -386,14 +408,17 @@ export default function ProductModal({ isOpen = true, product, currency = "COP",
                   ref={closeButtonRef}
                   type="button"
                   onClick={() => canClose && onClose?.()}
-                  className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-gray-200 text-base font-semibold text-gray-700 transition hover:bg-gray-50 active:scale-[.98]"
                   aria-label="Cerrar"
+                  className="inline-flex h-11 w-11 aspect-square items-center justify-center rounded-full
+                             bg-white border border-gray-200 text-base font-semibold text-gray-700
+                             shadow-sm transition hover:bg-gray-50 active:scale-[.98] focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
                 >
                   ✕
                 </button>
               </div>
             </div>
 
+            {/* Contenido */}
             <div className="pt-4">
               <div className="grid gap-6 lg:grid-cols-[1fr_520px]">
                 {/* Bloque de imágenes */}
@@ -405,21 +430,24 @@ export default function ProductModal({ isOpen = true, product, currency = "COP",
                       className="h-full w-full object-contain"
                     />
                   </div>
-                  <div className="mt-3 flex gap-2 overflow-x-auto">
-                    {images.map((src, i) => (
-                      <button
-                        key={`${product?.slug || "p"}-thumb-${i}`}
-                        onClick={() => setActiveIndex(i)}
-                        className={cx(
-                          "h-16 w-16 shrink-0 overflow-hidden rounded-lg border bg-white",
-                          i === activeIndex ? "border-emerald-600" : "border-gray-300"
-                        )}
-                        aria-label={`Vista ${i + 1}`}
-                      >
-                        <img src={src} alt={`Vista ${i + 1}`} className="h-full w-full object-contain" />
-                      </button>
-                    ))}
-                  </div>
+                  {/* Miniaturas — ocultas en móvil, visibles desde lg */}
+                  {images.length > 1 && (
+                    <div className="mt-3 hidden lg:flex gap-2 overflow-x-auto">
+                      {images.map((src, i) => (
+                        <button
+                          key={`${product?.slug || "p"}-thumb-${i}`}
+                          onClick={() => setActiveIndex(i)}
+                          className={cx(
+                            "h-16 w-16 shrink-0 overflow-hidden rounded-lg border bg-white",
+                            i === activeIndex ? "border-emerald-600" : "border-gray-300"
+                          )}
+                          aria-label={`Vista ${i + 1}`}
+                        >
+                          <img src={src} alt={`Vista ${i + 1}`} className="h-full w-full object-contain" />
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 {/* Información del producto */}
@@ -441,10 +469,13 @@ export default function ProductModal({ isOpen = true, product, currency = "COP",
                         </p>
                       </>
                     ) : (
-                      <p className="mt-1 text-sm text-gray-700">
+                      <p className="mt-2 text-base sm:text-lg font-medium text-gray-800">
                         Precio:
-                        <span className="ml-1 font-semibold text-gray-900">
-                          {showPrice}<span className="ml-1 text-gray-500">{safeCurrency}</span>
+                        <span className="ml-2 text-xl sm:text-2xl font-bold text-gray-900">
+                          {showPrice}
+                          <span className="ml-1 text-gray-500 text-base font-semibold">
+                            {safeCurrency}
+                          </span>
                         </span>
                       </p>
                     )
@@ -494,14 +525,29 @@ export default function ProductModal({ isOpen = true, product, currency = "COP",
                     {paid && downloadUrl && (
                       <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3">
                         <p className="font-medium text-emerald-800">Pago exitoso ✅</p>
-                        <a
-                          href={downloadUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="mt-2 inline-flex items-center justify-center rounded-md bg-emerald-700 px-4 py-2 font-semibold text-white hover:bg-emerald-800"
-                        >
-                          Descargar
-                        </a>
+                        <div className="mt-2 flex flex-wrap gap-3">
+                          {/* Botón Descargar */}
+                          <a
+                            href={downloadUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex items-center justify-center rounded-md bg-emerald-700 px-4 py-2 font-semibold text-white hover:bg-emerald-800 transition"
+                          >
+                            Descargar
+                          </a>
+
+                          {/* Botón WhatsApp */}
+                          <a
+                            href={`https://wa.me/573001112233?text=${encodeURIComponent(
+                              `¡Hola! Acabo de comprar la plantilla "${product?.title || "CivilesPro"}" 🚀\nID de transacción: ${orderId || "N/A"}`
+                            )}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center justify-center rounded-md bg-green-600 px-4 py-2 font-semibold text-white hover:bg-green-700 transition"
+                          >
+                            WhatsApp
+                          </a>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -511,11 +557,11 @@ export default function ProductModal({ isOpen = true, product, currency = "COP",
                     Al pagar se activará el botón <strong>Descargar</strong> para obtener el archivo al instante.
                   </div>
 
-                  <div className="mt-2 flex items-center gap-2 rounded-md border border-sky-200 bg-sky-50 p-2 text-sm text-sky-800">
-                    <svg width="16" height="16" viewBox="0 0 24 24" className="shrink-0" aria-hidden="true">
-                      <path fill="currentColor" d="M12 1l3 5l6 1l-4 4l1 6l-6-3l-6 3l1-6L1 7l6-1z" />
-                    </svg>
-                    Pagos procesados en <strong>USD</strong> por PayPal. El precio mostrado es referencial en {safeCurrency}.
+                  <div className="mt-3 flex items-start gap-2 rounded-md border border-sky-200 bg-sky-50 px-3 py-2.5 text-[15px] sm:text-base leading-snug text-sky-800">
+                    <span>
+                      Pagos procesados en <strong className="font-semibold text-sky-900">USD</strong> por PayPal.<br />
+                      
+                    </span>
                   </div>
 
                   {/* Reseñas */}
@@ -534,6 +580,7 @@ export default function ProductModal({ isOpen = true, product, currency = "COP",
                 </div>
               </div>
             </div>
+            {/* Fin contenido */}
           </div>
         </div>
       </div>

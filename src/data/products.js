@@ -6,8 +6,7 @@ const products = [
     image: "/productos/Excel Pedido de Acero.png",
     images: [
       "/productos/Excel Pedido de Acero.png",
-      "/productos/Excel Pedido de Acero.png",
-      "/productos/Excel Pedido de Acero.png",
+     
     ],
     fileKey: "pedido-acero-v2.zip",
     description: `
@@ -25,8 +24,7 @@ const products = [
     image: "/productos/Excel de Control de Acero.png",
     images: [
       "/productos/Excel de Control de Acero.png",
-      "/productos/Excel de Control de Acero.png",
-      "/productos/Excel de Control de Acero.png",
+      
     ],
     fileKey: "control-acero-control.zip",
     description: `
@@ -43,8 +41,7 @@ const products = [
     image: "/productos/Excel de Almacen.png",
     images: [
       "/productos/Excel de Almacen.png",
-      "/productos/Excel de Almacen.png",
-      "/productos/Excel de Almacen.png",
+     
     ],
     fileKey: "almacen-obra-control.zip",
     description: `
@@ -61,8 +58,7 @@ const products = [
     image: "/productos/Excel de Encofrados.png",
     images: [
       "/productos/Excel de Encofrados.png",
-      "/productos/Excel de Encofrados.png",
-      "/productos/Excel de Encofrados.png",
+      
     ],
     fileKey: "formaletas-encofrados-kit.zip",
     description: `
@@ -79,8 +75,7 @@ const products = [
     image: "/productos/Excel de Cantidades de Materiales.png",
     images: [
       "/productos/Excel de Cantidades de Materiales.png",
-      "/productos/Excel de Cantidades de Materiales.png",
-      "/productos/Excel de Cantidades de Materiales.png",
+      
     ],
     fileKey: "cantidades-instant-2.zip",
     description: `
@@ -99,8 +94,7 @@ const products = [
     image: "/productos/Excel de Concreto de Hormigueras.png",
     images: [
       "/productos/Excel de Concreto de Hormigueras.png",
-      "/productos/Excel de Concreto de Hormigueras.png",
-      "/productos/Excel de Concreto de Hormigueras.png",
+      
     ],
     fileKey: "concretos-autohormigoneras.xlsx",
     description: `
@@ -114,23 +108,24 @@ const products = [
   },
   {
     slug: "plataforma-civilespro",
-    title: "Plataforma CivilesPro (APU + Informes de Obra Diarios)",
+    title: "Plataforma CivilesPro (BIBLIOTECA de APU + Informes de Obra Diarios)",
     priceCop: 60000,
     priceCopYear: 150000,
-    image: "/productos/Excel de Cantidades de Materiales.png",
+    image: "/productos/Plataforma Civiles.png",
     images: [
-      "/productos/Excel de Cantidades de Materiales.png",
-      "/productos/Excel de Cantidades de Materiales.png",
-      "/productos/Excel de Cantidades de Materiales.png",
+      "/productos/Plataforma Civiles.png",
+      
     ],
     fileKey: "plataforma-civilespro-plan.zip",
     description: `
-    🌐 Plataforma integral para presupuestar y documentar obra.
-    ✅ Genera presupuestos con APU conectados a tus materiales.
-    ✅ Reportes automáticos y exportación en Excel.
+    🌐 Herramienta para Crear Presupuestos Profesionales Rápidamente
+    ✅ Armá APU en segundos desde una biblioteca con más de 1500 insumos: materiales, mano de obra, equipos y transporte actualizados al año.
+    ✅ Usá, editá y duplicá una biblioteca de APU listos con fórmulas predefinidas y precios reales de obra actualizados.
+    ✅ Calcula automáticamente todo: insumos, IVA, imprevistos, costos indirectos, utilidad por contrato y/o por labor.
+    ✅ Crea memorias de cálculos conectados directamente al presupuesto.
     ✅ Incluye Informes de Obra Diarios (materiales, mano de obra, avances).
-    ✅ Plan mensual o anual con actualizaciones continuas.
-    Diseñada para centralizar el control de proyectos y acelerar la entrega de informes.`,
+    ✅ Crea memorias de cálculos conectados directamente al presupuesto.
+    Diseñada para centralizar el control de proyectos y acelerar la entrega de informes.`
   },
   {
     slug: "plantillas-revit",
