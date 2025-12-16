@@ -125,7 +125,9 @@ const products = [
     ✅ Crea memorias de cálculos conectados directamente al presupuesto.
     ✅ Incluye Informes de Obra Diarios (materiales, mano de obra, avances).
     ✅ Crea memorias de cálculos conectados directamente al presupuesto.
-    Diseñada para centralizar el control de proyectos y acelerar la entrega de informes.`
+    Ajustá rendimientos según la realidad de tu proyecto, sin tener que rehacer fórmulas.
+
+    Ideal para presupuestar, cotizar o simplemente tener claro cuánto cuesta cada actividad con datos reales.`
   },
   {
     slug: "plantillas-revit",
@@ -134,8 +136,7 @@ const products = [
     image: "/productos/Familia de Revit.png",
     images: [
       "/productos/Familia de Revit.png",
-      "/productos/Familia de Revit.png",
-      "/productos/Familia de Revit.png",
+      
     ],
     fileKey: "plantillas-revit-pack.zip",
     description: `
@@ -152,8 +153,7 @@ const products = [
     image: "/productos/Bloques Dinamicos.png",
     images: [
       "/productos/Bloques Dinamicos.png",
-      "/productos/Bloques Dinamicos.png",
-      "/productos/Bloques Dinamicos.png",
+      
     ],
     fileKey: "bloques-dinamicos-pack.zip",
     description: `
@@ -170,8 +170,7 @@ const products = [
     image: "/productos/Megapack.png",
     images: [
       "/productos/Megapack.png",
-      "/productos/Megapack.png",
-      "/productos/Megapack.png",
+     
     ],
     fileKey: null,
     description: `
