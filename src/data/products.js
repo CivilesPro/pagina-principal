@@ -111,9 +111,9 @@ const products = [
     title: "Plataforma CivilesPro (BIBLIOTECA de APU + Informes de Obra Diarios)",
     priceCop: 60000,
     priceCopYear: 150000,
-    image: "/productos/Plataforma Civiles.png",
+    image: "/productos/PRESUPUESTO.png",
     images: [
-      "/productos/Plataforma Civiles.png",
+      "/productos/PRESUPUESTO.png",
       
     ],
     fileKey: "plataforma-civilespro-plan.zip",
