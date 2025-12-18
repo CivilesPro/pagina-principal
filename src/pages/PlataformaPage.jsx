@@ -369,9 +369,9 @@ function Plans() {
       variant="fade-in"
       once={false}
       rootMargin="-12% 0px -12% 0px"
-      className="py-16"
+      className="pricing-glow relative overflow-hidden py-16"
     >
-      <div className="wrap-wide px-4">
+      <div className="relative z-10 wrap-wide px-4">
         <h2 className="text-center text-3xl font-extrabold text-gray-900 sm:text-4xl">Nuestros Planes</h2>
         <p className="mt-1 text-center text-gray-600">Elige el plan mas apropiado para tu obra.</p>
         <div className="mx-auto mt-10 grid max-w-5xl grid-cols-1 gap-6 sm:grid-cols-2">

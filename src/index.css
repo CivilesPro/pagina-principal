@@ -65,3 +65,67 @@ body { margin: 0; background: #fff; color: #111; }
     overflow: hidden;
   }
 }
+
+/* Background premium (halos laterales) para sección de planes */
+.pricing-glow {
+  background: linear-gradient(180deg, #ffffff 0%, #f7fffb 100%);
+}
+
+.pricing-glow::before,
+.pricing-glow::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.pricing-glow::before {
+  /* Halo izquierdo */
+  background:
+    radial-gradient(600px 600px at 0% 55%,
+      rgba(16, 185, 129, 0.20),
+      rgba(16, 185, 129, 0.00) 60%),
+    radial-gradient(420px 420px at 10% 20%,
+      rgba(5, 90, 39, 0.10),
+      rgba(5, 90, 39, 0.00) 60%);
+  filter: blur(30px);
+  transform: translateX(-10%);
+}
+
+.pricing-glow::after {
+  /* Halo derecho */
+  background:
+    radial-gradient(600px 600px at 100% 55%,
+      rgba(16, 185, 129, 0.18),
+      rgba(16, 185, 129, 0.00) 60%),
+    radial-gradient(420px 420px at 90% 20%,
+      rgba(34, 197, 94, 0.10),
+      rgba(34, 197, 94, 0.00) 60%);
+  filter: blur(30px);
+  transform: translateX(10%);
+}
+
+/* Ajuste mobile para que no “invada” tanto */
+@media (max-width: 640px) {
+  .pricing-glow::before,
+  .pricing-glow::after {
+    filter: blur(22px);
+  }
+
+  .pricing-glow::before {
+    background:
+      radial-gradient(420px 420px at 0% 50%,
+        rgba(16, 185, 129, 0.18),
+        rgba(16, 185, 129, 0.00) 60%);
+    transform: translateX(-15%);
+  }
+
+  .pricing-glow::after {
+    background:
+      radial-gradient(420px 420px at 100% 50%,
+        rgba(16, 185, 129, 0.16),
+        rgba(16, 185, 129, 0.00) 60%);
+    transform: translateX(15%);
+  }
+}
