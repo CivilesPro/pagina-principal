@@ -455,7 +455,7 @@ function Plans() {
 
                 {/* Ahorro vs mensual (sin decir % exacto) */}
                 <div className="mt-2 inline-flex items-center rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">
-                  Mejor precio pagando anual
+                  Ahorra hasta un 30% si luego decides cambiar de plan.
                 </div>
               </div>
 
