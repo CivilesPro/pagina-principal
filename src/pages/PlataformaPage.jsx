@@ -316,10 +316,10 @@ function HowItWorks() {
       variant="fade-in"
       once={false}
       rootMargin="-15% 0px -15% 0px"
-      className="py-16"
+      className="bg-gradient-to-b from-white to-emerald-50/40 py-20"
     >
-      <div className="wrap-wide px-4">
-        <h2 className="text-center text-3xl font-extrabold text-gray-900 sm:text-4xl">Y ademas...</h2>
+      <div className="mx-auto max-w-6xl px-4">
+        <h2 className="text-center text-4xl font-black tracking-tight text-gray-900 md:text-5xl">Y ademas...</h2>
 
         {/* Grid 2 columnas */}
         <div className="mx-auto mt-8 grid max-w-5xl grid-cols-1 gap-4 sm:grid-cols-2">
@@ -331,12 +331,12 @@ function HowItWorks() {
               once={false}
               rootMargin="-20% 0px -20% 0px"
             >
-              <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-                <div className="inline-flex items-center gap-2 rounded-lg bg-emerald-50 px-3 py-1 text-emerald-700">
+              <div className="space-y-2 rounded-2xl border border-emerald-100/70 bg-white/70 p-6 shadow-[0_10px_30px_-20px_rgba(0,0,0,0.25)] backdrop-blur-md transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_18px_45px_-25px_rgba(0,0,0,0.35)]">
+                <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-emerald-700 ring-1 ring-emerald-100">
                   {s.icon}
                   <span className="text-xs font-semibold uppercase">{s.title}</span>
                 </div>
-                <p className="mt-3 text-gray-700">{s.text}</p>
+                <p className="text-gray-600">{s.text}</p>
               </div>
             </Reveal>
           ))}
@@ -345,17 +345,20 @@ function HowItWorks() {
         {/* Banner verde de privacidad – ocupa el ancho de ambas tarjetas */}
         <Reveal variant="fade-up" delay={120} once={false} rootMargin="-20% 0px -20% 0px">
           <div className="mx-auto mt-4 max-w-5xl">
-            <div className="rounded-2xl border border-emerald-700 bg-emerald-600 p-6 shadow-sm">
-              <div className="inline-flex items-center gap-2 rounded-lg bg-emerald-500/30 px-3 py-1 text-white">
-                <LuLock className="h-5 w-5" aria-hidden="true" />
-                <span className="text-xs font-semibold uppercase">Privacidad</span>
+            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-700 to-emerald-600 p-6 shadow-[0_20px_60px_-35px_rgba(16,185,129,0.65)] ring-1 ring-white/15">
+              <div className="pointer-events-none absolute inset-0 bg-white/10 blur-2xl" aria-hidden="true" />
+              <div className="relative space-y-3">
+                <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-white ring-1 ring-white/20">
+                  <LuLock className="h-5 w-5" aria-hidden="true" />
+                  <span>Privacidad</span>
+                </div>
+                <h3 className="text-xl font-black text-white">
+                  Tus presupuestos son <span className="underline decoration-white/30">Privados</span>.
+                </h3>
+                <p className="text-white/85">
+                  Nadie ve tus precios, APU o cantidades a menos que tú los compartas. Tu información está segura.
+                </p>
               </div>
-              <h3 className="mt-2 text-xl font-extrabold text-white">
-                Tus presupuestos son <span className="underline decoration-white/50">Privados</span>.
-              </h3>
-              <p className="mt-2 text-emerald-50">
-                Nadie ve tus precios, APU o cantidades a menos que tú los compartas. Tu información está segura.
-              </p>
             </div>
           </div>
         </Reveal>
