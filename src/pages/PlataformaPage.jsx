@@ -261,27 +261,7 @@ function BenefitRow({
   );
 }
 
-function CalculationsSection() {
-  return (
-    <section className="bg-white py-16">
-      <div className="wrap-wide px-4">
-        <RibbonMarqueeTitle />
 
-        <div className="mx-auto mt-10 max-w-5xl">
-          <div className="overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm">
-            <div className="aspect-[16/9] w-full">
-              <VideoLoop
-                webm="/calculos/calculos.webm"
-                poster="/calculos/calculos.png"
-                className="h-full w-full object-cover"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
 
 
 
@@ -710,8 +690,7 @@ export default function PlataformaPage() {
         </div>
       </section>
 
-      {/* ===== Cálculos (Video) ===== */}
-      <CalculationsSection />
+ 
 
       {/* ===== Cómo funciona ===== */}
       <HowItWorks />
