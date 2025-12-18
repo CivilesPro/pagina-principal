@@ -24,7 +24,7 @@ const PRIMARY = "#055a27";
 const SECONDARY = "#111111ff";
 
 // Texto “role typing” que aparece en el hero
-const HERO_ROLES = ["Ingenieros", "Arquitectos", "Maestros de obra"];
+
 
 // =====================
 // Utilidades
@@ -221,13 +221,13 @@ function BenefitRow({
         >
           {videoWebm ? (
             <div
-              className="order-1 md:order-none flex justify-center w-full"
+              className="order-1 md:order-none flex justify-center w-full  "
               style={{ perspective: "1200px" }}
             >
               <VideoLoop
                 webm={videoWebm}
                 poster={poster}
-                className="w-full h-auto [clip-path:inset(0_2%_0_0)]"
+                className="w-full h-auto [clip-path:inset(2.3%_0%_2.7%_0%)] "
               />
             </div>
           ) : (
@@ -389,7 +389,7 @@ function Plans() {
                 <div className="mt-1 text-sm text-gray-500">Es igual a ${formatCOP(plusMonth)} / mes</div>
               </div>
 
-              <p className="mt-3 text-sm text-gray-600">Ideal para personas que deseen cotizar rápido.</p>
+              <p className="mt-3 text-sm text-gray-600">Ideal para contratistas independientes.</p>
 
               <div className="mt-6 space-y-3">
                 <Feature ok>Presupuesto + APU</Feature>
@@ -640,7 +640,7 @@ function RecommendedBlogs() {
 // Página
 // =====================
 export default function PlataformaPage() {
-  const typed = useTypewriter(HERO_ROLES);
+
   const { pathname } = useLocation();
   const canonicalPath = pathname === "/presupuesto" ? "/presupuesto" : "/plataforma";
 
@@ -665,18 +665,15 @@ export default function PlataformaPage() {
             {/* Texto */}
             <div>
               <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-emerald-700">
-                <span className="text-xs font-semibold uppercase tracking-wide">Civiles Pro · Plataforma para presupuestar obras civiles</span>
+                <span className="text-xs font-semibold uppercase tracking-wide">El tiempo es dinero cuando se trata de contratos.</span>
               </div>
               <h1 className="mt-4 text-4xl font-extrabold leading-tight text-gray-900 sm:text-5xl">
-                Lo que{" "}
-                <span className="inline-block border-b-4 border-gray-900 text-gray-900">
-                  {typed || "\u00A0"}
-                </span>
-                <br />
-                <span className="text-emerald-700">utilizan para crear Presupuesto de Obra.</span>
+              Crea presupuestos de Obra
+                            <br />
+                <span className="text-emerald-700">Sin retrasarte en el cierre de contratos.</span>
               </h1>
               <p className="mt-5 text-lg text-gray-700">
-                Crea APU conectados al Presupuesto · Usa la biblioteca de APU · Exporta a Excel
+                Utiliza/crea APU conectados al Presupuesto · Exporta a Excel
               </p>
               <div className="mt-8 flex flex-col justify-start gap-3 sm:flex-row">
                 <a
@@ -709,12 +706,12 @@ export default function PlataformaPage() {
             Beneficios para tu presupuesto
           </h2>
 
-          <div className="mx-auto mt-10 max-w-10xl space-y-8 snap-y">
+          <div className="mx-auto mt-10 max-w-10xl space-y-10 snap-y">
             {[
               {
                 itemunico: "APU Faciles de hacer",
                 title: "Crear APU en segundos",
-                text: "Arma APU con nuestra biblioteca de +1500 insumos que incluyen: materiales, mano de obra, equipos y transporte. Sin perder tiempo.",
+                text: "Arma APU rapidamente con mas 1500 insumos que incluyen: materiales, mano de obra, equipos y transporte.",
                 gif: "/gif/beneficio-apu-segundos.gif",
                 pngFallback: "/gif/beneficio-apu-segundos.png",
                 videoWebm: "/apuvideos/apu-crear.webm",
@@ -724,7 +721,7 @@ export default function PlataformaPage() {
               {
                 itemunico: "Listos para usar",
                 title: "Biblioteca de APU",
-                text: "Usa, edita y duplica nuestra biblioteca Privada de APU. Todos con rendimientos listos para usar en tu presupuesto.",
+                text: "Usa y edita nuestra biblioteca privada de APU. Todos con rendimientos listos para usar en tu presupuesto.",
                 gif: "/gif/beneficio-biblioteca-180.gif",
                 pngFallback: "/gif/beneficio-biblioteca-180.png",
                 videoWebm: "/apuvideos/apu-biblioteca.webm",
@@ -745,10 +742,10 @@ export default function PlataformaPage() {
                 itemunico: "Datos confiables",
                 title: "Memorias de Cantidades.",
                 text: "Agrega memorias de cantidades en cada APU que utilices. Conectalo directamente con el presupuesto.",
-                gif: "/gif/beneficio-export-excel.gif",
-                pngFallback: "/gif/beneficio-export-excel.png",
-                videoWebm: "/apuvideos/excel-exportar.webm",
-                poster: "/gif/beneficio-export-excel.png",
+                gif: "/gif/memorias-cantidades.gif",
+                pngFallback: "/gif/memorias-cantidades.png",
+                videoWebm: "/apuvideos/memorias-cantidades.webm",
+                poster: "/gif/memorias-cantidades.png",
                 icon: <LuFileSpreadsheet className="h-4 w-4" aria-hidden="true" />,
               },
               {
@@ -799,7 +796,7 @@ export default function PlataformaPage() {
                 ¿Listo para presupuestar más rápido?
               </h2>
               <p className="mt-3 text-base leading-relaxed text-gray-600 md:text-lg">
-                Te ayudamos a ser mas eficiente y rentable. El tiempo es dinero cuando se trata de contratos.
+                Te ayudamos a ser mas eficiente y rentable. Empieza gratis hoy. 
               </p>
               <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
                 <a
