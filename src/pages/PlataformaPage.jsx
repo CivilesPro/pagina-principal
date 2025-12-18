@@ -663,7 +663,7 @@ export default function PlataformaPage() {
               {
                 itemunico: "Listos para usar",
                 title: "Biblioteca de APU",
-                text: "Usa, edita y duplica nuestra biblioteca Privada de APU.",
+                text: "Usa, edita y duplica nuestra biblioteca Privada de APU. Todos con rendimientos listos para usar en tu presupuesto.",
                 gif: "/gif/beneficio-biblioteca-180.gif",
                 pngFallback: "/gif/beneficio-biblioteca-180.png",
                 videoWebm: "/apuvideos/apu-biblioteca.webm",
@@ -673,7 +673,7 @@ export default function PlataformaPage() {
               {
                 itemunico: "Interfaz fácil de usar",
                 title: "Crea un Presupuesto en una sola pantalla",
-                text: "Vista dividida enfocada: APU a la izquierda, Presupuesto a la derecha.",
+                text: "Deja de buscar entre varias hojas de excel. APU a la izquierda, Presupuesto a la derecha.",
                 gif: "/gif/beneficio-splitview.gif",
                 pngFallback: "/gif/beneficio-splitview.png",
                 videoWebm: "/apuvideos/apu-interfaz.webm",
@@ -681,9 +681,19 @@ export default function PlataformaPage() {
                 icon: <LuWallet className="h-4 w-4" aria-hidden="true" />,
               },
               {
-                itemunico: "Excel listo para enviar",
-                title: "Exportar a Excel con APU conectados",
-                text: "Lleva tu presupuesto y sus APU enlazados a Excel para cotizar al instante.",
+                itemunico: "Datos confiables",
+                title: "Memorias de Cantidades.",
+                text: "Agrega memorias de cantidades en cada APU que utilices. Conectalo directamente con el presupuesto.",
+                gif: "/gif/beneficio-export-excel.gif",
+                pngFallback: "/gif/beneficio-export-excel.png",
+                videoWebm: "/apuvideos/excel-exportar.webm",
+                poster: "/gif/beneficio-export-excel.png",
+                icon: <LuFileSpreadsheet className="h-4 w-4" aria-hidden="true" />,
+              },
+              {
+                itemunico: "Excel listo para presentar",
+                title: "Exportar a Excel el Presupuesto",
+                text: "Lleva tu presupuesto, sus APU y Memorias de Cantidades a Excel con formulas y datos conectados.",
                 gif: "/gif/beneficio-export-excel.gif",
                 pngFallback: "/gif/beneficio-export-excel.png",
                 videoWebm: "/apuvideos/excel-exportar.webm",
@@ -719,13 +729,13 @@ export default function PlataformaPage() {
             <span className="pointer-events-none absolute -bottom-24 -right-24 h-64 w-64 rounded-full bg-teal-400/15 blur-3xl" />
             <div className="relative">
               <div className="inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-emerald-700 ring-1 ring-emerald-100">
-                CTA
+                tiempo = dinero
               </div>
               <h2 className="mt-4 text-3xl font-black tracking-tight text-gray-900 md:text-4xl">
                 ¿Listo para presupuestar más rápido?
               </h2>
               <p className="mt-3 text-base leading-relaxed text-gray-600 md:text-lg">
-                Te ayudamos a crear tu primer presupuesto con APU conectados. Exporta a Excel y compártelo hoy.
+                Te ayudamos a ser mas eficiente y rentable. El tiempo es dinero cuando se trata de contratos.
               </p>
               <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
                 <a
