@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { FaWhatsapp } from "react-icons/fa6";
 import { LuCalculator, LuDownload, LuListChecks, LuWallet, LuFileSpreadsheet, LuPercent, LuBuilding2, LuFileText, LuArrowRight, LuCopyCheck } from "react-icons/lu";
 import { LuUser } from "react-icons/lu";
@@ -7,6 +7,7 @@ import SEO from "../components/SEO.jsx";
 import { LuCircleCheck, LuCircleX, LuCrown, LuLock } from "react-icons/lu";
 import Reveal from "../components/Reveal.jsx";
 import VideoLoop from "@/components/VideoLoop";
+import blogs from "../data/blogList.json";
 
 /**
  * PlataformaPage.jsx
@@ -576,12 +577,59 @@ function Testimonials() {
   );
 }
 
+function RecommendedBlogs() {
+  const recommendedSlugs = ["presupuesto-obra", "que-es-un-apu"];
+  const posts = recommendedSlugs
+    .map((slug) => blogs.find((post) => post.slug === slug))
+    .filter(Boolean);
+
+  if (posts.length === 0) return null;
+
+  return (
+    <section className="bg-gradient-to-b from-white to-emerald-50/30 py-16">
+      <div className="mx-auto max-w-5xl px-4">
+        <div className="text-center">
+          <p className="text-sm font-semibold uppercase tracking-wide text-emerald-700">
+            Blogs recomendados
+          </p>
+          <h2 className="mt-2 text-3xl font-black tracking-tight text-gray-900">
+            Sigue aprendiendo sobre presupuesto y APU
+          </h2>
+          <p className="mt-3 text-base leading-relaxed text-gray-700 md:text-lg">
+            Dos lecturas clave para profundizar en presupuestos de obra y análisis de precios unitarios.
+          </p>
+        </div>
+
+        <div className="mt-10 grid gap-6 md:grid-cols-2">
+          {posts.map((post) => (
+            <article
+              key={post.slug}
+              className="group flex h-full flex-col rounded-2xl border border-emerald-100/70 bg-white/70 p-6 shadow-sm backdrop-blur transition duration-200 hover:-translate-y-0.5 hover:shadow-lg"
+            >
+              <h3 className="text-xl font-semibold leading-tight text-gray-900">{post.title}</h3>
+              <p className="mt-3 text-gray-700 leading-relaxed">{post.description}</p>
+              <Link
+                to={`/blog/${post.slug}`}
+                className="mt-6 inline-flex items-center gap-2 font-semibold text-emerald-700 hover:text-emerald-800"
+              >
+                Leer
+                <LuArrowRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // =====================
 // Página
 // =====================
 export default function PlataformaPage() {
   const typed = useTypewriter(HERO_ROLES);
   const { pathname } = useLocation();
+  const canonicalPath = pathname === "/presupuesto" ? "/presupuesto" : "/plataforma";
 
   // Scroll al top cuando se entra a la página
   useEffect(() => {
@@ -593,8 +641,8 @@ export default function PlataformaPage() {
       <SEO
         title="Presupuesto de Obra con APU — Civiles Pro"
         description="Crea presupuestos de obra en minutos con APU conectados. Biblioteca de +180 APU, vista dividida y exportación a Excel/PDF."
-        url={`${SITE_URL}/plataforma`}
-        canonical={`${SITE_URL}/plataforma`}
+        url={`${SITE_URL}${canonicalPath}`}
+        canonical={`${SITE_URL}${canonicalPath}`}
       />
 
       {/* ===== Hero ===== */}
@@ -719,7 +767,10 @@ export default function PlataformaPage() {
       <PlanComparison />
 
       {/* ===== Testimonios ===== */}
-      <Testimonials />  
+      <Testimonials />
+
+      {/* ===== Blogs recomendados ===== */}
+      <RecommendedBlogs />
 
       {/* ===== CTA final ===== */}
       <section className="bg-gradient-to-b from-white via-emerald-50/30 to-white py-20">

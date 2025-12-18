@@ -1,7 +1,7 @@
 // src/pages/BlogPost.jsx
 import { useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
-import fm from "front-matter"
+import fm from "front-matter";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -42,6 +42,45 @@ const POSTS_SORTED = Object.values(POSTS_BY_SLUG).sort((a, b) => {
   return bd.localeCompare(ad);
 });
 
+const MARKDOWN_COMPONENTS = {
+  h1: ({ node: _node, ...props }) => (
+    <h1
+      className="mt-10 text-3xl font-black leading-tight tracking-tight text-gray-900"
+      {...props}
+    />
+  ),
+  h2: ({ node: _node, ...props }) => (
+    <h2 className="mt-8 text-2xl font-bold text-gray-900" {...props} />
+  ),
+  h3: ({ node: _node, ...props }) => (
+    <h3 className="mt-6 text-xl font-semibold text-gray-900" {...props} />
+  ),
+  p: ({ node: _node, ...props }) => (
+    <p className="text-base leading-relaxed text-gray-700 md:text-lg" {...props} />
+  ),
+  ul: ({ node: _node, ...props }) => (
+    <ul className="mt-4 list-disc space-y-2 pl-6 text-gray-700" {...props} />
+  ),
+  ol: ({ node: _node, ...props }) => (
+    <ol className="mt-4 list-decimal space-y-2 pl-6 text-gray-700" {...props} />
+  ),
+  li: ({ node: _node, ...props }) => (
+    <li className="leading-relaxed" {...props} />
+  ),
+  blockquote: ({ node: _node, ...props }) => (
+    <blockquote
+      className="mt-6 border-l-4 border-emerald-200 pl-4 text-gray-800 italic"
+      {...props}
+    />
+  ),
+  strong: ({ node: _node, ...props }) => (
+    <strong className="font-semibold text-gray-900" {...props} />
+  ),
+  a: ({ node: _node, ...props }) => (
+    <a className="font-semibold text-emerald-700 underline underline-offset-2" {...props} />
+  ),
+};
+
 export default function BlogPost() {
   const { slug: rawSlug } = useParams();
   const slug = decodeURIComponent(rawSlug || "").toLowerCase();
@@ -78,13 +117,19 @@ export default function BlogPost() {
   const { meta, content } = post;
 
   return (
-    <main className="max-w-3xl mx-auto px-4 py-12">
+    <main className="max-w-3xl mx-auto px-4 py-14">
       {/* Encabezado */}
-      <p className="text-xs tracking-widest text-green-700 font-semibold">BLOG</p>
-      <h1 className="mt-2 text-3xl font-bold">{meta.title || post.slug}</h1>
-      {meta.description && <p className="mt-2 text-gray-600">{meta.description}</p>}
+      <p className="text-xs font-semibold tracking-widest text-green-700">BLOG</p>
+      <h1 className="mt-3 text-4xl font-black tracking-tight text-gray-900">
+        {meta.title || post.slug}
+      </h1>
+      {meta.description && (
+        <p className="mt-3 text-base leading-relaxed text-gray-700 md:text-lg">
+          {meta.description}
+        </p>
+      )}
       {meta.date && (
-        <p className="mt-1 text-sm text-gray-400">
+        <p className="mt-2 text-sm text-gray-500">
           {new Date(meta.date).toLocaleDateString("es-CO", {
             year: "numeric",
             month: "long",
@@ -98,14 +143,14 @@ export default function BlogPost() {
         <img
           src={meta.cover}
           alt={meta.title || post.slug}
-          className="mt-6 w-full rounded-xl border"
+          className="mt-8 w-full rounded-xl border"
           loading="lazy"
         />
       )}
 
         {/* Galería desde front-matter (PNG/JPG/GIF) */}
         {Array.isArray(meta?.images) && meta.images.length > 0 && (
-          <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
             {meta.images.map((src, i) => (
               <img
                 key={i}
@@ -119,8 +164,14 @@ export default function BlogPost() {
         )}
 
       {/* Contenido */}
-      <article className="prose max-w-none mt-8 prose-headings:scroll-mt-24">
-        <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+      <article className="mt-10">
+        <ReactMarkdown
+          className="space-y-4 text-gray-700 font-normal leading-relaxed"
+          remarkPlugins={[remarkGfm]}
+          components={MARKDOWN_COMPONENTS}
+        >
+          {content}
+        </ReactMarkdown>
       </article>
 
       {/* Navegación prev/next */}

@@ -28,6 +28,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
             <Route path="/certificados" element={<Navigate to="/cursos-certificados" replace />} />
             <Route path="/cursos-certificados" element={<CursosCertificadosPage />} />
             <Route path="/plataforma" element={<PlataformaPage />} />
+            <Route path="/presupuesto" element={<PlataformaPage />} />
             <Route path="/calculadora-de-materiales" element={<PlataformaPage />} />
             <Route path="/manual-de-uso" element={<Navigate to="/blog?cat=manual" replace />} />
             <Route path="/blog" element={<Blog />} />
