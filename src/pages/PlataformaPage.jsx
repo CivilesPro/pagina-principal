@@ -24,7 +24,7 @@ const PRIMARY = "#055a27";
 const SECONDARY = "#111111ff";
 
 // Texto “role typing” que aparece en el hero
-const HERO_ROLES = ["Ingenieros", "Arquitectos", "Maestros de obra"];
+const HERO_ROLES = ["presupuestos de Obra"];
 
 // =====================
 // Utilidades
@@ -665,15 +665,15 @@ export default function PlataformaPage() {
             {/* Texto */}
             <div>
               <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-emerald-700">
-                <span className="text-xs font-semibold uppercase tracking-wide">Civiles Pro · Plataforma para presupuestar obras civiles</span>
+                <span className="text-xs font-semibold uppercase tracking-wide">El tiempo es dinero cuando se trata de contratos.</span>
               </div>
               <h1 className="mt-4 text-4xl font-extrabold leading-tight text-gray-900 sm:text-5xl">
-                Lo que{" "}
+                Crea{" "}
                 <span className="inline-block border-b-4 border-gray-900 text-gray-900">
                   {typed || "\u00A0"}
                 </span>
                 <br />
-                <span className="text-emerald-700">utilizan para crear Presupuesto de Obra.</span>
+                <span className="text-emerald-700">sin retrasarte en el cierre de contratos.</span>
               </h1>
               <p className="mt-5 text-lg text-gray-700">
                 Crea APU conectados al Presupuesto · Usa la biblioteca de APU · Exporta a Excel
