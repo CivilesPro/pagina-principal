@@ -369,8 +369,21 @@ function Plans() {
       variant="fade-in"
       once={false}
       rootMargin="-12% 0px -12% 0px"
-      className="pricing-glow relative overflow-hidden py-16"
+      className="relative overflow-hidden py-16 bg-gradient-to-b from-white to-emerald-50/50"
     >
+      {/* Fondo decorativo (arcos laterales) */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+        {/* Izquierda */}
+        <div className="absolute -left-[520px] top-1/2 h-[1100px] w-[1100px] -translate-y-1/2 rounded-full border border-emerald-200/60" />
+        <div className="absolute -left-[360px] top-1/2 h-[850px] w-[850px] -translate-y-1/2 rounded-full border border-emerald-200/50" />
+        <div className="absolute -left-[260px] top-1/2 h-[650px] w-[650px] -translate-y-1/2 rounded-full bg-emerald-400/10 blur-3xl" />
+
+        {/* Derecha */}
+        <div className="absolute -right-[520px] top-1/2 h-[1100px] w-[1100px] -translate-y-1/2 rounded-full border border-emerald-200/60" />
+        <div className="absolute -right-[360px] top-1/2 h-[850px] w-[850px] -translate-y-1/2 rounded-full border border-emerald-200/50" />
+        <div className="absolute -right-[260px] top-1/2 h-[650px] w-[650px] -translate-y-1/2 rounded-full bg-emerald-400/10 blur-3xl" />
+      </div>
+
       <div className="relative z-10 wrap-wide px-4">
         <h2 className="text-center text-3xl font-extrabold text-gray-900 sm:text-4xl">Nuestros Planes</h2>
         <p className="mt-1 text-center text-gray-600">Elige el plan mas apropiado para tu obra.</p>
