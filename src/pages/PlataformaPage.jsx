@@ -260,6 +260,85 @@ function BenefitRow({
   );
 }
 
+function RibbonTitle({ label, title }) {
+  const ref = React.useRef(null);
+  const [visible, setVisible] = React.useState(false);
+
+  React.useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          io.disconnect();
+        }
+      },
+      { threshold: 0.3, rootMargin: "-15% 0px -15% 0px" }
+    );
+
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  return (
+    <div ref={ref} className="relative mx-auto w-full max-w-4xl py-6 text-center">
+      {label ? (
+        <div className="mb-2 inline-flex items-center justify-center gap-2 rounded-full bg-emerald-100 px-4 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-800">
+          {label}
+        </div>
+      ) : null}
+
+      <div className="relative inline-flex items-center justify-center px-6 py-4">
+        <div
+          className={[
+            "absolute left-1/2 top-1/2 h-16 w-[320px] -translate-x-1/2 -translate-y-1/2 rotate-[-10deg] rounded-2xl bg-emerald-100/80 shadow-lg",
+            "transition-all duration-700 ease-out",
+            visible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-16",
+          ].join(" ")}
+        />
+        <div
+          className={[
+            "absolute left-1/2 top-1/2 h-16 w-[340px] -translate-x-1/2 -translate-y-1/2 rotate-[-4deg] rounded-2xl bg-emerald-600 shadow-2xl",
+            "transition-all duration-700 ease-out",
+            visible ? "opacity-100 translate-x-0 delay-150" : "opacity-0 translate-x-16",
+          ].join(" ")}
+        />
+        <h2 className="relative text-3xl font-black tracking-tight text-white drop-shadow-lg sm:text-4xl">
+          {title}
+        </h2>
+      </div>
+    </div>
+  );
+}
+
+function CalculationsSection() {
+  return (
+    <section className="relative overflow-hidden bg-slate-950 py-16 text-white">
+      <div className="absolute inset-0 opacity-[0.18]" aria-hidden="true">
+        <div className="absolute left-10 top-10 h-40 w-40 rounded-full bg-emerald-400 blur-3xl" />
+        <div className="absolute right-6 bottom-6 h-44 w-44 rounded-full bg-emerald-700 blur-3xl" />
+      </div>
+      <div className="wrap-wide relative px-4">
+        <RibbonTitle label="Cálculos" title="Cálculos en acción" />
+
+        <div className="mx-auto mt-10 max-w-5xl">
+          <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-4 shadow-2xl backdrop-blur">
+            <div className="overflow-hidden rounded-2xl ring-1 ring-white/10">
+              <VideoLoop
+                webm="/calculos/calculos.webm"
+                poster="/calculos/calculos.png"
+                className="h-full w-full rounded-2xl"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function HowItWorks() {
   const steps = [
     {
@@ -684,6 +763,9 @@ export default function PlataformaPage() {
           </div>
         </div>
       </section>
+
+      {/* ===== Cálculos (Video) ===== */}
+      <CalculationsSection />
 
       {/* ===== Cómo funciona ===== */}
       <HowItWorks />
