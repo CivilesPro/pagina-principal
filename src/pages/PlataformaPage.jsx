@@ -260,91 +260,127 @@ function BenefitRow({
   );
 }
 
-function RibbonMarqueeTitle() {
-  const items = React.useMemo(
-    () =>
-      Array.from({ length: 8 }).map((_, i) => (
-        <span
-          key={`marquee-item-${i}`}
-          className="px-4 text-sm font-semibold uppercase tracking-[0.28em] text-emerald-900/80 md:text-base"
-        >
-          Cálculos / Presupuesto / APU / Memorias / Excel /
-        </span>
-      )),
-    []
-  );
+function RibbonMarqueeTitle({
+  label = "CÁLCULOS",
+  title = "Cálculos en acción",
+}) {
+  // Texto “corto” pero repetido de forma eficiente
+  const text = "Cálculos / Presupuesto / APU / Memorias / Excel /";
 
   return (
-    <div className="relative isolate mx-auto w-full max-w-5xl">
-      <style>
-        {`
-          @keyframes ribbon-marquee-forward {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-          }
-          @keyframes ribbon-marquee-reverse {
-            0% { transform: translateX(-50%); }
-            100% { transform: translateX(0); }
-          }
-        `}
-      </style>
+    <div className="relative w-full">
+      <style>{`
+        @keyframes marqueeLeft {
+          0% { transform: translate3d(0,0,0); }
+          100% { transform: translate3d(-50%,0,0); }
+        }
+        @keyframes marqueeRight {
+          0% { transform: translate3d(-50%,0,0); }
+          100% { transform: translate3d(0,0,0); }
+        }
+      `}</style>
 
-      <div className="relative h-[160px] overflow-hidden md:h-[190px]">
-        {/* Ribbons */}
-        <div className="absolute left-[-14%] top-[46%] z-[1] w-[128%] rotate-[-4deg]">
-          <div className="relative overflow-hidden rounded-2xl bg-emerald-100/80 py-3 shadow-md">
-            <div className="flex min-w-[200%]" style={{ animation: "ribbon-marquee-reverse 24s linear infinite" }}>
-              <div className="flex items-center" aria-hidden="true">
-                {items}
-              </div>
-              <div className="flex items-center" aria-hidden="true">
-                {items}
-              </div>
-            </div>
-          </div>
-        </div>
+      <div className="relative h-[170px] md:h-[210px] overflow-hidden">
+        {/* Ribbon atrás */}
+        <Ribbon
+          text={text}
+          top="top-[92px] md:top-[110px]"
+          bg="bg-[#6D5CFF]/25"
+          color="text-gray-900/30"
+          anim="marqueeRight"
+          seconds={26}
+          z="z-10"
+        />
 
-        <div className="absolute left-[-10%] top-[22%] z-[2] w-[122%] rotate-[-4deg]">
-          <div className="relative overflow-hidden rounded-2xl bg-emerald-500/90 py-3 shadow-xl ring-1 ring-emerald-700/50">
-            <div className="flex min-w-[200%]" style={{ animation: "ribbon-marquee-forward 18s linear infinite" }}>
-              <div className="flex items-center text-white drop-shadow-sm" aria-hidden="true">
-                {items}
-              </div>
-              <div className="flex items-center text-white drop-shadow-sm" aria-hidden="true">
-                {items}
-              </div>
-            </div>
-          </div>
-        </div>
+        {/* Ribbon delante */}
+        <Ribbon
+          text={text}
+          top="top-[48px] md:top-[56px]"
+          bg="bg-[#6D5CFF]"
+          color="text-white"
+          anim="marqueeLeft"
+          seconds={18}
+          z="z-20"
+        />
 
-        {/* Title */}
-        <div className="relative z-[3] flex h-full flex-col items-center justify-center text-center">
-          <span className="mb-2 inline-flex items-center justify-center rounded-full bg-emerald-50 px-4 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-800">
-            Cálculos
+        {/* Título centrado */}
+        <div className="relative z-30 flex h-full flex-col items-center justify-start pt-2 text-center">
+          <span className="mb-3 inline-flex items-center justify-center rounded-full bg-emerald-50 px-4 py-1 text-xs font-bold uppercase tracking-wider text-emerald-700">
+            {label}
           </span>
-          <h2 className="text-3xl font-black tracking-tight text-gray-900 sm:text-4xl">Cálculos en acción</h2>
+          <h2 className="text-3xl font-black tracking-tight text-gray-900 sm:text-4xl">
+            {title}
+          </h2>
         </div>
       </div>
     </div>
   );
 }
 
+function Ribbon({ text, top, bg, color, anim, seconds, z }) {
+  return (
+    <div
+      className={[
+        "absolute left-1/2 w-[130vw] -translate-x-1/2 rotate-[-4deg] overflow-hidden",
+        top,
+        z,
+      ].join(" ")}
+    >
+      <div className={["relative rounded-2xl", bg, "py-5 md:py-6"].join(" ")}>
+        {/* Marquee track (duplicado) */}
+        <div
+          className="flex w-[200%] whitespace-nowrap will-change-transform"
+          style={{
+            animation: `${anim} ${seconds}s linear infinite`,
+          }}
+        >
+          <MarqueeLine text={text} className={color} />
+          <MarqueeLine text={text} className={color} ariaHidden />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MarqueeLine({ text, className, ariaHidden = false }) {
+  // Pocas repeticiones: mejor rendimiento
+  return (
+    <div
+      className="flex w-1/2 items-center"
+      aria-hidden={ariaHidden ? "true" : undefined}
+    >
+      {Array.from({ length: 8 }).map((_, i) => (
+        <span
+          key={i}
+          className={[
+            "mx-8 md:mx-12 font-semibold tracking-wide",
+            "text-3xl md:text-5xl",
+            className,
+          ].join(" ")}
+        >
+          {text}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+
+
 function CalculationsSection() {
   return (
-    <section className="relative overflow-hidden bg-white py-16 text-gray-900">
-      <div className="wrap-wide relative px-4">
+    <section className="bg-white py-16">
+      <div className="wrap-wide px-4">
         <RibbonMarqueeTitle />
 
-        <div className="mx-auto mt-14 max-w-5xl">
-          <div className="overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-xl">
-            <div className="relative overflow-hidden rounded-[22px] border border-emerald-50 bg-emerald-50/40">
-              <div className="aspect-[16/9] w-full">
-                <VideoLoop
-                  webm="/calculos/calculos.webm"
-                  poster="/calculos/calculos.png"
-                  className="h-full w-full rounded-[18px] object-cover"
-                />
-              </div>
+        <div className="mx-auto mt-10 max-w-5xl">
+          <div className="overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm">
+            <div className="aspect-[16/9] w-full">
+              <VideoLoop
+                webm="/calculos/calculos.webm"
+                poster="/calculos/calculos.png"
+                className="h-full w-full object-cover"
+              />
             </div>
           </div>
         </div>
@@ -352,6 +388,8 @@ function CalculationsSection() {
     </section>
   );
 }
+
+
 
 function HowItWorks() {
   const steps = [
