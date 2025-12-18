@@ -152,7 +152,7 @@ function useTypewriter(words, speed = 90, pause = 900) {
 
 function Stars({ value = 5 }) {
   return (
-    <div className="flex items-center gap-1 text-amber-500" aria-label={`${value} estrellas`}>
+    <div className="flex items-center gap-1 text-sm text-amber-400/90" aria-label={`${value} estrellas`}>
       {Array.from({ length: 5 }).map((_, i) => (
         <span key={i}>{i < value ? "★" : "☆"}</span>
       ))}
@@ -550,11 +550,11 @@ function Testimonials() {
       variant="fade-in"
       once={false}
       rootMargin="-12% 0px -12% 0px"
-      className="py-16"
+      className="bg-gradient-to-b from-white via-emerald-50/30 to-white py-20"
     >
-      <div className="wrap-wide px-4">
-        <h2 className="text-center text-3xl font-extrabold text-gray-900 sm:text-4xl">Testimonios</h2>
-        <div className="mx-auto mt-8 grid max-w-5xl grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="mx-auto max-w-6xl px-4">
+        <h2 className="text-center text-4xl font-black tracking-tight text-gray-900 md:text-5xl">Testimonios</h2>
+        <div className="mx-auto mt-12 grid grid-cols-1 items-stretch gap-6 md:grid-cols-3">
           {items.map((t, i) => (
             <Reveal
               key={t.name}
@@ -563,11 +563,24 @@ function Testimonials() {
               once={false}
               rootMargin="-20% 0px -20% 0px"
             >
-              <article className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-                <Stars value={t.rating} />
-                <p className="mt-3 text-gray-800 italic">“{t.text}”</p>
-                <div className="mt-4 font-semibold text-gray-900">{t.name}</div>
-                <div className="text-sm text-gray-500">{t.role} ✅</div>
+              <article className="relative h-full overflow-hidden rounded-3xl border border-emerald-100/70 bg-white/70 p-7 shadow-[0_20px_60px_-45px_rgba(0,0,0,0.35)] backdrop-blur-md ring-1 ring-white/50 transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_28px_80px_-55px_rgba(0,0,0,0.45)] md:p-8">
+                <div className="pointer-events-none absolute inset-0 rounded-3xl bg-gradient-to-br from-emerald-50/60 via-white/40 to-teal-50/60 opacity-70" aria-hidden="true" />
+                <div className="pointer-events-none absolute -top-24 -left-24 h-48 w-48 rounded-full bg-emerald-400/15 blur-3xl" aria-hidden="true" />
+                <div className="pointer-events-none absolute -bottom-28 -right-28 h-56 w-56 rounded-full bg-teal-400/10 blur-3xl" aria-hidden="true" />
+                <div className="pointer-events-none absolute top-3 left-4 text-[90px] font-black leading-none text-gray-900/5 select-none" aria-hidden="true">
+                  “
+                </div>
+                <div className="relative z-10 flex h-full flex-col">
+                  <Stars value={t.rating} />
+                  <p className="mt-4 text-base leading-relaxed text-gray-800 md:text-lg">“{t.text}”</p>
+                  <div className="mt-6 flex items-center justify-between gap-4 pt-5 border-t border-gray-200/60">
+                    <div className="font-semibold text-gray-900">{t.name}</div>
+                    <div className="inline-flex items-center gap-2 text-sm text-gray-600">
+                      <span className="h-2 w-2 rounded-full bg-emerald-500" aria-hidden="true" />
+                      <span>{t.role}</span>
+                    </div>
+                  </div>
+                </div>
               </article>
             </Reveal>
           ))}
