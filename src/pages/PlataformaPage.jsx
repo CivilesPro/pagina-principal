@@ -260,54 +260,70 @@ function BenefitRow({
   );
 }
 
-function RibbonTitle({ label, title }) {
-  const ref = React.useRef(null);
-  const [visible, setVisible] = React.useState(false);
-
-  React.useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setVisible(true);
-          io.disconnect();
-        }
-      },
-      { threshold: 0.3, rootMargin: "-15% 0px -15% 0px" }
-    );
-
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
+function RibbonMarqueeTitle() {
+  const items = React.useMemo(
+    () =>
+      Array.from({ length: 8 }).map((_, i) => (
+        <span
+          key={`marquee-item-${i}`}
+          className="px-4 text-sm font-semibold uppercase tracking-[0.28em] text-emerald-900/80 md:text-base"
+        >
+          Cálculos / Presupuesto / APU / Memorias / Excel /
+        </span>
+      )),
+    []
+  );
 
   return (
-    <div ref={ref} className="relative mx-auto w-full max-w-4xl py-6 text-center">
-      {label ? (
-        <div className="mb-2 inline-flex items-center justify-center gap-2 rounded-full bg-emerald-100 px-4 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-800">
-          {label}
-        </div>
-      ) : null}
+    <div className="relative isolate mx-auto w-full max-w-5xl">
+      <style>
+        {`
+          @keyframes ribbon-marquee-forward {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+          }
+          @keyframes ribbon-marquee-reverse {
+            0% { transform: translateX(-50%); }
+            100% { transform: translateX(0); }
+          }
+        `}
+      </style>
 
-      <div className="relative inline-flex items-center justify-center px-6 py-4">
-        <div
-          className={[
-            "absolute left-1/2 top-1/2 h-16 w-[320px] -translate-x-1/2 -translate-y-1/2 rotate-[-10deg] skew-x-[-12deg] rounded-2xl bg-gradient-to-r from-emerald-100/90 via-white/70 to-emerald-100/90 shadow-lg",
-            "transition-all duration-700 ease-out will-change-transform",
-            visible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-16",
-          ].join(" ")}
-        />
-        <div
-          className={[
-            "absolute left-1/2 top-1/2 h-16 w-[340px] -translate-x-1/2 -translate-y-1/2 rotate-[-4deg] skew-x-[-10deg] rounded-2xl bg-gradient-to-r from-emerald-700 via-emerald-600 to-emerald-700 shadow-2xl",
-            "transition-all duration-700 ease-out will-change-transform",
-            visible ? "opacity-100 translate-x-0 delay-150" : "opacity-0 translate-x-16",
-          ].join(" ")}
-        />
-        <h2 className="relative text-3xl font-black tracking-tight text-white drop-shadow-lg sm:text-4xl">
-          {title}
-        </h2>
+      <div className="relative h-[160px] overflow-hidden md:h-[190px]">
+        {/* Ribbons */}
+        <div className="absolute left-[-14%] top-[46%] z-[1] w-[128%] rotate-[-4deg]">
+          <div className="relative overflow-hidden rounded-2xl bg-emerald-100/80 py-3 shadow-md">
+            <div className="flex min-w-[200%]" style={{ animation: "ribbon-marquee-reverse 24s linear infinite" }}>
+              <div className="flex items-center" aria-hidden="true">
+                {items}
+              </div>
+              <div className="flex items-center" aria-hidden="true">
+                {items}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="absolute left-[-10%] top-[22%] z-[2] w-[122%] rotate-[-4deg]">
+          <div className="relative overflow-hidden rounded-2xl bg-emerald-500/90 py-3 shadow-xl ring-1 ring-emerald-700/50">
+            <div className="flex min-w-[200%]" style={{ animation: "ribbon-marquee-forward 18s linear infinite" }}>
+              <div className="flex items-center text-white drop-shadow-sm" aria-hidden="true">
+                {items}
+              </div>
+              <div className="flex items-center text-white drop-shadow-sm" aria-hidden="true">
+                {items}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Title */}
+        <div className="relative z-[3] flex h-full flex-col items-center justify-center text-center">
+          <span className="mb-2 inline-flex items-center justify-center rounded-full bg-emerald-50 px-4 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-800">
+            Cálculos
+          </span>
+          <h2 className="text-3xl font-black tracking-tight text-gray-900 sm:text-4xl">Cálculos en acción</h2>
+        </div>
       </div>
     </div>
   );
@@ -315,22 +331,18 @@ function RibbonTitle({ label, title }) {
 
 function CalculationsSection() {
   return (
-    <section className="relative overflow-hidden bg-slate-950 py-16 text-white">
-      <div className="absolute inset-0 opacity-[0.18]" aria-hidden="true">
-        <div className="absolute left-10 top-10 h-40 w-40 rounded-full bg-emerald-400 blur-3xl" />
-        <div className="absolute right-6 bottom-6 h-44 w-44 rounded-full bg-emerald-700 blur-3xl" />
-      </div>
+    <section className="relative overflow-hidden bg-white py-16 text-gray-900">
       <div className="wrap-wide relative px-4">
-        <RibbonTitle label="Cálculos" title="Cálculos en acción" />
+        <RibbonMarqueeTitle />
 
-        <div className="mx-auto mt-10 max-w-5xl">
-          <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-4 shadow-2xl backdrop-blur">
-            <div className="relative overflow-hidden rounded-2xl ring-1 ring-white/10">
+        <div className="mx-auto mt-14 max-w-5xl">
+          <div className="overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-xl">
+            <div className="relative overflow-hidden rounded-[22px] border border-emerald-50 bg-emerald-50/40">
               <div className="aspect-[16/9] w-full">
                 <VideoLoop
                   webm="/calculos/calculos.webm"
                   poster="/calculos/calculos.png"
-                  className="h-full w-full rounded-2xl object-cover"
+                  className="h-full w-full rounded-[18px] object-cover"
                 />
               </div>
             </div>
