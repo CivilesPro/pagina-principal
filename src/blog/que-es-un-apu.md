@@ -16,11 +16,12 @@ Un APU se compone del rendimiento, los insumos y los costos unitarios. El rendim
 
 ## Construye APU con datos reales
 
-CivilesPro permite crear plantillas personalizadas por actividad. Importa listas de precios, define cuadrillas y agrega factores de seguridad. El sistema calcula el costo directo y sugiere un porcentaje de gastos generales y utilidad.
+APU listos para usar y fáciles de adaptar
+En CivilesPro puedes partir de nuestra biblioteca de APU, duplicar el que necesites y ajustarlo a tu obra: insumos, cantidades y precios. Así estandarizas tu forma de presupuestar y no vuelves a empezar desde cero cada vez que cotizas.
 
 ## Integra tus APU al presupuesto
 
-Al vincular cada partida con su APU, actualizas el presupuesto completo con un clic. También puedes comparar escenarios y generar un historial de versiones para auditoría.
+APU conectado al presupuesto (y exportación a Excel)
+Vincula cada ítem del presupuesto con su APU para que todo quede coherente: subtotales claros y soporte técnico cuando lo necesites. Al finalizar, exporta a Excel con el presupuesto y sus APU enlazados para presentar o compartir al instante (y si aplica, incluir memorias de cantidades).
 
 > Un APU transparente mejora la negociación con clientes y proveedores.
-
