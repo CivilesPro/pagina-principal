@@ -712,31 +712,38 @@ export default function PlataformaPage() {
       <Testimonials />  
 
       {/* ===== CTA final ===== */}
-      <section className="py-16">
-        <div className="wrap-wide px-4">
-          <div className="mx-auto max-w-3xl rounded-3xl border border-emerald-100 bg-white p-10 text-center shadow-sm">
-            <h2 className="text-3xl font-extrabold text-gray-900">¿Listo para presupuestar más rápido?</h2>
-            <p className="mt-3 text-gray-700">
-              Te ayudamos a crear tu primer presupuesto con APU conectados. Exporta a Excel y compártelo hoy.
-            </p>
-            <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <a
-                href="https://app.civilespro.com/register"
-                className="btn"
-                style={{ backgroundColor: SECONDARY, borderColor: SECONDARY, color: "#fff" }}
-              >
-                Comienza gratis
-              </a>
-              <a
-                href="https://wa.me/573127437848?text=Hola%2C%20quiero%20saber%20m%C3%A1s%20sobre%20la%20Plataforma%20de%20Presupuesto"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-full px-6 py-3 font-semibold text-white"
-                style={{ backgroundColor: SECONDARY }}
-              >
-                <FaWhatsapp aria-hidden="true" />
-                Hablar por WhatsApp
-              </a>
+      <section className="bg-gradient-to-b from-white via-emerald-50/30 to-white py-20">
+        <div className="mx-auto max-w-6xl px-4">
+          <div className="relative mx-auto max-w-4xl overflow-hidden rounded-3xl border border-emerald-100/70 bg-white/70 p-10 text-center shadow-[0_20px_60px_-35px_rgba(0,0,0,0.25)] backdrop-blur-md md:p-12">
+            <span className="pointer-events-none absolute -top-24 -left-24 h-64 w-64 rounded-full bg-emerald-400/20 blur-3xl" />
+            <span className="pointer-events-none absolute -bottom-24 -right-24 h-64 w-64 rounded-full bg-teal-400/15 blur-3xl" />
+            <div className="relative">
+              <div className="inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-emerald-700 ring-1 ring-emerald-100">
+                CTA
+              </div>
+              <h2 className="mt-4 text-3xl font-black tracking-tight text-gray-900 md:text-4xl">
+                ¿Listo para presupuestar más rápido?
+              </h2>
+              <p className="mt-3 text-base leading-relaxed text-gray-600 md:text-lg">
+                Te ayudamos a crear tu primer presupuesto con APU conectados. Exporta a Excel y compártelo hoy.
+              </p>
+              <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+                <a
+                  href="https://app.civilespro.com/register"
+                  className="rounded-full bg-emerald-700 px-7 py-3 font-semibold text-white shadow-[0_12px_30px_-18px_rgba(16,185,129,0.8)] transition hover:bg-emerald-800"
+                >
+                  Comienza gratis
+                </a>
+                <a
+                  href="https://wa.me/573127437848?text=Hola%2C%20quiero%20saber%20m%C3%A1s%20sobre%20la%20Plataforma%20de%20Presupuesto"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white/70 px-7 py-3 font-semibold text-gray-900 shadow-sm backdrop-blur transition hover:bg-white"
+                >
+                  <FaWhatsapp aria-hidden="true" />
+                  Hablar por WhatsApp
+                </a>
+              </div>
             </div>
           </div>
         </div>
