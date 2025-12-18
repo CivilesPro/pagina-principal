@@ -563,9 +563,9 @@ function Testimonials() {
               once={false}
               rootMargin="-20% 0px -20% 0px"
             >
-              <article className="relative h-full overflow-hidden rounded-3xl border border-emerald-100/70 bg-white/70 p-7 shadow-[0_20px_60px_-45px_rgba(0,0,0,0.35)] backdrop-blur-md ring-1 ring-white/50 transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_28px_80px_-55px_rgba(0,0,0,0.45)] md:p-8">
-                <div className="pointer-events-none absolute inset-0 rounded-3xl bg-gradient-to-br from-emerald-50/60 via-white/40 to-teal-50/60 opacity-70" aria-hidden="true" />
-                <div className="pointer-events-none absolute -top-24 -left-24 h-48 w-48 rounded-full bg-emerald-400/15 blur-3xl" aria-hidden="true" />
+              <article className="relative h-full overflow-hidden rounded-3xl border border-emerald-100/70 bg-white/70 p-7 backdrop-blur-md ring-1 ring-white/50 transition-all duration-200 hover:-translate-y-1  md:p-8">
+                
+                
                 <div className="pointer-events-none absolute -bottom-28 -right-28 h-56 w-56 rounded-full bg-teal-400/10 blur-3xl" aria-hidden="true" />
                 <div className="pointer-events-none absolute top-3 left-4 text-[90px] font-black leading-none text-gray-900/5 select-none" aria-hidden="true">
                   “
@@ -653,7 +653,7 @@ export default function PlataformaPage() {
     <>
       <SEO
         title="Presupuesto de Obra con APU — Civiles Pro"
-        description="Crea presupuestos de obra en minutos con APU conectados. Biblioteca de +180 APU, vista dividida y exportación a Excel/PDF."
+        description="Crea presupuestos de obra en minutos con APU conectados. Biblioteca de APU, vista dividida y exportación a Excel/PDF."
         url={`${SITE_URL}${canonicalPath}`}
         canonical={`${SITE_URL}${canonicalPath}`}
       />
@@ -788,9 +788,9 @@ export default function PlataformaPage() {
       {/* ===== CTA final ===== */}
       <section className="bg-gradient-to-b from-white via-emerald-50/30 to-white py-20">
         <div className="mx-auto max-w-6xl px-4">
-          <div className="relative mx-auto max-w-4xl overflow-hidden rounded-3xl border border-emerald-100/70 bg-white/70 p-10 text-center shadow-[0_20px_60px_-35px_rgba(0,0,0,0.25)] backdrop-blur-md md:p-12">
+          <div className="relative mx-auto max-w-4xl overflow-hidden rounded-3xl border border-emerald-100/70 bg-white/70 p-10 text-center  backdrop-blur-md md:p-12">
             <span className="pointer-events-none absolute -top-24 -left-24 h-64 w-64 rounded-full bg-emerald-400/20 blur-3xl" />
-            <span className="pointer-events-none absolute -bottom-24 -right-24 h-64 w-64 rounded-full bg-teal-400/15 blur-3xl" />
+           
             <div className="relative">
               <div className="inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-emerald-700 ring-1 ring-emerald-100">
                 tiempo = dinero
