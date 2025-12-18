@@ -376,15 +376,14 @@ function Plans() {
         {/* Izquierda */}
         <div className="absolute -left-[520px] top-1/2 h-[1100px] w-[1100px] -translate-y-1/2 rounded-full border border-emerald-200/60" />
         <div className="absolute -left-[360px] top-1/2 h-[850px] w-[850px] -translate-y-1/2 rounded-full border border-emerald-200/50" />
-        <div className="absolute -left-[260px] top-1/2 h-[650px] w-[650px] -translate-y-1/2 rounded-full bg-emerald-400/10 blur-3xl" />
+        
 
         {/* Derecha */}
         <div className="absolute -right-[520px] top-1/2 h-[1100px] w-[1100px] -translate-y-1/2 rounded-full border border-emerald-200/60" />
         <div className="absolute -right-[360px] top-1/2 h-[850px] w-[850px] -translate-y-1/2 rounded-full border border-emerald-200/50" />
-        <div className="absolute -right-[260px] top-1/2 h-[650px] w-[650px] -translate-y-1/2 rounded-full bg-emerald-400/10 blur-3xl" />
+        
       </div>
-
-      <div className="relative z-10 wrap-wide px-4">
+       <div className="wrap-wide px-4">
         <h2 className="text-center text-3xl font-extrabold text-gray-900 sm:text-4xl">Nuestros Planes</h2>
         <p className="mt-1 text-center text-gray-600">Elige el plan mas apropiado para tu obra.</p>
         <div className="mx-auto mt-10 grid max-w-5xl grid-cols-1 gap-6 sm:grid-cols-2">
@@ -424,7 +423,7 @@ function Plans() {
 
           {/* -------- Plan Premium -------- */}
           <Reveal variant="slide-left" delay={160} once={false}>
-            <article className="group relative flex min-h-[480px] flex-col rounded-2xl border-2 border-emerald-400 bg-emerald-50/40 p-6 shadow-md ring-1 ring-emerald-200 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg">
+            <article className="group relative flex min-h-[480px] flex-col rounded-2xl border-2 border-emerald-400 bg-white p-6 shadow-md ring-1 ring-emerald-200 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg">
               {/* Franja superior: MÁS POPULAR */}
               <div className="-mx-6 -mt-6 mb-5 h-9 rounded-t-2xl bg-gradient-to-b from-emerald-500 to-emerald-600 text-white text-[11px] font-bold tracking-wide flex items-center justify-center shadow-sm">
                 MÁS POPULAR
@@ -680,7 +679,7 @@ export default function PlataformaPage() {
               <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-emerald-700">
                 <span className="text-xs font-semibold uppercase tracking-wide">El tiempo es dinero cuando se trata de contratos.</span>
               </div>
-              <h1 className="mt-4 text-4xl font-extrabold leading-tight text-gray-900 sm:text-5xl">
+              <h1 className="mt-4 text-4xl  font-black tracking-tight leading-tight text-gray-900 sm:text-5xl">
               Crea presupuestos de Obra
                             <br />
                 <span className="text-emerald-700">Sin retrasarte en el cierre de contratos.</span>
@@ -723,10 +722,10 @@ export default function PlataformaPage() {
             {[
               {
                 itemunico: "APU Faciles de hacer",
-                title: "Crear APU en segundos",
-                text: "Arma APU rapidamente con mas 1500 insumos que incluyen: materiales, mano de obra, equipos y transporte.",
+                title: "Crea APU en Minutos  ",
+                text: "Mas 1500 insumos que incluyen: materiales, mano de obra, equipos y transporte. Con precios Actualizados.",
                 gif: "/gif/beneficio-apu-segundos.gif",
-                pngFallback: "/gif/beneficio-apu-segundos.png",
+                pngFallback: "/gif/beneficio-apu-segundos.png", 
                 videoWebm: "/apuvideos/apu-crear.webm",
                 poster: "/gif/beneficio-apu-segundos.png",
                 icon: <LuCalculator className="h-4 w-4" aria-hidden="true" />,
@@ -744,7 +743,7 @@ export default function PlataformaPage() {
               {
                 itemunico: "Interfaz fácil de usar",
                 title: "Crea un Presupuesto en una sola pantalla",
-                text: "Deja de buscar entre varias hojas de excel. APU a la izquierda, Presupuesto a la derecha.",
+                text: "Deja de perder tiempo buscando entre varias hojas de Excel. Nuestra interfaz está diseñada para ser rápida y fácil: APU a la izquierda, Presupuesto a la derecha.",
                 gif: "/gif/beneficio-splitview.gif",
                 pngFallback: "/gif/beneficio-splitview.png",
                 videoWebm: "/apuvideos/apu-interfaz.webm",
@@ -754,7 +753,7 @@ export default function PlataformaPage() {
               {
                 itemunico: "Datos confiables",
                 title: "Memorias de Cantidades.",
-                text: "Agrega memorias de cantidades en cada APU que utilices. Conectalo directamente con el presupuesto.",
+                text: "Agrega memorias de cantidades a cada APU que uses y conéctalas directamente con el presupuesto.",
                 gif: "/gif/memorias-cantidades.gif",
                 pngFallback: "/gif/memorias-cantidades.png",
                 videoWebm: "/apuvideos/memorias-cantidades.webm",
@@ -763,7 +762,7 @@ export default function PlataformaPage() {
               },
               {
                 itemunico: "Excel listo para presentar",
-                title: "Exportar a Excel el Presupuesto",
+                title: "Exporta a Excel",
                 text: "Lleva tu presupuesto, sus APU y Memorias de Cantidades a Excel con formulas y datos conectados.",
                 gif: "/gif/beneficio-export-excel.gif",
                 pngFallback: "/gif/beneficio-export-excel.png",
