@@ -122,17 +122,39 @@ export default function ProductosPage() {
         canonical={`${SITE_URL}/`}
       />
 
-      <section className="py-16">
-  <div className="mx-auto max-w-4xl px-4 text-center">
-    <h1 className="text-4xl font-extrabold text-primary md:text-5xl">
-      Plantillas de Excel y recursos para construcción 🚧
-    </h1>
+      <section className="relative overflow-hidden bg-gradient-to-b from-white via-emerald-50/40 to-white py-16">
+        {/* Fondo decorativo luxury (sin imágenes) */}
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+          {/* Spotlight superior (halo central) */}
+          <div className="absolute inset-0 bg-[radial-gradient(900px_520px_at_50%_20%,rgba(16,185,129,0.20),transparent_62%)]" />
 
-    <p className="mt-5 text-lg text-gray-700">
-      Calcula materiales, controla acero y concreto, y genera presupuestos de obra en minutos con plantillas de Excel listas para usar.
-    </p>
-  </div>
-</section>
+          {/* Arcos laterales más finos (look premium) */}
+          <div className="absolute -left-[520px] top-1/2 h-[980px] w-[980px] -translate-y-1/2 rounded-full border border-emerald-200/60" />
+          <div className="absolute -left-[380px] top-1/2 h-[760px] w-[760px] -translate-y-1/2 rounded-full border border-emerald-200/45" />
+
+          <div className="absolute -right-[520px] top-1/2 h-[980px] w-[980px] -translate-y-1/2 rounded-full border border-emerald-200/60" />
+          <div className="absolute -right-[380px] top-1/2 h-[760px] w-[760px] -translate-y-1/2 rounded-full border border-emerald-200/45" />
+
+          {/* Glow lateral suave (para “profundidad”) */}
+          <div className="absolute -left-[260px] top-1/2 h-[620px] w-[620px] -translate-y-1/2 rounded-full bg-emerald-400/10 blur-3xl" />
+          <div className="absolute -right-[260px] top-1/2 h-[620px] w-[620px] -translate-y-1/2 rounded-full bg-emerald-400/10 blur-3xl" />
+
+          {/* Patrón sutil tipo “dot grid” (muy luxury, casi invisible) */}
+          <div className="absolute inset-0 opacity-[0.06] bg-[radial-gradient(circle_at_1px_1px,rgba(16,185,129,0.9)_1px,transparent_0)] [background-size:26px_26px]" />
+        </div>
+
+        <div className="relative z-10">
+          <div className="mx-auto max-w-4xl px-4 text-center">
+            <h1 className="text-center text-4xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-emerald-950 to-emerald-600 sm:text-5xl">
+              Plantillas de Excel y recursos para construcción 🚧
+            </h1>
+
+            <p className="mx-auto mt-4 max-w-2xl text-center text-base text-gray-700 sm:mt-5 sm:text-lg">
+              Calcula materiales, controla acero y concreto, y genera presupuestos de obra en minutos con plantillas de Excel listas para usar.
+            </p>
+          </div>
+        </div>
+      </section>
 
 
       <section id="productos" className="bg-gray-50 py-10">
