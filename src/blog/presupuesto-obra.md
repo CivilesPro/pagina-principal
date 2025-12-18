@@ -29,7 +29,7 @@ Todo presupuesto profesional se organiza por **capítulos**:
 
 Cada capítulo agrupa los **ítems de obra** relacionados, facilitando el control de costos y el seguimiento durante la ejecución.
 
-> 💡 **Consejo:** en CivilesPro puedes personalizar tus capítulos y mantener una plantilla base para todos tus proyectos.
+> 💡 **Consejo:** en CivilesPro puedes personalizar tus capítulos.
 
 ---
 
@@ -51,8 +51,8 @@ Solo debes buscar el ítem que necesites o crear uno nuevo ajustando materiales,
 Antes de sumar precios, necesitas saber **cuánto** se va a construir.  
 Con la **Calculadora de Materiales** de CivilesPro puedes:
 - Registrar medidas de planos o modelos 3D.  
-- Ajustar desperdicios y rendimientos.  
-- Guardar plantillas para reutilizarlas en futuros proyectos.
+- Ajustar medidas y hacer calculos.  
+- Guardar Memorias para reutilizarlas en futuros proyectos.
 
 Estas cantidades alimentan automáticamente los APU, garantizando que el presupuesto sea realista y actualizado.
 
@@ -61,9 +61,8 @@ Estas cantidades alimentan automáticamente los APU, garantizando que el presupu
 ## 4. Suma los costos y genera el total del proyecto
 
 Cada APU produce un **costo unitario**, que al multiplicarse por la cantidad de obra da un **subtotal**.  
-Luego se agregan:
 
-- **Costos directos:** materiales, mano de obra, equipos, transporte, etc.  
+- **Costos directos:** materiales, mano de obra, equipos, transporte, etc. 
 - **Costos indirectos:** administración, herramientas, imprevistos y gastos generales.  
 - **Utilidad:** margen del contratista.  
 - **Impuestos:** IVA u otros aplicables.
@@ -99,10 +98,10 @@ Un buen presupuesto de obra:
 - Nace de información confiable.  
 - Usa APU precisos y cantidades reales.  
 - Considera costos directos, indirectos e impuestos.  
-- Se entrega en formatos claros (Excel o PDF).  
+- Se entrega en formatos claros Excel   
 
 Con **CivilesPro** puedes hacerlo todo en un solo lugar:  
-crear APU, calcular materiales, consolidar capítulos y entregar presupuestos completos y listos para aprobar.
+crear APU, calcular materiales, y entregar presupuestos completos y listos para aprobar.
 
 [**Ir a la Calculadora de Materiales →**](/calculadora)
 
