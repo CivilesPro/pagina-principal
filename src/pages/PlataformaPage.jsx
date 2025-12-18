@@ -293,15 +293,15 @@ function RibbonTitle({ label, title }) {
       <div className="relative inline-flex items-center justify-center px-6 py-4">
         <div
           className={[
-            "absolute left-1/2 top-1/2 h-16 w-[320px] -translate-x-1/2 -translate-y-1/2 rotate-[-10deg] rounded-2xl bg-emerald-100/80 shadow-lg",
-            "transition-all duration-700 ease-out",
+            "absolute left-1/2 top-1/2 h-16 w-[320px] -translate-x-1/2 -translate-y-1/2 rotate-[-10deg] skew-x-[-12deg] rounded-2xl bg-gradient-to-r from-emerald-100/90 via-white/70 to-emerald-100/90 shadow-lg",
+            "transition-all duration-700 ease-out will-change-transform",
             visible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-16",
           ].join(" ")}
         />
         <div
           className={[
-            "absolute left-1/2 top-1/2 h-16 w-[340px] -translate-x-1/2 -translate-y-1/2 rotate-[-4deg] rounded-2xl bg-emerald-600 shadow-2xl",
-            "transition-all duration-700 ease-out",
+            "absolute left-1/2 top-1/2 h-16 w-[340px] -translate-x-1/2 -translate-y-1/2 rotate-[-4deg] skew-x-[-10deg] rounded-2xl bg-gradient-to-r from-emerald-700 via-emerald-600 to-emerald-700 shadow-2xl",
+            "transition-all duration-700 ease-out will-change-transform",
             visible ? "opacity-100 translate-x-0 delay-150" : "opacity-0 translate-x-16",
           ].join(" ")}
         />
@@ -325,12 +325,14 @@ function CalculationsSection() {
 
         <div className="mx-auto mt-10 max-w-5xl">
           <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-4 shadow-2xl backdrop-blur">
-            <div className="overflow-hidden rounded-2xl ring-1 ring-white/10">
-              <VideoLoop
-                webm="/calculos/calculos.webm"
-                poster="/calculos/calculos.png"
-                className="h-full w-full rounded-2xl"
-              />
+            <div className="relative overflow-hidden rounded-2xl ring-1 ring-white/10">
+              <div className="aspect-[16/9] w-full">
+                <VideoLoop
+                  webm="/calculos/calculos.webm"
+                  poster="/calculos/calculos.png"
+                  className="h-full w-full rounded-2xl object-cover"
+                />
+              </div>
             </div>
           </div>
         </div>
