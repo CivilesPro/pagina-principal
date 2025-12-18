@@ -23,6 +23,17 @@ const SITE_URL = "https://civilespro.com";
 const PRIMARY = "#055a27";
 const SECONDARY = "#111111ff";
 
+const PLAN_PRICING = {
+  plus: {
+    year: 140000,
+    wompiUrl: "https://checkout.wompi.co/l/2m52KY",
+  },
+  premium: {
+    year: 450000,
+    wompiUrl: "https://checkout.wompi.co/l/OsWsP5",
+  },
+};
+
 // Texto “role typing” que aparece en el hero
 
 
@@ -352,15 +363,15 @@ function Feature({ children, ok = false }) {
 }
 
 function Plans() {
-  // precios
-  const plusYear = 60000;
-  const premiumYear = 150000;
+  // precios centralizados
+  const plusYear = PLAN_PRICING.plus.year;
+  const premiumYear = PLAN_PRICING.premium.year;
 
   const formatCOP = (n) =>
     n.toLocaleString("es-CO", { maximumFractionDigits: 0, minimumFractionDigits: 0 });
 
-  const plusMonth = Math.round(plusYear / 12);       // ≈ $5.000 / mes
-  const premiumMonth = Math.round(premiumYear / 12); // ≈ $12.500 / mes
+  const plusMonth = Math.round(plusYear / 12);
+  const premiumMonth = Math.round(premiumYear / 12);
 
   return (
     <Reveal
@@ -412,7 +423,7 @@ function Plans() {
               </div>
 
               <a
-                href="https://checkout.wompi.co/l/vyKSFA"
+                href={PLAN_PRICING.plus.wompiUrl}
                 className="mt-7 inline-flex h-12 w-full items-center justify-center rounded-lg px-5 font-semibold text-white transition-colors"
                 style={{ backgroundColor: "#03a042ff" }}
               >
@@ -444,7 +455,7 @@ function Plans() {
 
                 {/* Ahorro vs mensual (sin decir % exacto) */}
                 <div className="mt-2 inline-flex items-center rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">
-                  Ahorra más del 70% si decides luego cambiar de plan
+                  Mejor precio pagando anual
                 </div>
               </div>
 
@@ -461,7 +472,7 @@ function Plans() {
               </div>
 
               <a
-                href="https://checkout.wompi.co/l/Wcbaj4"
+                href={PLAN_PRICING.premium.wompiUrl}
                 className="mt-7 inline-flex h-12 w-full items-center justify-center rounded-lg px-5 font-semibold text-white transition-colors"
                 style={{ backgroundColor: "#03a042ff" }}
               >

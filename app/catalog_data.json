@@ -50,8 +50,8 @@
   {
     "slug": "plataforma-civilespro",
     "title": "Plataforma CivilesPro (APU + Informes de Obra Diarios)",
-    "priceCop": 20000,
-    "priceCopYear": 150000,
+    "priceCop": 140000,
+    "priceCopYear": 450000,
     "fileKey": "plataforma-civilespro-plan.zip",
     "description": "Genera presupuestos con APU conectados + Informes de Obra Diarios en Excel. Plan mensual y anual."
   },

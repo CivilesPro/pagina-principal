@@ -109,8 +109,8 @@ const products = [
   {
     slug: "plataforma-civilespro",
     title: "Plataforma CivilesPro (BIBLIOTECA de APU + Informes de Obra Diarios)",
-    priceCop: 60000,
-    priceCopYear: 150000,
+    priceCop: 140000,
+    priceCopYear: 450000,
     image: "/productos/PRESUPUESTO.png",
     images: [
       "/productos/PRESUPUESTO.png",
