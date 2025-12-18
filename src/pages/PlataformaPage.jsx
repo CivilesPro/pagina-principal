@@ -270,8 +270,8 @@ function BenefitRow({
 function HowItWorks() {
   const steps = [
     {
-      title: "Estructura por capítulos",
-      text: "Crea Capitulos de Obra.",
+      title: "Calculadora de Materiales",
+      text: "Calcula cantidades de Materiales para cualquier trabajo.",
       icon: <LuListChecks className="h-5 w-5" aria-hidden="true" />,
     },
     {
@@ -323,10 +323,10 @@ function HowItWorks() {
                   <span>Privacidad</span>
                 </div>
                 <h3 className="text-xl font-black text-white">
-                  Tus presupuestos son <span className="underline decoration-white/30">Privados</span>.
+                  Tus presupuestos son <span className="decoration-white/10">Privados</span>.
                 </h3>
                 <p className="text-white/85">
-                  Nadie ve tus precios, APU o cantidades a menos que tú los compartas. Tu información está segura.
+                  Nadie ve tus precios, APU o cantidades los datos se guardan en tu navegador. Tu información está segura.
                 </p>
               </div>
             </div>
@@ -388,18 +388,19 @@ function Plans() {
                 <div className="mt-1 text-sm text-gray-500">Es igual a ${formatCOP(plusMonth)} / mes</div>
               </div>
 
-              <p className="mt-3 text-sm text-gray-600">Ideal para cotizar rápido con APU y exportar.</p>
+              <p className="mt-3 text-sm text-gray-600">Ideal para personas que deseen cotizar rápido.</p>
 
               <div className="mt-6 space-y-3">
                 <Feature ok>Presupuesto + APU</Feature>
                 <Feature ok>Exportar a Excel</Feature>
+                <Feature>Memorias de Cantidades</Feature>
                 <Feature>Cálculos</Feature>
                 <Feature>Registro Diario</Feature>
               </div>
 
               <a
                 href="https://checkout.wompi.co/l/vyKSFA"
-                className="mt-auto inline-flex h-12 w-full items-center justify-center rounded-lg px-5 font-semibold text-white transition-colors"
+                className="mt-7 inline-flex h-12 w-full items-center justify-center rounded-lg px-5 font-semibold text-white transition-colors"
                 style={{ backgroundColor: "#03a042ff" }}
               >
                 Activar Plus anual
@@ -435,12 +436,13 @@ function Plans() {
               </div>
 
               <p className="mt-3 text-sm text-gray-600">
-                Para obra completa: cálculo, presupuesto y registro.
+                Para empresas que manejan varias obras.
               </p>
 
               <div className="mt-6 space-y-3">
                 <Feature ok>Presupuesto + APU</Feature>
                 <Feature ok>Exportar a Excel</Feature>
+                <Feature ok>Memoria de Cantidades</Feature>
                 <Feature ok>Cálculos</Feature>
                 <Feature ok>Registro Diario</Feature>
               </div>
@@ -482,20 +484,20 @@ function PlanComparison() {
     // GRATIS (solo estas 4)
     { f: "Crear Presupuesto", free: true,  plus: true,  premium: true },
     { f: "Crear APU",         free: true,  plus: true,  premium: true },
-    { f: "Biblioteca de +180 APU", free: true, plus: true, premium: true },
+    { f: "Biblioteca de APU", free: true, plus: true, premium: true },
     { f: "Capítulos y partidas", free: true, plus: true, premium: true },
-
     // PLUS / PREMIUM
     { f: "Exportar presupuesto a Excel", free: false, plus: true,  premium: true },
+    { f: "Memorias de Cantidades", free: false, plus: false, premium: true },
 
     // PREMIUM extra
-    { f: "32 herramientas de cálculo",        free: false, plus: false, premium: true },
+    { f: "Calculadora de Materiales",        free: false, plus: false, premium: true },
     { f: "Generar consolidados",              free: false, plus: false, premium: true },
     { f: "Registro Diario",                   free: false, plus: false, premium: true },
-    { f: "Exportación Registro Diario a Excel", free: false, plus: false, premium: true },
+    
 
     // SOPORTE
-    { f: "Soporte", free: "Comunidad", plus: "Estándar", premium: "Prioritario" },
+    { f: "Soporte", free: false, plus: "Whatsapp", premium: "Prioritario" },
   ];
 
   return (
@@ -511,7 +513,7 @@ function PlanComparison() {
           <div className="mx-auto max-w-5xl overflow-hidden rounded-2xl border border-emerald-100 bg-white shadow-sm">
             {/* Cabecera */}
             <div className="grid grid-cols-4 border-b bg-emerald-50/40 px-4 py-3 text-sm font-semibold text-emerald-900">
-              <div>Características</div>
+              <div>Incluye</div>
               <div className="text-center">Gratis</div>
               <div className="text-center">Plus</div>
               <div className="text-center">Premium</div>
@@ -621,7 +623,7 @@ export default function PlataformaPage() {
                   className="btn"
                   style={{ backgroundColor: SECONDARY, borderColor: SECONDARY, color: "#fff" }}
                 >
-                  Crear cuenta gratis
+                  Comienza gratis
                 </a>
                 <a href="#planes" className="btn-outline" style={{ borderColor: SECONDARY, color: SECONDARY }}>
                   Ver planes
@@ -723,7 +725,7 @@ export default function PlataformaPage() {
                 className="btn"
                 style={{ backgroundColor: SECONDARY, borderColor: SECONDARY, color: "#fff" }}
               >
-                Crear cuenta Gratis
+                Comienza gratis
               </a>
               <a
                 href="https://wa.me/573127437848?text=Hola%2C%20quiero%20saber%20m%C3%A1s%20sobre%20la%20Plataforma%20de%20Presupuesto"
