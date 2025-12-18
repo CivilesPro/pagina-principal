@@ -264,37 +264,7 @@ function BenefitRow({
 
 
 
-function CalculationsVideoSection() {
-  const videoSrc = "/apuvideos/apu-interfaz.webm";
-  const poster = "/gif/beneficio-splitview.png";
 
-  return (
-    <section className="bg-white py-16">
-      <div className="wrap-wide px-4">
-        <div className="mx-auto mb-8 max-w-3xl text-center">
-          <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">Cálculos en acción</h2>
-          <p className="mt-2 text-gray-600">Visualiza la herramienta en pantalla completa.</p>
-        </div>
-
-        <div className="relative mx-auto max-w-7xl rounded-3xl">
-          <div
-            className="pointer-events-none absolute -left-6 -top-6 h-40 w-40 rounded-3xl bg-purple-400/30 blur-3xl"
-            aria-hidden="true"
-          />
-          <div className="relative overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-md">
-            <div className="aspect-[16/9] w-full">
-              <VideoLoop
-                webm={videoSrc}
-                poster={poster}
-                className="h-full w-full rounded-3xl object-cover"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
 
 
 function HowItWorks() {
@@ -722,7 +692,7 @@ export default function PlataformaPage() {
         </div>
       </section>
 
-      <CalculationsVideoSection />
+    
 
 
       {/* ===== Cómo funciona ===== */}
