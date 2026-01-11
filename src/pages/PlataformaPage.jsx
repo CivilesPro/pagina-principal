@@ -4,7 +4,7 @@ import { FaWhatsapp } from "react-icons/fa6";
 import { LuCalculator, LuDownload, LuListChecks, LuWallet, LuFileSpreadsheet, LuPercent, LuBuilding2, LuFileText, LuArrowRight, LuCopyCheck } from "react-icons/lu";
 import { LuUser } from "react-icons/lu";
 import SEO from "../components/SEO.jsx";
-import { LuCircleCheck, LuCircleX, LuCrown, LuLock } from "react-icons/lu";
+import { LuCircleCheck, LuCircleX, LuCrown, LuLock, LuUpload, LuChartLine, LuUsers } from "react-icons/lu";
 import Reveal from "../components/Reveal.jsx";
 import VideoLoop from "@/components/VideoLoop";
 import blogs from "../data/blogList.json";
@@ -103,18 +103,18 @@ function HeroScreens() {
     >
       {/* Imagen APU (debajo, izquierda) */}
       <img
-        src="/img/apu1.png"
+        src="/img/ejecutado.png"
         alt="Lista de APU"
-        className="absolute left-[-6%] top-[18%] w-100 md:w-[100%] rounded-2xl border  shadow-2xl"
+        className="absolute left-[-5%] top-[18%] w-100 md:w-[100%] rounded-2xl border border-4 shadow-2xl"
         style={tAPU}
         loading="eager"
       />
 
       {/* Imagen Presupuesto (encima, derecha) */}
       <img
-        src="/img/presupuesto1.png"
+        src="/img/presupuesto.png"
         alt="Presupuesto"
-        className="absolute right-[-6%] top-0 w-100 md:w-[100%] rounded-2xl border shadow-[0_20px_60px_rgba(0,0,0,0.18)]"
+        className="absolute right-[-6%] top-0 w-100 md:w-[100%] rounded-2xl border border-4 shadow-[0_20px_60px_rgba(0,0,0,0.18)]"
         style={tPresu}
         loading="eager"
       />
@@ -122,44 +122,7 @@ function HeroScreens() {
   );
 }
 
-function useTypewriter(words, speed = 90, pause = 900) {
-  const [index, setIndex] = useState(0);
-  const [typed, setTyped] = useState("");
-  useEffect(() => {
-    let mounted = true;
-    let i = 0;
-    let forward = true;
-    const loop = () => {
-      const current = words[index % words.length];
-      if (!mounted) return;
-      if (forward) {
-        if (i <= current.length) {
-          setTyped(current.slice(0, i));
-          i += 1;
-          setTimeout(loop, speed);
-        } else {
-          forward = false;
-          setTimeout(loop, pause);
-        }
-      } else {
-        if (i > 0) {
-          i -= 1;
-          setTyped(current.slice(0, i));
-          setTimeout(loop, speed / 2);
-        } else {
-          forward = true;
-          setIndex((p) => (p + 1) % words.length);
-          setTimeout(loop, speed);
-        }
-      }
-    };
-    loop();
-    return () => {
-      mounted = false;
-    };
-  }, [index, words, speed, pause]);
-  return typed;
-}
+
 
 function Stars({ value = 5 }) {
   return (
@@ -688,15 +651,15 @@ export default function PlataformaPage() {
             {/* Texto */}
             <div>
               <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-emerald-700">
-                <span className="text-xs font-semibold uppercase tracking-wide">El tiempo es dinero cuando se trata de contratos.</span>
+                <span className="text-xs font-semibold uppercase tracking-wide">Para no perder plata ni tiempo en obra.</span>
               </div>
               <h1 className="mt-4 text-4xl  font-black tracking-tight leading-tight text-gray-900 sm:text-5xl">
-              Crea presupuestos de Obra
+              Presupuesta, ejecuta y controla
                             <br />
-                <span className="text-emerald-700">Sin retrasarte en el cierre de contratos.</span>
+                <span className="text-emerald-700"> en un solo lugar.</span>
               </h1>
               <p className="mt-5 text-lg text-gray-700">
-                Utiliza/crea APU conectados al Presupuesto · Exporta a Excel
+               Presupuesto · Ejecutado · Control · Alertas · Exportación a Excel
               </p>
               <div className="mt-8 flex flex-col justify-start gap-3 sm:flex-row">
                 <a
@@ -726,61 +689,81 @@ export default function PlataformaPage() {
       <section className="py-16">
         <div className="wrap-wide px-4">
           <h2 className="text-center text-3xl font-extrabold text-gray-900 sm:text-4xl">
-            Beneficios para tu presupuesto
+            Beneficios para tu proyectos
           </h2>
 
           <div className="mx-auto mt-10 max-w-10xl space-y-10 snap-y">
             {[
               {
-                itemunico: "APU Faciles de hacer",
-                title: "Crea APU en Minutos  ",
-                text: "Mas 1500 insumos que incluyen: materiales, mano de obra, equipos y transporte. Con precios Actualizados.",
-                gif: "/gif/beneficio-apu-segundos.gif",
-                pngFallback: "/gif/beneficio-apu-segundos.png", 
-                videoWebm: "/apuvideos/apu-crear.webm",
-                poster: "/gif/beneficio-apu-segundos.png",
-                icon: <LuCalculator className="h-4 w-4" aria-hidden="true" />,
-              },
-              {
-                itemunico: "Listos para usar",
-                title: "Biblioteca de APU",
-                text: "Usa y edita nuestra biblioteca privada de APU. Todos con rendimientos listos para usar en tu presupuesto.",
-                gif: "/gif/beneficio-biblioteca-180.gif",
-                pngFallback: "/gif/beneficio-biblioteca-180.png",
-                videoWebm: "/apuvideos/apu-biblioteca.webm",
-                poster: "/gif/beneficio-biblioteca-180.png",
-                icon: <LuListChecks className="h-4 w-4" aria-hidden="true" />,
-              },
-              {
-                itemunico: "Interfaz fácil de usar",
-                title: "Crea un Presupuesto en una sola pantalla",
-                text: "Deja de perder tiempo buscando entre varias hojas de Excel. Nuestra interfaz está diseñada para ser rápida y fácil: APU a la izquierda, Presupuesto a la derecha.",
-                gif: "/gif/beneficio-splitview.gif",
-                pngFallback: "/gif/beneficio-splitview.png",
-                videoWebm: "/apuvideos/apu-interfaz.webm",
-                poster: "/gif/beneficio-splitview.png",
-                icon: <LuWallet className="h-4 w-4" aria-hidden="true" />,
-              },
-              {
-                itemunico: "Datos confiables",
-                title: "Memorias de Cantidades.",
-                text: "Agrega memorias de cantidades a cada APU que uses y conéctalas directamente con el presupuesto.",
-                gif: "/gif/memorias-cantidades.gif",
-                pngFallback: "/gif/memorias-cantidades.png",
-                videoWebm: "/apuvideos/memorias-cantidades.webm",
-                poster: "/gif/memorias-cantidades.png",
-                icon: <LuFileSpreadsheet className="h-4 w-4" aria-hidden="true" />,
-              },
-              {
-                itemunico: "Excel listo para presentar",
-                title: "Exporta a Excel",
-                text: "Lleva tu presupuesto, sus APU y Memorias de Cantidades a Excel con formulas y datos conectados.",
-                gif: "/gif/beneficio-export-excel.gif",
-                pngFallback: "/gif/beneficio-export-excel.png",
-                videoWebm: "/apuvideos/excel-exportar.webm",
-                poster: "/gif/beneficio-export-excel.png",
-                icon: <LuFileSpreadsheet className="h-4 w-4" aria-hidden="true" />,
-              },
+    itemunico: "Presupuestos en minutos",
+    title: "Crea presupuestos de obra en minutos",
+    text: "Elige un ítem de nuestra biblioteca de APU o créalo desde cero con más de 1500 insumos (materiales, mano de obra, equipos y transporte), con rendimientos editables. Todo en una sola pantalla.",
+    gif: "/gif/beneficio-apu-segundos.gif",
+    pngFallback: "/gif/beneficio-apu-segundos.png",
+    videoWebm: "/apuvideos/apu-crear.webm",
+    poster: "/gif/beneficio-apu-segundos.png",
+    icon: <LuCalculator className="h-4 w-4" aria-hidden="true" />,
+  },
+
+  // 2) NUEVO: Importación
+  {
+    itemunico: "Importa desde Excel",
+    title: "Importa tu presupuesto desde Excel",
+    text: "Si ya tienes un presupuesto armado, tráelo y empieza a controlar de inmediato. Sin volver a construirlo desde cero.",
+    gif: "/gif/beneficio-importar-excel.gif",
+    pngFallback: "/gif/beneficio-importar-excel.png",
+    videoWebm: "/apuvideos/importar-presupuesto.webm",
+    poster: "/gif/beneficio-importar-excel.png",
+    icon: <LuUpload className="h-4 w-4" aria-hidden="true" />,
+  },
+
+  // 3) Memorias
+  {
+    itemunico: "Datos confiables",
+    title: "Memorias de cantidades conectadas",
+    text: "Agrega memorias a cada APU y conéctalas directamente al presupuesto. Menos errores, más trazabilidad.",
+    gif: "/gif/memorias-cantidades.gif",
+    pngFallback: "/gif/memorias-cantidades.png",
+    videoWebm: "/apuvideos/memorias-cantidades.webm",
+    poster: "/gif/memorias-cantidades.png",
+    icon: <LuFileSpreadsheet className="h-4 w-4" aria-hidden="true" />,
+  },
+
+  // 4) NUEVO: Ejecutado + Control + Alertas
+  {
+    itemunico: "Control del proyecto",
+    title: "Ejecutado y control del proyecto",
+    text: "Registra el avance de la obra y detecta sobrecostos a tiempo. KPIs claros: EV (valor ganado) y Proyección al cierre (EAC).",
+    gif: "/gif/beneficio-control-proyecto.gif",
+    pngFallback: "/gif/beneficio-control-proyecto.png",
+    videoWebm: "/apuvideos/control-proyecto.webm",
+    poster: "/gif/beneficio-control-proyecto.png",
+    icon: <LuChartLine className="h-4 w-4" aria-hidden="true" />,
+  },
+
+  // 5) NUEVO: Equipos
+  {
+    itemunico: "Trabajo en equipo",
+    title: "Equipos y permisos",
+    text: "Comparte el proyecto con tu equipo con acceso controlado. Cada persona ve lo que necesita, sin ver o dañar detalles del presupuesto.",
+    gif: "/gif/beneficio-equipos.gif",
+    pngFallback: "/gif/beneficio-equipos.png",
+    videoWebm: "/apuvideos/equipos-permisos.webm",
+    poster: "/gif/beneficio-equipos.png",
+    icon: <LuUsers className="h-4 w-4" aria-hidden="true" />,
+  },
+
+  // 6) Export Excel
+  {
+    itemunico: "Excel listo para presentar",
+    title: "Exporta a Excel con fórmulas conectadas",
+    text: "Llévate presupuesto + APU + memorias a Excel listo para trabajar, con datos y fórmulas que se mantienen vinculados.",
+    gif: "/gif/beneficio-export-excel.gif",
+    pngFallback: "/gif/beneficio-export-excel.png",
+    videoWebm: "/apuvideos/excel-exportar.webm",
+    poster: "/gif/beneficio-export-excel.png",
+    icon: <LuFileSpreadsheet className="h-4 w-4" aria-hidden="true" />,
+  },
             ].map((b, i) => (
               <BenefitRow key={b.title} index={i} {...b} />
             ))}
