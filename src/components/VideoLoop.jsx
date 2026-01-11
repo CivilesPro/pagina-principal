@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function VideoLoop({ webm, mp4, poster, className }) {
+export default function VideoLoop({ webm, mp4, poster, className, onError }) {
   const ref = React.useRef(null);
   const [loaded, setLoaded] = React.useState(false);
 
@@ -76,11 +76,13 @@ export default function VideoLoop({ webm, mp4, poster, className }) {
     <video
       ref={ref}
       className={className}
+      autoPlay
       muted
       loop
       playsInline
-      preload="none"
+      preload="metadata"
       poster={poster}
+      onError={onError}
     />
   );
 }

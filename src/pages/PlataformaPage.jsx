@@ -84,6 +84,39 @@ function useParallaxPair() {
   return [ref, progress];
 }
 
+function useMediaQuery(query) {
+  const [matches, setMatches] = React.useState(() => {
+    if (typeof window === "undefined" || !window.matchMedia) {
+      return false;
+    }
+    return window.matchMedia(query).matches;
+  });
+
+  React.useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return;
+
+    const mediaQueryList = window.matchMedia(query);
+    const onChange = (event) => setMatches(event.matches);
+
+    setMatches(mediaQueryList.matches);
+    if (mediaQueryList.addEventListener) {
+      mediaQueryList.addEventListener("change", onChange);
+    } else {
+      mediaQueryList.addListener(onChange);
+    }
+
+    return () => {
+      if (mediaQueryList.removeEventListener) {
+        mediaQueryList.removeEventListener("change", onChange);
+      } else {
+        mediaQueryList.removeListener(onChange);
+      }
+    };
+  }, [query]);
+
+  return matches;
+}
+
 function HeroScreens() {
   const [ref, p] = useParallaxPair();
 
@@ -142,12 +175,16 @@ function BenefitRow({
   gif,
   pngFallback,
   videoWebm,
+  videoWebmMobile,
   poster,
   icon,
   index = 0,
 }) {
   const ref = React.useRef(null);
   const [visible, setVisible] = React.useState(false);
+  const [videoFailed, setVideoFailed] = React.useState(false);
+  const isMobile = useMediaQuery("(max-width: 768px)");
+  const videoSrc = isMobile && videoWebmMobile ? videoWebmMobile : videoWebm;
 
   React.useEffect(() => {
     const el = ref.current;
@@ -193,29 +230,29 @@ function BenefitRow({
             perspective: "1200px", // Profundidad 3D
           }}
         >
-          {videoWebm ? (
-            <div
-              className="order-1 md:order-none flex justify-center w-full  "
-              style={{ perspective: "1200px" }}
-            >
+          <div
+            className="relative w-full overflow-hidden rounded-2xl bg-white/60 shadow-md aspect-[9/16] md:aspect-[16/9]"
+            style={{ perspective: "1200px" }}
+          >
+            {videoSrc && !videoFailed ? (
               <VideoLoop
-                webm={videoWebm}
+                webm={videoSrc}
                 poster={poster}
-                className="w-full h-auto [clip-path:inset(2.3%_0%_2.7%_0%)] "
+                className="h-full w-full object-cover"
+                onError={() => setVideoFailed(true)}
               />
-            </div>
-          ) : (
-            <picture>
-              <source srcSet={gif} type="image/gif" />
-              <img
-                src={pngFallback || poster}
-                alt={title}
-                loading="lazy"
-                className="w-full max-w-6xl rounded-2xl shadow-2xl transform 
-                          rotate-y-[-15deg] rotate-x-[2deg] scale-[1.05]"
-              />
-            </picture>
-          )}
+            ) : (
+              <picture>
+                <source srcSet={gif} type="image/gif" />
+                <img
+                  src={pngFallback || poster}
+                  alt={title}
+                  loading="lazy"
+                  className="h-full w-full object-cover"
+                />
+              </picture>
+            )}
+          </div>
         </div>
 
         <div className="flex flex-col  items-start">
@@ -694,13 +731,14 @@ export default function PlataformaPage() {
 
           <div className="mx-auto mt-10 max-w-10xl space-y-10 snap-y">
             {[
-              {
+  {
     itemunico: "Presupuestos en minutos",
     title: "Crea presupuestos de obra en minutos",
     text: "Elige un ítem de nuestra biblioteca de APU o créalo desde cero con más de 1500 insumos (materiales, mano de obra, equipos y transporte), con rendimientos editables. Todo en una sola pantalla.",
     gif: "/gif/beneficio-apu-segundos.gif",
     pngFallback: "/gif/beneficio-apu-segundos.png",
     videoWebm: "/apuvideos/apu-crear.webm",
+    videoWebmMobile: null,
     poster: "/gif/beneficio-apu-segundos.png",
     icon: <LuCalculator className="h-4 w-4" aria-hidden="true" />,
   },
@@ -713,6 +751,7 @@ export default function PlataformaPage() {
     gif: "/gif/beneficio-importar-excel.gif",
     pngFallback: "/gif/beneficio-importar-excel.png",
     videoWebm: "/apuvideos/importar-presupuesto.webm",
+    videoWebmMobile: null,
     poster: "/gif/beneficio-importar-excel.png",
     icon: <LuUpload className="h-4 w-4" aria-hidden="true" />,
   },
@@ -725,6 +764,7 @@ export default function PlataformaPage() {
     gif: "/gif/memorias-cantidades.gif",
     pngFallback: "/gif/memorias-cantidades.png",
     videoWebm: "/apuvideos/memorias-cantidades.webm",
+    videoWebmMobile: null,
     poster: "/gif/memorias-cantidades.png",
     icon: <LuFileSpreadsheet className="h-4 w-4" aria-hidden="true" />,
   },
@@ -737,6 +777,7 @@ export default function PlataformaPage() {
     gif: "/gif/beneficio-control-proyecto.gif",
     pngFallback: "/gif/beneficio-control-proyecto.png",
     videoWebm: "/apuvideos/control-proyecto.webm",
+    videoWebmMobile: null,
     poster: "/gif/beneficio-control-proyecto.png",
     icon: <LuChartLine className="h-4 w-4" aria-hidden="true" />,
   },
@@ -749,6 +790,7 @@ export default function PlataformaPage() {
     gif: "/gif/beneficio-equipos.gif",
     pngFallback: "/gif/beneficio-equipos.png",
     videoWebm: "/apuvideos/equipos-permisos.webm",
+    videoWebmMobile: "/apuvideos/equipos-permisos-movil.webm",
     poster: "/gif/beneficio-equipos.png",
     icon: <LuUsers className="h-4 w-4" aria-hidden="true" />,
   },
@@ -761,6 +803,7 @@ export default function PlataformaPage() {
     gif: "/gif/beneficio-export-excel.gif",
     pngFallback: "/gif/beneficio-export-excel.png",
     videoWebm: "/apuvideos/excel-exportar.webm",
+    videoWebmMobile: null,
     poster: "/gif/beneficio-export-excel.png",
     icon: <LuFileSpreadsheet className="h-4 w-4" aria-hidden="true" />,
   },
