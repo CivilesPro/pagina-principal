@@ -4,7 +4,7 @@ import { FaWhatsapp } from "react-icons/fa6";
 import { LuCalculator, LuDownload, LuListChecks, LuWallet, LuFileSpreadsheet, LuPercent, LuBuilding2, LuFileText, LuArrowRight, LuCopyCheck } from "react-icons/lu";
 import { LuUser } from "react-icons/lu";
 import SEO from "../components/SEO.jsx";
-import { LuCircleCheck, LuCircleX, LuCrown, LuLock, LuUpload, LuChartLine, LuUsers } from "react-icons/lu";
+import { LuCircleCheck, LuCircleX, LuCrown, LuTriangleAlert, LuUpload, LuChartLine, LuUsers } from "react-icons/lu";
 import Reveal from "../components/Reveal.jsx";
 import VideoLoop from "@/components/VideoLoop";
 import blogs from "../data/blogList.json";
@@ -231,14 +231,14 @@ function BenefitRow({
           }}
         >
           <div
-            className="relative w-full overflow-hidden rounded-2xl bg-white/60 shadow-md aspect-[9/16] md:aspect-[16/9]"
+            className="relative w-full overflow-hidden bg-white/60  aspect-[9/16] md:aspect-[16/9]"
             style={{ perspective: "1200px" }}
           >
             {videoSrc && !videoFailed ? (
               <VideoLoop
                 webm={videoSrc}
                 poster={poster}
-                className="h-full w-full object-cover"
+                className="w-full h-full [clip-path:inset(2.3%_0%_2.7%_0%)]"
                 onError={() => setVideoFailed(true)}
               />
             ) : (
@@ -287,9 +287,9 @@ function HowItWorks() {
       icon: <LuListChecks className="h-5 w-5" aria-hidden="true" />,
     },
     {
-      title: "Aumenta tu rentabilidad",
-      text: "Agrega costos indirectos, directos y impuestos claros.",
-      icon: <LuCalculator className="h-5 w-5" aria-hidden="true" />,
+      title: "Recibe Alertas",
+      text: "Recibe alertas antes de tener sobrecostos.",
+      icon: <LuTriangleAlert className="h-5 w-5" aria-hidden="true" />,
     },
   ];
   return (
@@ -331,14 +331,14 @@ function HowItWorks() {
               <div className="pointer-events-none absolute inset-0 bg-white/10 blur-2xl" aria-hidden="true" />
               <div className="relative space-y-3">
                 <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-white ring-1 ring-white/20">
-                  <LuLock className="h-5 w-5" aria-hidden="true" />
-                  <span>Privacidad</span>
+                  <LuUsers className="h-5 w-5" aria-hidden="true" />
+                  <span>Equipos</span>
                 </div>
                 <h3 className="text-xl font-black text-white">
-                  Tus presupuestos son <span className="decoration-white/10">Privados</span>.
+                  Invita a tu equipo de trabajo.
                 </h3>
                 <p className="text-white/85">
-                  Nadie ve tus precios, APU o cantidades los datos se guardan en tu navegador. Tu información está segura.
+                 Comparte el proyecto con tu equipo con acceso controlado. Cada persona ve lo que necesita, sin ver o dañar detalles del presupuesto.
                 </p>
               </div>
             </div>
@@ -396,7 +396,7 @@ function Plans() {
       </div>
        <div className="wrap-wide px-4">
         <h2 className="text-center text-3xl font-extrabold text-gray-900 sm:text-4xl">Nuestros Planes</h2>
-        <p className="mt-1 text-center text-gray-600">Elige el plan mas apropiado para tu obra.</p>
+        <p className="mt-1 text-center text-gray-600">Elige un plan o inicia gratis hasta estar seguro.</p>
         <div className="mx-auto mt-10 grid max-w-5xl grid-cols-1 gap-6 sm:grid-cols-2">
           {/* -------- Plan Plus -------- */}
           <Reveal variant="slide-right" delay={80} once={false}>
@@ -417,9 +417,10 @@ function Plans() {
               <div className="mt-6 space-y-3">
                 <Feature ok>Presupuesto + APU</Feature>
                 <Feature ok>Exportar a Excel</Feature>
-                <Feature>Memorias de Cantidades</Feature>
+                <Feature ok>Administra 3 Proyectos</Feature>
                 <Feature>Cálculos</Feature>
                 <Feature>Registro Diario</Feature>
+                <Feature>Ejecutado y Control</Feature>
               </div>
 
               <a
@@ -464,11 +465,12 @@ function Plans() {
               </p>
 
               <div className="mt-6 space-y-3">
-                <Feature ok>Presupuesto + APU</Feature>
+              <Feature ok>Presupuesto + APU</Feature>
                 <Feature ok>Exportar a Excel</Feature>
-                <Feature ok>Memoria de Cantidades</Feature>
+                <Feature ok>Proyectos Ilimitados</Feature>
                 <Feature ok>Cálculos</Feature>
                 <Feature ok>Registro Diario</Feature>
+                <Feature ok>Ejecutado y Control</Feature>
               </div>
 
               <a
@@ -509,16 +511,17 @@ function PlanComparison() {
     { f: "Crear Presupuesto", free: true,  plus: true,  premium: true },
     { f: "Crear APU",         free: true,  plus: true,  premium: true },
     { f: "Biblioteca de APU", free: true, plus: true, premium: true },
-    { f: "Capítulos y partidas", free: true, plus: true, premium: true },
+    { f: "Calcula Concretos", free: true, plus: true, premium: true },
     // PLUS / PREMIUM
     { f: "Exportar presupuesto a Excel", free: false, plus: true,  premium: true },
     { f: "Memorias de Cantidades", free: false, plus: false, premium: true },
 
     // PREMIUM extra
     { f: "Calculadora de Materiales",        free: false, plus: false, premium: true },
-    { f: "Generar consolidados",              free: false, plus: false, premium: true },
+    { f: "Compartir con Equipos",              free: false, plus: false, premium: true },
     { f: "Registro Diario",                   free: false, plus: false, premium: true },
-    
+    { f: "Avance de Obra",                   free: false, plus: false, premium: true },
+    { f: "Control de Obra",                   free: false, plus: false, premium: true },
 
     // SOPORTE
     { f: "Soporte", free: false, plus: "Whatsapp", premium: "Prioritario" },
@@ -629,7 +632,7 @@ function RecommendedBlogs() {
             Blogs recomendados
           </p>
           <h2 className="mt-2 text-3xl font-black tracking-tight text-gray-900">
-            Sigue aprendiendo sobre presupuesto y APU
+            Sigue aprendiendo sobre Proyectos de Obra
           </h2>
           <p className="mt-3 text-base leading-relaxed text-gray-700 md:text-lg">
             Dos lecturas clave para profundizar en presupuestos de obra y análisis de precios unitarios.
@@ -738,7 +741,7 @@ export default function PlataformaPage() {
     gif: "/gif/beneficio-apu-segundos.gif",
     pngFallback: "/gif/beneficio-apu-segundos.png",
     videoWebm: "/apuvideos/apu-crear.webm",
-    videoWebmMobile: null,
+    videoWebmMobile: "/apuvideos/apu-crear-movil.webm",
     poster: "/gif/beneficio-apu-segundos.png",
     icon: <LuCalculator className="h-4 w-4" aria-hidden="true" />,
   },
@@ -751,7 +754,7 @@ export default function PlataformaPage() {
     gif: "/gif/beneficio-importar-excel.gif",
     pngFallback: "/gif/beneficio-importar-excel.png",
     videoWebm: "/apuvideos/importar-presupuesto.webm",
-    videoWebmMobile: null,
+    videoWebmMobile: "/apuvideos/importar-presupuesto-movil.webm",
     poster: "/gif/beneficio-importar-excel.png",
     icon: <LuUpload className="h-4 w-4" aria-hidden="true" />,
   },
@@ -764,7 +767,7 @@ export default function PlataformaPage() {
     gif: "/gif/memorias-cantidades.gif",
     pngFallback: "/gif/memorias-cantidades.png",
     videoWebm: "/apuvideos/memorias-cantidades.webm",
-    videoWebmMobile: null,
+    videoWebmMobile: "/apuvideos/memorias-cantidades-movil.webm",
     poster: "/gif/memorias-cantidades.png",
     icon: <LuFileSpreadsheet className="h-4 w-4" aria-hidden="true" />,
   },
@@ -777,33 +780,21 @@ export default function PlataformaPage() {
     gif: "/gif/beneficio-control-proyecto.gif",
     pngFallback: "/gif/beneficio-control-proyecto.png",
     videoWebm: "/apuvideos/control-proyecto.webm",
-    videoWebmMobile: null,
+    videoWebmMobile: "/apuvideos/control-proyecto-movil.webm",
     poster: "/gif/beneficio-control-proyecto.png",
     icon: <LuChartLine className="h-4 w-4" aria-hidden="true" />,
   },
 
-  // 5) NUEVO: Equipos
-  {
-    itemunico: "Trabajo en equipo",
-    title: "Equipos y permisos",
-    text: "Comparte el proyecto con tu equipo con acceso controlado. Cada persona ve lo que necesita, sin ver o dañar detalles del presupuesto.",
-    gif: "/gif/beneficio-equipos.gif",
-    pngFallback: "/gif/beneficio-equipos.png",
-    videoWebm: "/apuvideos/equipos-permisos.webm",
-    videoWebmMobile: "/apuvideos/equipos-permisos-movil.webm",
-    poster: "/gif/beneficio-equipos.png",
-    icon: <LuUsers className="h-4 w-4" aria-hidden="true" />,
-  },
 
   // 6) Export Excel
   {
     itemunico: "Excel listo para presentar",
     title: "Exporta a Excel con fórmulas conectadas",
-    text: "Llévate presupuesto + APU + memorias a Excel listo para trabajar, con datos y fórmulas que se mantienen vinculados.",
+    text: "Llévate presupuesto + APU + memorias a Excel listo para trabajar, con hojas y formulas anidadas.",
     gif: "/gif/beneficio-export-excel.gif",
     pngFallback: "/gif/beneficio-export-excel.png",
     videoWebm: "/apuvideos/excel-exportar.webm",
-    videoWebmMobile: null,
+    videoWebmMobile: "/apuvideos/excel-exportar-movil.webm",
     poster: "/gif/beneficio-export-excel.png",
     icon: <LuFileSpreadsheet className="h-4 w-4" aria-hidden="true" />,
   },
