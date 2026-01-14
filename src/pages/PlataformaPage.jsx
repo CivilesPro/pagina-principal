@@ -117,6 +117,77 @@ function useMediaQuery(query) {
   return matches;
 }
 
+function usePrefersReducedMotion() {
+  const [prefersReducedMotion, setPrefersReducedMotion] = React.useState(() => {
+    if (typeof window === "undefined" || !window.matchMedia) {
+      return false;
+    }
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  });
+
+  React.useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return;
+
+    const mediaQueryList = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const onChange = (event) => setPrefersReducedMotion(event.matches);
+
+    setPrefersReducedMotion(mediaQueryList.matches);
+    if (mediaQueryList.addEventListener) {
+      mediaQueryList.addEventListener("change", onChange);
+    } else {
+      mediaQueryList.addListener(onChange);
+    }
+
+    return () => {
+      if (mediaQueryList.removeEventListener) {
+        mediaQueryList.removeEventListener("change", onChange);
+      } else {
+        mediaQueryList.removeListener(onChange);
+      }
+    };
+  }, []);
+
+  return prefersReducedMotion;
+}
+
+function useCountUp(target, start, durationMs, reduceMotion = false) {
+  const [value, setValue] = React.useState(() => (
+    start || reduceMotion ? target : 0
+  ));
+
+  React.useEffect(() => {
+    if (!start || reduceMotion) {
+      if (reduceMotion) {
+        setValue(target);
+      }
+      return;
+    }
+
+    let rafId = 0;
+    const startTime = performance.now();
+    const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+
+    const tick = (now) => {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / durationMs, 1);
+      const eased = easeOutCubic(progress);
+      const nextValue = Math.round(target * eased);
+
+      setValue(nextValue);
+      if (progress < 1) {
+        rafId = requestAnimationFrame(tick);
+      }
+    };
+
+    rafId = requestAnimationFrame(tick);
+    return () => {
+      if (rafId) cancelAnimationFrame(rafId);
+    };
+  }, [target, start, durationMs, reduceMotion]);
+
+  return start || reduceMotion ? value : 0;
+}
+
 function HeroScreens() {
   const [ref, p] = useParallaxPair();
 
@@ -168,23 +239,9 @@ function Stars({ value = 5 }) {
 }
 
 // Beneficio con GIF a la izquierda y texto a la derecha
-function BenefitRow({
-  title,
-  text,
-  itemunico,
-  gif,
-  pngFallback,
-  videoWebm,
-  videoWebmMobile,
-  poster,
-  icon,
-  index = 0,
-}) {
+function useBenefitVisibility() {
   const ref = React.useRef(null);
   const [visible, setVisible] = React.useState(false);
-  const [videoFailed, setVideoFailed] = React.useState(false);
-  const isMobile = useMediaQuery("(max-width: 768px)");
-  const videoSrc = isMobile && videoWebmMobile ? videoWebmMobile : videoWebm;
 
   React.useEffect(() => {
     const el = ref.current;
@@ -192,12 +249,11 @@ function BenefitRow({
 
     const io = new IntersectionObserver(
       ([entry]) => {
-        // visible solo cuando la tarjeta está mayormente en viewport
+        // visible solo cuando la tarjeta esta mayormente en viewport
         setVisible(entry.isIntersecting && entry.intersectionRatio >= 0.6);
       },
       {
         root: null,
-        // deja un margen para que “prenda” cerca del centro
         rootMargin: "-10% 0px -10% 0px",
         threshold: [0, 0.6, 1],
       }
@@ -207,65 +263,120 @@ function BenefitRow({
     return () => io.disconnect();
   }, []);
 
+  return { ref, visible };
+}
+
+function BenefitCard({
+  title,
+  text,
+  itemunico,
+  gif,
+  pngFallback,
+  videoWebm,
+  videoWebmMobile,
+  poster,
+  icon,
+}) {
+  const [videoFailed, setVideoFailed] = React.useState(false);
+  const isMobile = useMediaQuery("(max-width: 768px)");
+
+  const videoSrc = isMobile && videoWebmMobile ? videoWebmMobile : videoWebm;
+
   return (
-    // Min-height grande para que cada tarjeta “ocupe” la vista
+    <div className="grid grid-cols-1 items-center gap-6 rounded-2xl bg-white p-4 sm:p-6 md:grid-cols-[70%_30%]">
+      <div
+        className="order-1 md:order-none hidden md:flex justify-center"
+        style={{
+          perspective: "1200px", // Profundidad 3D
+        }}
+      >
+        <div
+          className="relative w-full overflow-hidden bg-white/60 aspect-[9/16] md:aspect-[16/9]"
+          style={{ perspective: "1200px" }}
+        >
+          {videoSrc && !videoFailed ? (
+            <VideoLoop
+              webm={videoSrc}
+              poster={poster}
+              className="w-full h-full [clip-path:inset(0%_1%_0%_1%)] md:[clip-path:inset(2.3%_0%_2.7%_0%)]"
+              onError={() => setVideoFailed(true)}
+            />
+          ) : (
+            <picture>
+              <source srcSet={gif} type="image/gif" />
+              <img
+                src={pngFallback || poster}
+                alt={title}
+                loading="lazy"
+                className="h-full w-full object-cover"
+              />
+            </picture>
+          )}
+        </div>
+      </div>
+
+      <div className="flex flex-col items-start">
+        <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-emerald-700">
+          {icon}
+          <span className="text-xs font-semibold uppercase tracking-wide">
+            {itemunico}
+          </span>
+        </div>
+        <h3 className="text-xl font-extrabold text-gray-900 sm:text-2xl">
+          {title}
+        </h3>
+        <p className="mt-2 text-gray-700">{text}</p>
+      </div>
+    </div>
+  );
+}
+
+function BenefitRow({ index = 0, ...benefit }) {
+  const { ref, visible } = useBenefitVisibility();
+
+  return (
     <section
       ref={ref}
-      className="min-h-[70vh] md:min-h-[65vh] flex items-center snap-start"
+      className="py-10 md:py-0 md:min-h-[65vh] flex items-start md:items-center md:snap-start"
       aria-hidden={!visible}
     >
       <div
         className={[
-          "grid grid-cols-1 items-center gap-6 rounded-2xl  bg-white p-4 sm:p-6 md:grid-cols-[70%_30%]",
           "transition-all duration-700 will-change-transform",
           visible
             ? "opacity-100 translate-y-0 scale-100"
             : "opacity-0 translate-y-8 scale-[0.98]",
         ].join(" ")}
-        style={{ transitionDelay: `${Math.min(index * 60, 240)}ms` }} // leve “stagger”
+        style={{ transitionDelay: `${Math.min(index * 60, 240)}ms` }}
       >
-        <div
-          className=" order-1 md:order-none flex justify-center"
-          style={{
-            perspective: "1200px", // Profundidad 3D
-          }}
-        >
-          <div
-            className="relative w-full overflow-hidden bg-white/60  aspect-[9/16] md:aspect-[16/9]"
-            style={{ perspective: "1200px" }}
-          >
-            {videoSrc && !videoFailed ? (
-              <VideoLoop
-                webm={videoSrc}
-                poster={poster}
-                className="w-full h-full [clip-path:inset(2.3%_0%_2.7%_0%)]"
-                onError={() => setVideoFailed(true)}
-              />
-            ) : (
-              <picture>
-                <source srcSet={gif} type="image/gif" />
-                <img
-                  src={pngFallback || poster}
-                  alt={title}
-                  loading="lazy"
-                  className="h-full w-full object-cover"
-                />
-              </picture>
-            )}
-          </div>
-        </div>
+        <BenefitCard {...benefit} />
+      </div>
+    </section>
+  );
+}
 
-        <div className="flex flex-col  items-start">
-          <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-emerald-700">
-            {icon}
-            <span className="text-xs font-semibold uppercase tracking-wide">
-              {itemunico}
-            </span>
-          </div>
-          <h3 className="text-xl font-extrabold text-gray-900 sm:text-2xl">
-            {title}
-          </h3>
-          <p className="mt-2 text-gray-700">{text}</p>
+function BenefitPair({ items, index = 0 }) {
+  const { ref, visible } = useBenefitVisibility();
+
+  return (
+    <section
+      ref={ref}
+      className="py-10 md:py-0 md:min-h-[65vh] flex items-start md:items-center md:snap-start"
+      aria-hidden={!visible}
+    >
+      <div
+        className={[
+          "transition-all duration-700 will-change-transform",
+          visible
+            ? "opacity-100 translate-y-0 scale-100"
+            : "opacity-0 translate-y-8 scale-[0.98]",
+        ].join(" ")}
+        style={{ transitionDelay: `${Math.min(index * 60, 240)}ms` }}
+      >
+        <div className="flex flex-col justify-center gap-4">
+          {items.map((benefit) => (
+            <BenefitCard key={benefit.title} {...benefit} />
+          ))}
         </div>
       </div>
     </section>
@@ -276,14 +387,11 @@ function BenefitRow({
 
 
 
-
-
-
 function HowItWorks() {
   const steps = [
     {
       title: "Calculadora de Materiales",
-      text: "Calcula cantidades de Materiales para cualquier trabajo.",
+      text: "Calcula cantidades de Materiales de tus proyectos.",
       icon: <LuListChecks className="h-5 w-5" aria-hidden="true" />,
     },
     {
@@ -537,6 +645,7 @@ function PlanComparison() {
     >
       <div className="wrap-wide px-4">
         <Reveal variant="fade-up" delay={80} once={false}>
+          <h2 className="text-center text-3xl mb-2 font-extrabold text-gray-900 sm:text-4xl">Compara los planes</h2>
           <div className="mx-auto max-w-5xl overflow-hidden rounded-2xl border border-emerald-100 bg-white shadow-sm">
             {/* Cabecera */}
             <div className="grid grid-cols-4 border-b bg-emerald-50/40 px-4 py-3 text-sm font-semibold text-emerald-900">
@@ -669,11 +778,129 @@ export default function PlataformaPage() {
 
   const { pathname } = useLocation();
   const canonicalPath = pathname === "/presupuesto" ? "/presupuesto" : "/plataforma";
+  const isMobile = useMediaQuery("(max-width: 768px)");
+
+  const prefersReducedMotion = usePrefersReducedMotion();
+  const kpiRef = React.useRef(null);
+  const [kpiInView, setKpiInView] = React.useState(prefersReducedMotion);
+
 
   // Scroll al top cuando se entra a la página
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [pathname]);
+
+
+  React.useEffect(() => {
+    if (prefersReducedMotion) {
+      setKpiInView(true);
+      return;
+    }
+    if (kpiInView) return;
+
+    const el = kpiRef.current;
+    if (!el) return;
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setKpiInView(true);
+          io.disconnect();
+        }
+      },
+      {
+        root: null,
+        rootMargin: "0px 0px -10% 0px",
+        threshold: 0.35,
+      }
+    );
+
+    io.observe(el);
+    return () => io.disconnect();
+  }, [prefersReducedMotion, kpiInView]);
+
+  const benefits = [
+    {
+  itemunico: "Presupuestos en minutos",
+  title: "Crea presupuestos de obra en minutos",
+  text: "Elige un ítem de nuestra biblioteca de APU o créalo desde cero con más de 1500 insumos (materiales, mano de obra, equipos y transporte), con rendimientos editables. Todo en una sola pantalla.",
+  gif: "/gif/beneficio-apu-segundos.gif",
+  pngFallback: "/gif/beneficio-apu-segundos.png",
+  videoWebm: "/apuvideos/apu-crear.webm",
+  videoWebmMobile: "/apuvideos/apu-crear-movil.webm",
+  poster: "/gif/beneficio-apu-segundos.png",
+  icon: <LuCalculator className="h-4 w-4" aria-hidden="true" />,
+},
+
+// 2) NUEVO: Importación
+{
+  itemunico: "Importa desde Excel",
+  title: "Importa tu presupuesto desde Excel",
+  text: "Si ya tienes un presupuesto armado, tráelo y empieza a controlar de inmediato. Sin volver a construirlo desde cero.",
+  gif: "/gif/beneficio-importar-excel.gif",
+  pngFallback: "/gif/beneficio-importar-excel.png",
+  videoWebm: "/apuvideos/importar-presupuesto.webm",
+  videoWebmMobile: "/apuvideos/importar-presupuesto-movil.webm",
+  poster: "/gif/beneficio-importar-excel.png",
+  icon: <LuUpload className="h-4 w-4" aria-hidden="true" />,
+},
+
+// 3) Memorias
+{
+  itemunico: "Datos confiables",
+  title: "Memorias de cantidades conectadas",
+  text: "Agrega memorias a cada APU y conéctalas directamente al presupuesto. Menos errores, más trazabilidad.",
+  gif: "/gif/memorias-cantidades.gif",
+  pngFallback: "/gif/memorias-cantidades.png",
+  videoWebm: "/apuvideos/memorias-cantidades.webm",
+  videoWebmMobile: "/apuvideos/memorias-cantidades-movil.webm",
+  poster: "/gif/memorias-cantidades.png",
+  icon: <LuFileSpreadsheet className="h-4 w-4" aria-hidden="true" />,
+},
+
+// 4) NUEVO: Ejecutado + Control + Alertas
+{
+  itemunico: "Control del proyecto",
+  title: "Ejecutado y control del proyecto",
+  text: "Registra el avance de la obra y detecta sobrecostos a tiempo. KPIs claros: EV (valor ganado) y Proyección al cierre (EAC).",
+  gif: "/gif/beneficio-control-proyecto.gif",
+  pngFallback: "/gif/beneficio-control-proyecto.png",
+  videoWebm: "/apuvideos/control-proyecto.webm",
+  videoWebmMobile: "/apuvideos/control-proyecto-movil.webm",
+  poster: "/gif/beneficio-control-proyecto.png",
+  icon: <LuChartLine className="h-4 w-4" aria-hidden="true" />,
+},
+
+// 6) Export Excel
+{
+  itemunico: "Excel listo para presentar",
+  title: "Exporta a Excel con fórmulas conectadas",
+  text: "Llévate presupuesto + APU + memorias a Excel listo para trabajar, con hojas y fórmulas anidadas.",
+  gif: "/gif/beneficio-export-excel.gif",
+  pngFallback: "/gif/beneficio-export-excel.png",
+  videoWebm: "/apuvideos/excel-exportar.webm",
+  videoWebmMobile: "/apuvideos/excel-exportar-movil.webm",
+  poster: "/gif/beneficio-export-excel.png",
+  icon: <LuFileSpreadsheet className="h-4 w-4" aria-hidden="true" />,
+},
+
+  ];
+
+  const benefitPairs = [];
+  for (let i = 0; i < benefits.length; i += 2) {
+    benefitPairs.push(benefits.slice(i, i + 2));
+  }
+
+
+  const dias = useCountUp(2, kpiInView, 900, prefersReducedMotion);
+  const mins = useCountUp(20, kpiInView, 1100, prefersReducedMotion);
+
+  const kpiMotionClass = prefersReducedMotion
+    ? ""
+    : "transition-all duration-500 ease-out";
+  const kpiRevealClass = kpiInView
+    ? "opacity-100 translate-y-0"
+    : "opacity-0 translate-y-3";
 
   return (
     <>
@@ -732,80 +959,121 @@ export default function PlataformaPage() {
             Beneficios para tu proyectos
           </h2>
 
-          <div className="mx-auto mt-10 max-w-10xl space-y-10 snap-y">
-            {[
-  {
-    itemunico: "Presupuestos en minutos",
-    title: "Crea presupuestos de obra en minutos",
-    text: "Elige un ítem de nuestra biblioteca de APU o créalo desde cero con más de 1500 insumos (materiales, mano de obra, equipos y transporte), con rendimientos editables. Todo en una sola pantalla.",
-    gif: "/gif/beneficio-apu-segundos.gif",
-    pngFallback: "/gif/beneficio-apu-segundos.png",
-    videoWebm: "/apuvideos/apu-crear.webm",
-    videoWebmMobile: "/apuvideos/apu-crear-movil.webm",
-    poster: "/gif/beneficio-apu-segundos.png",
-    icon: <LuCalculator className="h-4 w-4" aria-hidden="true" />,
-  },
-
-  // 2) NUEVO: Importación
-  {
-    itemunico: "Importa desde Excel",
-    title: "Importa tu presupuesto desde Excel",
-    text: "Si ya tienes un presupuesto armado, tráelo y empieza a controlar de inmediato. Sin volver a construirlo desde cero.",
-    gif: "/gif/beneficio-importar-excel.gif",
-    pngFallback: "/gif/beneficio-importar-excel.png",
-    videoWebm: "/apuvideos/importar-presupuesto.webm",
-    videoWebmMobile: "/apuvideos/importar-presupuesto-movil.webm",
-    poster: "/gif/beneficio-importar-excel.png",
-    icon: <LuUpload className="h-4 w-4" aria-hidden="true" />,
-  },
-
-  // 3) Memorias
-  {
-    itemunico: "Datos confiables",
-    title: "Memorias de cantidades conectadas",
-    text: "Agrega memorias a cada APU y conéctalas directamente al presupuesto. Menos errores, más trazabilidad.",
-    gif: "/gif/memorias-cantidades.gif",
-    pngFallback: "/gif/memorias-cantidades.png",
-    videoWebm: "/apuvideos/memorias-cantidades.webm",
-    videoWebmMobile: "/apuvideos/memorias-cantidades-movil.webm",
-    poster: "/gif/memorias-cantidades.png",
-    icon: <LuFileSpreadsheet className="h-4 w-4" aria-hidden="true" />,
-  },
-
-  // 4) NUEVO: Ejecutado + Control + Alertas
-  {
-    itemunico: "Control del proyecto",
-    title: "Ejecutado y control del proyecto",
-    text: "Registra el avance de la obra y detecta sobrecostos a tiempo. KPIs claros: EV (valor ganado) y Proyección al cierre (EAC).",
-    gif: "/gif/beneficio-control-proyecto.gif",
-    pngFallback: "/gif/beneficio-control-proyecto.png",
-    videoWebm: "/apuvideos/control-proyecto.webm",
-    videoWebmMobile: "/apuvideos/control-proyecto-movil.webm",
-    poster: "/gif/beneficio-control-proyecto.png",
-    icon: <LuChartLine className="h-4 w-4" aria-hidden="true" />,
-  },
-
-
-  // 6) Export Excel
-  {
-    itemunico: "Excel listo para presentar",
-    title: "Exporta a Excel con fórmulas conectadas",
-    text: "Llévate presupuesto + APU + memorias a Excel listo para trabajar, con hojas y formulas anidadas.",
-    gif: "/gif/beneficio-export-excel.gif",
-    pngFallback: "/gif/beneficio-export-excel.png",
-    videoWebm: "/apuvideos/excel-exportar.webm",
-    videoWebmMobile: "/apuvideos/excel-exportar-movil.webm",
-    poster: "/gif/beneficio-export-excel.png",
-    icon: <LuFileSpreadsheet className="h-4 w-4" aria-hidden="true" />,
-  },
-            ].map((b, i) => (
-              <BenefitRow key={b.title} index={i} {...b} />
-            ))}
+          <div className="mx-auto mt-10 max-w-10xl space-y-10 md:snap-y">
+            {isMobile
+              ? benefitPairs.map((pair, i) => (
+                  <BenefitPair key={pair[0].title} items={pair} index={i} />
+                ))
+              : benefits.map((b, i) => (
+                  <BenefitRow key={b.title} index={i} {...b} />
+                ))}
           </div>
         </div>
       </section>
 
     
+
+
+      {/* ===== KPIs (solo movil) ===== */}
+      <section className="md:hidden">
+        <Reveal variant="blur-up" delay={100} once={false}>
+        <div className="wrap-wide px-4">
+          <div
+            ref={kpiRef}
+            className={[
+              "relative overflow-hidden rounded-3xl bg-white p-6",
+              kpiMotionClass,
+              kpiRevealClass,
+            ].join(" ")}
+          >
+            {/* glow */}
+            <div
+              className="pointer-events-none absolute -right-14 -top-14 h-52 w-20 rounded-full bg-emerald-300/30 blur-3xl"
+              aria-hidden="true"
+            />
+
+            <p
+              className={[
+                "text-center text-[12px] font-semibold uppercase tracking-[0.22em] text-gray-800",
+                kpiMotionClass,
+                kpiRevealClass,
+              ].join(" ")}
+              style={{ transitionDelay: prefersReducedMotion ? "0ms" : "80ms" }}
+            >
+              TIEMPO PROMEDIO PARA ARMAR UN PRESUPUESTO
+            </p>
+
+            <div className="relative mt-6 grid grid-cols-2 gap-6">
+              {/* Divider (SIEMPRE visible) */}
+              <div
+                className="pointer-events-none absolute inset-y-2 left-1/2 w-px -translate-x-1/2 bg-gradient-to-b from-transparent via-emerald-200/90 to-transparent"
+                aria-hidden="true"
+              />
+
+              {/* VS badge (SIEMPRE visible) */}
+              <div
+                className={[
+                  "pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-emerald-100 bg-white/85 px-2.5 py-1 text-[10px] font-extrabold tracking-[0.25em] text-emerald-800 shadow-[0_10px_25px_-18px_rgba(16,185,129,0.8)] backdrop-blur",
+                  kpiMotionClass,
+                  kpiRevealClass,
+                ].join(" ")}
+                style={{ transitionDelay: prefersReducedMotion ? "0ms" : "180ms" }}
+                aria-hidden="true"
+              >
+                VS
+              </div>
+
+              {/* Metodo comun */}
+              <div
+                className={[
+                  "text-center",
+                  kpiMotionClass,
+                  kpiRevealClass,
+                ].join(" ")}
+                style={{ transitionDelay: prefersReducedMotion ? "0ms" : "160ms" }}
+              >
+                <div className="text-sm font-medium text-gray-800">Metodo comun</div>
+
+                <div className="mt-3 flex items-center justify-center">
+                  <div className="flex items-end leading-none">
+                    <span className="text-6xl font-black tracking-tight text-gray-900 tabular-nums">{dias}</span>
+                    <span className="ml-2 pb-[6px] text-3xl font-black tracking-tight text-gray-900">
+                      dias
+                    </span>
+                  </div>
+                </div>
+
+                <p className="mt-2 text-[12px] text-gray-600">
+                  Varias hojas de excel, formulas rotas y errores humanos.
+                </p>
+              </div>
+
+              {/* Con Civiles Pro */}
+              <div
+                className={[
+                  "text-center",
+                  kpiMotionClass,
+                  kpiRevealClass,
+                ].join(" ")}
+                style={{ transitionDelay: prefersReducedMotion ? "0ms" : "220ms" }}
+              >
+                <div className="text-sm font-medium text-gray-800">Con Civiles Pro</div>
+
+                <div className="mt-3 flex items-center justify-center gap-2 leading-none">
+                  <span className="text-6xl font-black tracking-tight text-gray-900 ml-5 tabular-nums">{mins}</span>
+                  <span className="text-3xl font-black tracking-tight text-gray-900">min.</span>
+                </div>
+
+                <p className="mt-2 text-[12px] text-gray-600">
+                  Con APU conectados y exportación a Excel (Final)
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        </Reveal>
+      </section>
+
 
 
       {/* ===== Cómo funciona ===== */}
